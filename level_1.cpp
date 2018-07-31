@@ -1,11 +1,11 @@
-/*! \file game.cpp
+/*! \file level_1.cpp
  * \brief
  * \author Kevin Somervill < kevin @ somervill dot org >
  * \date 2018-07-29
  */
 
 #include <allegro5/allegro.h>
-#include "game.h"
+#include "level_1.h"
 
 #include <random>
 #include <iostream>
@@ -13,12 +13,10 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
-#include "level_1.h"
-
-game::game() {
+level_1::level_1() {
   display = NULL;
-  //event_queue = NULL;
-  //timer = NULL;
+  event_queue = NULL;
+  timer = NULL;
   
   hero = NULL;
 
@@ -26,46 +24,36 @@ game::game() {
   total_foes = 0;
 }
 
-game::game(float w, float h) {
+level_1::~level_1() {
 
 }
 
+bool level_1::play(ALLEGRO_DISPLAY *d) {
+  display = d;
 
-bool game::init() {
-
-  cout << "Initializing game..." << endl;
-
-  if(!al_init()) {
-    cerr << "failed to initialize allegro!" << endl;
+  if (! this->init()) {
     return false;
   }
-  
-  if(!al_install_keyboard()) {
-    cerr << "failed to initialize the keyboard!" << endl;
-    return false;
-  }
+  this->play_level();
+  print_stats();
+  end_level();
 
-  display = al_create_display(SCREEN_W, SCREEN_H);
-  if(!display) {
-    cerr << "failed to create display!" << endl;
-    return false;
-  }
-  //end game init
-  /*
+  return true;
+}//end level_1::play()
+
+
+bool level_1::init() {
 
   timer = al_create_timer(1.0/FPS);
   if(!timer) {
     cerr << "failed to create timer!" << endl;
-    al_destroy_display(display);
     return false;
   }
- 
  
   hero = new fighter();
   if (!hero->create_bitmap(SPRITE_SIZE, SPRITE_SIZE)) {
   //if (!hero->create_bitmap("sprites/hero.png")) 
     cerr << "failed to create hero bitmap!" << endl;
-    al_destroy_display(display);
     al_destroy_timer(timer);
     return false;
   }
@@ -76,7 +64,6 @@ bool game::init() {
   if (!init_foes(foes, 16)) {
     cerr << "failed to create foes!" << endl;
     delete hero;
-    al_destroy_display(display);
     al_destroy_timer(timer);
     return false;
   }
@@ -87,7 +74,6 @@ bool game::init() {
   if(!event_queue) {
     cerr << "failed to create event_queue!" << endl;
     delete hero;
-    al_destroy_display(display);
     al_destroy_timer(timer);
     return false;
   }
@@ -99,18 +85,12 @@ bool game::init() {
   al_clear_to_color(al_map_rgb(0,0,0));
  
   al_flip_display();
-  */
 
   return true;
-}//end game::init()
+}//end level_1::init()
  
-void game::play() {
-  level_1 *l = new level_1();
-  l->play(display);
-}
 
-/*
-void game::play() {
+void level_1::play_level() {
   //const float max_accel = 4;
   //const float max_vel = 8;
   float vel_x = 4.0;
@@ -269,24 +249,22 @@ void game::play() {
       this->redraw(y_max);
     }
   }//end while(playing)
-}//end game::play()
-*/
+}//end level_1::play_level()
 
-void game::print_score() {
+void level_1::print_stats() {
   float kill_eff = float(hits)*100.0/total_foes;
   cout << "So how did you do?" << endl;
   cout << "  Total foes: " << total_foes << endl;
   cout << "  Total hits: " << hits << " (eff: ";
   cout.precision(2);
   cout << std::fixed << kill_eff << "%)" << endl;
-}//end game::print_score()
+}//end level_1::print_stats()
  
-void game::end() {
+void level_1::end_level() {
   if (hero) {
     delete hero;
   }
 
-  /*
   for (auto &f: foes) {
     if (f) {
       delete f;
@@ -300,17 +278,11 @@ void game::end() {
   if (event_queue) {
     al_destroy_event_queue(event_queue);
   }
-  */
-
-  if (display) {
-    al_destroy_display(display);
-  }
 
   return;
-}//end game::end()
+}//end level_1::end()
 
-/*
-bool game::init_foes(armada &foes, int max) {
+bool level_1::init_foes(armada &foes, int max) {
   foes.clear();
   foes.resize(max);
   cout << "initializing foes" << endl;
@@ -329,9 +301,9 @@ bool game::init_foes(armada &foes, int max) {
     al_clear_to_color(al_map_rgb(37, 196, 23));
   }
   return true;
-}//end game::init_foes()
+}//end level_1::init_foes()
 
-bool game::activate_foe(armada &foes, float x) {
+bool level_1::activate_foe(armada &foes, float x) {
   for (auto &f: foes) {
     if (f->y() == SCREEN_H) {
       f->y(0);
@@ -345,7 +317,7 @@ bool game::activate_foe(armada &foes, float x) {
   return false;
 }
 
-void game::redraw(float y_max) {
+void level_1::redraw(float y_max) {
   al_clear_to_color(al_map_rgb(0,0,0));
   hero->redraw(); //al_draw_bitmap(bouncer, bouncer_x, bouncer_y, 0);
   for (auto &f: foes) {
@@ -361,6 +333,6 @@ void game::redraw(float y_max) {
     }
   }
   al_flip_display();
-}//end game::redraw()
+}//end level_1::redraw()
 
-*/
+

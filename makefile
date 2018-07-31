@@ -5,7 +5,7 @@ LDFLAGS += -lallegro_ttf
 
 TARGET = invader
 
-SRCS = main.cpp game.cpp basic_object.cpp fighter.cpp
+SRCS = main.cpp game.cpp base_level.cpp level_1.cpp basic_object.cpp fighter.cpp
 
 OBJS = $(subst .cpp,.o,${SRCS})
 

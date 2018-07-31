@@ -10,9 +10,11 @@ using armada = std::vector<basic_object*>;
 
 #include "fighter.h"
  
+/*
 enum MYKEYS {
    KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT
 };
+*/
 
 class game {
   private:
@@ -21,15 +23,17 @@ class game {
     //const int SCREEN_H = 480;
 
     ALLEGRO_DISPLAY *display;
-    ALLEGRO_EVENT_QUEUE *event_queue;
-    ALLEGRO_TIMER *timer;
+
+    //ALLEGRO_EVENT_QUEUE *event_queue;
+    //ALLEGRO_TIMER *timer;
+
     fighter *hero;
-    armada foes;
+    //armada foes;
 
     int hits;
     int total_foes;
 
-    bool key[4] = { false, false, false, false };
+    //bool key[4] = { false, false, false, false };
 
   public:
     game();
@@ -37,14 +41,14 @@ class game {
     ~game();
 
     bool init();
-    bool init_foes(armada&, int max);
-    bool activate_foe(armada&, float);
+    //bool init_foes(armada&, int max);
+    //bool activate_foe(armada&, float);
 
     void play();
     void print_score();
     void end();
 
-    void redraw(float);
+    //void redraw(float);
 
 };//end game
 

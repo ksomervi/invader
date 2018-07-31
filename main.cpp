@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
 
   if (g->init()) {
     g->play();
-    g->print_score();
+    //g->print_score();
   }
 
   g->end();
