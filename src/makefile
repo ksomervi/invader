@@ -1,3 +1,7 @@
+# Makefile for invader game
+# Copyright Kevin Somervill
+# August 3, 2018
+
 LDFLAGS =-lallegro -lallegro_image -lallegro_primitives
 #LDFLAGS += -lallegro_dialog
 LDFLAGS += -lallegro_font
@@ -18,14 +22,17 @@ CXXFLAGS=-std=c++11 -Wall -g
 COMPILE = ${CXX} ${CXXFLAGS}
 
 .cpp.o:
-	${COMPILE} -c $? 
+	${COMPILE} -c $?
 
 ${TARGET}: ${OBJS}
 	${COMPILE} -o $@ ${OBJS} ${LDFLAGS}
+
+demo: demo.o basic_object.o fighter.o
+	${COMPILE} -o $@ $^ ${LDFLAGS}
 
 neat:
 	-rm -f *.o *~
 
 clean: neat
-	-rm ${TARGET}
+	-rm ${TARGET} demo
 

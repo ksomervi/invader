@@ -1,3 +1,10 @@
+/* \file demo.cpp
+ *
+ * Scrap program to test features and objects.
+ *
+ * Completely ripped from the keyboard example at:
+ *   https://wiki.allegro.cc/index.php?title=Basic_Keyboard_Example
+ */
 #include <stdio.h>
 #include <allegro5/allegro.h>
 #include <vector>
@@ -5,8 +12,6 @@
 #include <iostream>
 using std::cout;
 using std::endl;
-
-#include "game.h"
 
 #include "basic_object.h"
 using armada = std::vector<basic_object*>;
@@ -16,7 +21,7 @@ using armada = std::vector<basic_object*>;
 bool init_foes(armada &, int max);
 bool activate_foe(armada&, float);
  
-const float FPS = 60.0;
+//const float FPS = 60.0;
 //const int SCREEN_W = 640;
 //const int SCREEN_H = 480;
 enum MYKEYS {
@@ -27,10 +32,8 @@ int main(int argc, char **argv) {
   ALLEGRO_DISPLAY *display = NULL;
   ALLEGRO_EVENT_QUEUE *event_queue = NULL;
   ALLEGRO_TIMER *timer = NULL;
-  //ALLEGRO_BITMAP *bouncer = NULL;
   fighter *hero = NULL;
   armada foes;
-  //object *foe = NULL;
 
   int hits = 0;
   int total_foes = 0;
@@ -87,7 +90,6 @@ int main(int argc, char **argv) {
     return -1;
   }
  
-  //basic_object = al_create_bitmap(BOUNCER_SIZE, BOUNCER_SIZE);
   hero = new fighter();
   if (!hero->create_bitmap(SPRITE_SIZE, SPRITE_SIZE)) {
   //if (!hero->create_bitmap("sprites/hero.png")) {
