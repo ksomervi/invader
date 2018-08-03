@@ -7,6 +7,18 @@
 #include "base_level.h"
 
 base_level::base_level() {
+  display = NULL;
+  event_queue = NULL;
+  timer = NULL;
+  
+  hero = NULL;
+
+  hits = 0;
+  total_foes = 0;
+
+  pfont = NULL;
+  textfont = NULL;
+
 
 };//end base_level::base_level()
 

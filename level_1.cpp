@@ -13,28 +13,26 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
-level_1::level_1() {
-  display = NULL;
-  event_queue = NULL;
-  timer = NULL;
-  
-  hero = NULL;
+#include <sstream>
+using std::ostringstream;
 
-  hits = 0;
-  total_foes = 0;
+level_1::level_1() {
 }
 
 level_1::~level_1() {
 
 }
 
-bool level_1::play(ALLEGRO_DISPLAY *d) {
-  display = d;
+bool level_1::play(game *env) {
+  display = env->get_display();
+  pfont = env->get_font(0);
+  textfont = env->get_font(1);
 
   if (! this->init()) {
     return false;
   }
-  this->play_level();
+
+  play_level();
   print_stats();
   end_level();
 
@@ -83,6 +81,10 @@ bool level_1::init() {
   al_register_event_source(event_queue, al_get_keyboard_event_source());
 
   al_clear_to_color(al_map_rgb(0,0,0));
+  
+  al_draw_text(pfont, al_map_rgb(255,255,255), 
+      al_get_display_width(display)/2, TITLE_FONTSIZE, ALLEGRO_ALIGN_CENTRE,
+      GAME_TITLE);
  
   al_flip_display();
 
@@ -195,8 +197,7 @@ void level_1::play_level() {
     }//end if(ev.type == ALLEGRO_EVENT_TIMER)
     else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
       break;
-    }
-     
+    }//end else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
     else if(ev.type == ALLEGRO_EVENT_KEY_DOWN) {
       switch(ev.keyboard.keycode) {
         case ALLEGRO_KEY_UP:
@@ -215,7 +216,7 @@ void level_1::play_level() {
           key[KEY_RIGHT] = true;
           break;
       }
-    }
+    }//end else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
     else if(ev.type == ALLEGRO_EVENT_KEY_UP) {
       switch(ev.keyboard.keycode) {
         case ALLEGRO_KEY_UP:
@@ -242,7 +243,7 @@ void level_1::play_level() {
           playing = false;
           break;
       }
-    }
+    }//end else if(ev.type == ALLEGRO_EVENT_KEY_UP)
  
     if(redraw_needed && al_is_event_queue_empty(event_queue)) {
       redraw_needed = false;
@@ -261,6 +262,7 @@ void level_1::print_stats() {
 }//end level_1::print_stats()
  
 void level_1::end_level() {
+  cout << "ending level..." << endl;
   if (hero) {
     delete hero;
   }
@@ -272,10 +274,12 @@ void level_1::end_level() {
   }
 
   if (timer) {
+    cout << "   ... destroying timer" << endl;
     al_destroy_timer(timer);
   }
 
   if (event_queue) {
+    cout << "   ... destroying event_queue" << endl;
     al_destroy_event_queue(event_queue);
   }
 
@@ -332,7 +336,54 @@ void level_1::redraw(float y_max) {
       }
     }
   }
+
+  update_score();
+
   al_flip_display();
 }//end level_1::redraw()
 
+
+/*
+void level_1::draw_text(const char *s, float x, float y, flag) {
+  al_draw_text(textfont, al_map_rgb(255,255,255), x, y, flag, s);
+}
+*/
+
+
+void level_1::update_score() {
+  float x_loc = al_get_display_width(display) - 220;
+  float line_height = SECONDARY_FONTSIZE + 4;
+  float y_loc = TITLE_Y;// + line_height;
+
+  int kill_eff = 0;
+  
+  if (total_foes > 0) {
+    kill_eff = hits*100/total_foes;
+  }
+
+  ostringstream line;
+
+  al_draw_text(pfont, al_map_rgb(255,255,255), 
+      al_get_display_width(display)/2, TITLE_Y, ALLEGRO_ALIGN_RIGHT,
+      GAME_TITLE);
+ 
+  al_draw_text(textfont, al_map_rgb(255,255,255), x_loc, y_loc, ALLEGRO_ALIGN_LEFT,
+      "Kills:");
+
+  line << hits;
+  x_loc += 100;
+  al_draw_text(textfont, al_map_rgb(255,255,255), x_loc, y_loc, ALLEGRO_ALIGN_RIGHT,
+      line.str().c_str());
+
+  x_loc += 14;
+  al_draw_text(textfont, al_map_rgb(255,255,255), x_loc, y_loc, ALLEGRO_ALIGN_CENTRE,
+      ":");
+
+  line.str("");
+  line << kill_eff << "%";
+  //y_loc += line_height;
+  x_loc += 14;
+  al_draw_text(textfont, al_map_rgb(255,255,255), x_loc, y_loc, ALLEGRO_ALIGN_LEFT,
+      line.str().c_str());
+}//end level_1::update_score()
 

@@ -10,6 +10,9 @@ class basic_object {
     float _h;
     float _x;
     float _y;
+
+    float _velx;
+    float _vely;
     bool _active;
     ALLEGRO_BITMAP *_bm;
 
@@ -31,6 +34,7 @@ class basic_object {
     bool create_bitmap(float, float);
     bool create_bitmap(const char*);
 
+    //Perhaps this should be a friend of the class?
     bool collides(basic_object*);
 
 };//end class basic_object

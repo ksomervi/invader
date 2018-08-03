@@ -17,13 +17,17 @@ basic_object::basic_object() {
   //Initial location, middle of the screen
    _x = (SCREEN_W - SPRITE_SIZE) / 2.0;
    _y = (SCREEN_H - SPRITE_SIZE) / 2.0;
+
+   _velx = 0.0;
+   _vely = 0.0;
+
    _bm = NULL;
 }//end basic_object
 
 
 basic_object::basic_object(float w, float h, float x, float y) {
-  _w = 0.0;
-  _h = 0.0;
+  _w = w;
+  _h = h;
   //Initial location, middle of the screen
   _x = x;
   _y = y;
@@ -88,10 +92,16 @@ void basic_object::active(bool a) {
 }
 
 bool basic_object::collides(basic_object *o) {
-  float yr = fmin(_h, o->_h);
-  float xr = fmin(_w, o->_w);
   float dx = fabs(_x - o->_x);
   float dy = fabs(_y - o->_y);
+  float yr = _h;
+  float xr = _w;
+  if (_y > o->_y) {
+    yr = o->_h;
+  }
+  if (_x > o->_x) {
+    xr = o->_w;
+  }
 
   if ((dx<xr) and (dy<yr)) {
 #if 0

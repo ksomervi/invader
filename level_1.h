@@ -2,7 +2,9 @@
 #define LEVEL_1_H 1
 
 #include <cstdio>
-//#include <allegro5/allegro.h>
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
 
 #include "base_level.h"
 
@@ -18,18 +20,13 @@ enum MYKEYS {
 
 class level_1: protected base_level {
   private:
-    const float FPS = 60.0;
-    //const int SCREEN_W = 640;
-    //const int SCREEN_H = 480;
-
-    ALLEGRO_DISPLAY *display;
-    ALLEGRO_EVENT_QUEUE *event_queue;
-    ALLEGRO_TIMER *timer;
+    /*
     fighter *hero;
     armada foes;
 
     int hits;
     int total_foes;
+    */
 
     bool key[4] = { false, false, false, false };
 
@@ -39,6 +36,8 @@ class level_1: protected base_level {
     void play_level();
     void print_stats();
     void redraw(float);
+    void update_score();
+
 
   public:
     level_1();
@@ -47,8 +46,7 @@ class level_1: protected base_level {
     bool init_foes(armada&, int max);
     bool activate_foe(armada&, float);
 
-    bool play(ALLEGRO_DISPLAY*);
-    //void end();
+    bool play(game *);
 
 };//end level_1
 

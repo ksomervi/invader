@@ -1,6 +1,7 @@
 #ifndef BASE_LEVEL_H
 #define BASE_LEVEL_H
 
+#include "game.h"
 #include "fighter.h"
 #include <vector>
 using armada = std::vector<basic_object*>;
@@ -8,9 +9,13 @@ using armada = std::vector<basic_object*>;
 class base_level {
   private:
 
+  protected:
     ALLEGRO_DISPLAY *display;
     ALLEGRO_EVENT_QUEUE *event_queue;
     ALLEGRO_TIMER *timer;
+    ALLEGRO_FONT *pfont;
+    ALLEGRO_FONT *textfont;
+
     fighter *hero;
     armada foes;
 
@@ -18,7 +23,6 @@ class base_level {
     int total_foes;
 
 
-  protected:
     bool init();
     void end_level();
     void play_level();
@@ -29,7 +33,7 @@ class base_level {
     base_level();
     virtual ~base_level() = 0;
 
-    virtual bool play(ALLEGRO_DISPLAY*) = 0;
+    virtual bool play(game *) = 0;
 
 };//end class base_level
 
