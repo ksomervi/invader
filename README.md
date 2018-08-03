@@ -5,7 +5,7 @@ It's a project in learning, so please keep any hopes in check.
 
 ## Dependencies:
 
-    - Allegro5
+- Allegro5
 
 
 
