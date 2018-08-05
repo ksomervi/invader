@@ -45,6 +45,9 @@ ALLEGRO_FONT *game::get_font(int f=1) {
   };
 }
 
+fighter* game::get_player() {
+  return hero;
+}
 
 bool game::init() {
 
@@ -57,6 +60,7 @@ bool game::init() {
  
   al_init_font_addon(); // initialize the font addon
   al_init_ttf_addon(); // initialize the ttf (True Type Font) addon
+  al_init_primitives_addon();
 
   if(!al_install_keyboard()) {
     cerr << "failed to initialize the keyboard!" << endl;
@@ -72,14 +76,15 @@ bool game::init() {
   title_font = al_load_ttf_font(FONTNAME, TITLE_FONTSIZE, 0);
   if (!title_font) {
     cerr << "Failed to load title font: " << FONTNAME << endl;
+    return false;
   }
 
   font = al_load_ttf_font(FONTNAME, SECONDARY_FONTSIZE, 0);
   if (!font) {
     cerr << "Failed to load secondary font: " << FONTNAME << endl;
+    return false;
   }
 
-  /*
   hero = new fighter();
   if (!hero->create_bitmap(SPRITE_SIZE, SPRITE_SIZE)) {
   //if (!hero->create_bitmap("sprites/hero.png")) 
@@ -89,8 +94,9 @@ bool game::init() {
   al_set_target_bitmap(hero->bitmap());
   al_clear_to_color(al_map_rgb(255, 174, 0));
   
-  al_set_target_bitmap(al_get_backbuffer(display));
+  al_set_target_backbuffer(display);
  
+  /*
   event_queue = al_create_event_queue();
   if(!event_queue) {
     cerr << "failed to create event_queue!" << endl;
@@ -131,21 +137,8 @@ void game::end() {
     delete hero;
   }
 
-  /*
-  for (auto &f: foes) {
-    if (f) {
-      delete f;
-    }
-  }
-
-  if (timer) {
-    al_destroy_timer(timer);
-  }
-
-  if (event_queue) {
-    al_destroy_event_queue(event_queue);
-  }
-  */
+  al_destroy_font(title_font);
+  al_destroy_font(font);
 
   if (display) {
     al_destroy_display(display);
@@ -153,5 +146,4 @@ void game::end() {
 
   return;
 }//end game::end()
-
 

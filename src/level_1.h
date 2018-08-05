@@ -20,31 +20,21 @@ enum MYKEYS {
 
 class level_1: protected base_level {
   private:
-    /*
-    fighter *hero;
-    armada foes;
-
-    int hits;
-    int total_foes;
-    */
-
     bool key[4] = { false, false, false, false };
 
   protected:
     bool init();
     void end_level();
     void play_level();
-    void print_stats();
+    void show_stats();
     void redraw(float);
     void update_score();
-
+    bool init_foes(armada&, int max);
+    bool activate_foe(armada&, float);
 
   public:
     level_1();
     ~level_1();
-
-    bool init_foes(armada&, int max);
-    bool activate_foe(armada&, float);
 
     bool play(game *);
 

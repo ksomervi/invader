@@ -5,6 +5,7 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_primitives.h>
 
 //#include "basic_object.h"
 //#include <vector>
@@ -31,6 +32,7 @@ class game {
     ~game();
     ALLEGRO_DISPLAY *get_display();
     ALLEGRO_FONT *get_font(int);
+    fighter* get_player();
 
     bool init();
     void play();

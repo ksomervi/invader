@@ -16,9 +16,8 @@ base_level::base_level() {
   hits = 0;
   total_foes = 0;
 
-  pfont = NULL;
+  title_font = NULL;
   textfont = NULL;
-
 
 };//end base_level::base_level()
 

@@ -34,5 +34,5 @@ neat:
 	-rm -f *.o *~
 
 clean: neat
-	-rm ${TARGET} demo
+	-rm -f ${TARGET} demo
 

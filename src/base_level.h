@@ -6,6 +6,8 @@
 #include <vector>
 using armada = std::vector<basic_object*>;
 
+enum Difficulty { EASY, NORMAL, HARD };
+
 class base_level {
   private:
 
@@ -13,7 +15,7 @@ class base_level {
     ALLEGRO_DISPLAY *display;
     ALLEGRO_EVENT_QUEUE *event_queue;
     ALLEGRO_TIMER *timer;
-    ALLEGRO_FONT *pfont;
+    ALLEGRO_FONT *title_font;
     ALLEGRO_FONT *textfont;
 
     fighter *hero;
@@ -21,7 +23,6 @@ class base_level {
 
     int hits;
     int total_foes;
-
 
     bool init();
     void end_level();
