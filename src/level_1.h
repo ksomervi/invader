@@ -21,6 +21,7 @@ enum MYKEYS {
 class level_1: protected base_level {
   private:
     bool key[4] = { false, false, false, false };
+    int _healing_time;
 
   protected:
     bool init();

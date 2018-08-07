@@ -4,7 +4,7 @@
 #define FPS 60.0
 
 //const int SPRITE_SIZE = 18;
-#define SPRITE_SIZE 18
+#define SPRITE_SIZE 36
 
 //const int SCREEN_W = 640;
 #define SCREEN_W  640

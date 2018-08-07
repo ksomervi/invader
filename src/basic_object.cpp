@@ -25,12 +25,15 @@ basic_object::basic_object() {
 }//end basic_object
 
 
-basic_object::basic_object(float w, float h, float x, float y) {
-  _w = w;
-  _h = h;
+basic_object::basic_object(float x, float y, float vx, float vy) {
+  _w = 0.0;
+  _h = 0.0;
   //Initial location, middle of the screen
   _x = x;
   _y = y;
+  _velx = vx;
+  _vely = vy;
+
   _bm = NULL;
 }//end basic_object
 
@@ -69,7 +72,13 @@ void basic_object::draw(float x, float y) {
 
 bool basic_object::create_bitmap(const char *filename) {
   _bm = al_load_bitmap(filename);
-  return _bm != NULL;
+  if (_bm) {
+    _w = al_get_bitmap_width(_bm);
+    _h = al_get_bitmap_height(_bm);
+    return true;
+  }
+
+  return false;
 }
 
 bool basic_object::create_bitmap(float w, float h) {

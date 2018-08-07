@@ -17,6 +17,7 @@ using std::endl;
 using std::ostringstream;
 
 level_1::level_1() {
+  _healing_time = 0;
 }
 
 level_1::~level_1() {
@@ -49,7 +50,7 @@ bool level_1::init() {
   }
  
   //TODO: we should get the hero from the game environment
-  hero = new fighter();
+  //hero = new fighter();
   if (!hero->create_bitmap(SPRITE_SIZE, SPRITE_SIZE)) {
   //if (!hero->create_bitmap("sprites/hero.png")) 
     cerr << "failed to create hero bitmap!" << endl;
@@ -118,7 +119,7 @@ void level_1::play_level() {
 
   std::default_random_engine generator;
   std::uniform_int_distribution<int> distribution(20,100);
-  int next_foe = 0;
+  int next_foe = 120;
 
   std::default_random_engine x_generator;
   std::uniform_real_distribution<float> x_distribution(x_min, x_max);
@@ -133,6 +134,13 @@ void level_1::play_level() {
     al_wait_for_event(event_queue, &ev);
  
     if(ev.type == ALLEGRO_EVENT_TIMER) {
+      if (_healing_time > 0) {
+        _healing_time--;
+      }
+      else {
+        _healing_time = 60;
+        hero->add_health(2);
+      }
       if (foes_remaining > 0) {
         if (next_foe > 0) {
           next_foe--;
@@ -264,6 +272,7 @@ void level_1::play_level() {
       this->redraw(y_max);
     }
 
+    active_foes = 0;
     for (auto &f: foes) {
       if (f->y() <= y_max) {
         active_foes++;
@@ -275,6 +284,7 @@ void level_1::play_level() {
       current_wave++;
       if (current_wave < max_waves) {
         foes_remaining = max_foes[current_wave];
+        next_foe = 120;
       }
       else {
         playing = false;
@@ -283,6 +293,11 @@ void level_1::play_level() {
   }//end while(playing)
 
   al_stop_timer(timer);
+  al_rest(2.0);
+  if (al_is_event_queue_empty(event_queue) == false) {
+    cout << "pending event ... flushing" << endl;
+    al_flush_event_queue(event_queue);
+  }
 
 }//end level_1::play_level()
 
@@ -354,7 +369,6 @@ void level_1::show_stats() {
       waiting = false;
     }
   }
-  //al_rest(5.0);
 }//end level_1::show_stats()
  
 void level_1::end_level() {
@@ -426,6 +440,8 @@ void level_1::redraw(float y_max) {
         hits++;
         cout << "hit: " << hits << endl;
         f->y(SCREEN_H);
+        hero->add_health(-20);
+        _healing_time = 60;
       } 
       else {
         f->redraw();
@@ -452,6 +468,7 @@ void level_1::update_score() {
   float y_loc = TITLE_Y;// + line_height;
 
   int kill_eff = 0;
+  float y_step = al_get_font_line_height(textfont);
   
   if (total_foes > 0) {
     kill_eff = hits*100/total_foes;
@@ -461,6 +478,39 @@ void level_1::update_score() {
       al_get_display_width(display)/2, TITLE_Y, ALLEGRO_ALIGN_RIGHT,
       GAME_TITLE);
  
+  al_draw_text(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+      ALLEGRO_ALIGN_LEFT, "Lives:");
+
+  x_loc += 100;
+  al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+      ALLEGRO_ALIGN_RIGHT, "%d", hero->lives());
+
+  x_loc -= 100;
+  y_loc += y_step;
+  al_draw_text(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+      ALLEGRO_ALIGN_LEFT, "Health:");
+
+  x_loc += 100;
+  float h_bar_len = 100;
+  float h_bar_fill = h_bar_len * hero->percent_health();
+  ALLEGRO_COLOR fill_color = GREEN;
+  if (hero->percent_health() < 0.4) {
+    fill_color = RED;
+  }
+  if (h_bar_fill > 0.0) {
+    al_draw_filled_rounded_rectangle(x_loc, y_loc, x_loc+h_bar_fill, y_loc+y_step,
+      5, 5, fill_color);
+  }
+
+  al_draw_rounded_rectangle(x_loc, y_loc, x_loc+h_bar_len, y_loc+y_step,
+      5, 5, al_map_rgb(255, 255, 255), 4);
+
+  al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc+h_bar_len/2.0, y_loc,
+      ALLEGRO_ALIGN_CENTRE, "%d", hero->max_health());
+
+
+  x_loc -= 100;
+  y_loc += y_step;
   al_draw_text(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
       ALLEGRO_ALIGN_LEFT, "Kills:");
 
@@ -475,5 +525,7 @@ void level_1::update_score() {
   x_loc += 14;
   al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
       ALLEGRO_ALIGN_LEFT, "%d%%", kill_eff);
+
+
 }//end level_1::update_score()
 
