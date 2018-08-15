@@ -19,9 +19,18 @@ base_level::base_level() {
   title_font = NULL;
   textfont = NULL;
 
+  _complete = false;
 };//end base_level::base_level()
 
 base_level::~base_level() {
 
 };//end base_level::~base_level()
+
+bool base_level::complete() {
+  return _complete;
+};//end base_level::complete()
+
+void base_level::complete(bool b) {
+  _complete = b;
+};//end base_level::complete()
 

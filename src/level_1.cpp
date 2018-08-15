@@ -33,11 +33,18 @@ bool level_1::play(game *env) {
     return false;
   }
 
-  play_level();
-  show_stats();
+  while (hero->health() > 0 and complete() == false) {
+    play_level();
+
+    if (hero->health() == 0) {
+      hero->add_lives(-1);
+    }
+
+    show_stats();
+  }
   end_level();
 
-  return true;
+  return complete();
 }//end level_1::play()
 
 
@@ -279,15 +286,23 @@ void level_1::play_level() {
       }
     }
 
+    if (hero->health() == 0) {
+      foes_remaining = 0;
+    }
+
     if (foes_remaining == 0 and active_foes == 0) {
-      cout << "Completed wave: " << current_wave << endl;
-      current_wave++;
-      if (current_wave < max_waves) {
-        foes_remaining = max_foes[current_wave];
-        next_foe = 120;
-      }
-      else {
-        playing = false;
+      playing = false;
+      if (hero->health()) {
+        cout << "Completed wave: " << current_wave << endl;
+        current_wave++;
+        if (current_wave < max_waves) {
+          foes_remaining = max_foes[current_wave];
+          next_foe = 120;
+          playing = true;
+        }
+        else {
+          complete(true);
+        }
       }
     }
   }//end while(playing)
@@ -301,6 +316,7 @@ void level_1::play_level() {
 
 }//end level_1::play_level()
 
+
 void level_1::show_stats() {
   int kill_eff = hits*100/total_foes;
   cout << "So how did you do?" << endl;
@@ -308,49 +324,65 @@ void level_1::show_stats() {
   cout << "  Total hits: " << hits << " (eff: "
     << kill_eff << "%)" << endl;
 
-  float stats_h = al_get_font_line_height(title_font) + 
+  float textbox_h = al_get_font_line_height(title_font) + 
     4 * al_get_font_line_height(textfont);
-  float stats_w = 0.8 * SCREEN_W;
+  float textbox_w = 0.8 * SCREEN_W;
 
-  ALLEGRO_BITMAP *stats = al_create_bitmap(stats_w, stats_h);
-  al_set_target_bitmap(stats);
+  ALLEGRO_BITMAP *textbox = al_create_bitmap(textbox_w, textbox_h);
+  al_set_target_bitmap(textbox);
   al_clear_to_color(al_map_rgb(0, 0, 0));
-  al_draw_rounded_rectangle(0, 0, al_get_bitmap_width(stats),
-      al_get_bitmap_height(stats), 10, 10, al_map_rgb(255, 255, 255), 4);
+  al_draw_rounded_rectangle(0, 0, al_get_bitmap_width(textbox),
+      al_get_bitmap_height(textbox), 10, 10, al_map_rgb(255, 255, 255), 4);
 
-  float x_loc = al_get_bitmap_width(stats)/2;
+  float x_loc = al_get_bitmap_width(textbox)/2;
   float y_loc = TITLE_Y;
 
-  al_draw_textf(title_font, al_map_rgb(255,255,255), x_loc, y_loc,
-      ALLEGRO_ALIGN_CENTRE, "Level %d Complete", 1);
+  if (complete()) {
+    al_draw_textf(title_font, al_map_rgb(255,255,255), x_loc, y_loc,
+        ALLEGRO_ALIGN_CENTRE, "Level %d Complete", 1);
 
-  y_loc += al_get_font_line_height(title_font);
+    y_loc += al_get_font_line_height(title_font);
 
-  al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+    al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
       ALLEGRO_ALIGN_CENTRE, "Total Foes: %d", total_foes);
 
-  y_loc += 34;
-  al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
-      ALLEGRO_ALIGN_CENTRE, "Hits: %d", hits);
+  }
+  else {
 
-  y_loc += 34;
+    al_draw_text(title_font, al_map_rgb(255,255,255), x_loc, y_loc,
+      ALLEGRO_ALIGN_CENTRE, "Player died!");
+
+    y_loc += al_get_font_line_height(title_font);
+
+    al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+      ALLEGRO_ALIGN_CENTRE, "Lives remaining: %d", hero->lives());
+
+  }
+
+  y_loc += al_get_font_line_height(textfont);
+
   al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
-      ALLEGRO_ALIGN_CENTRE, "Efficiency: %d%%", kill_eff);
- 
+    ALLEGRO_ALIGN_CENTRE, "Hits: %d", hits);
+
+  y_loc += al_get_font_line_height(textfont);
+
+  al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+    ALLEGRO_ALIGN_CENTRE, "Efficiency: %d%%", kill_eff);
+
   al_set_target_backbuffer(display);
   al_clear_to_color(al_map_rgb(0, 0, 0));
-  x_loc = (SCREEN_W - stats_w) / 2;
+  x_loc = (SCREEN_W - textbox_w) / 2;
   y_loc = 100;
-  al_draw_bitmap(stats, x_loc, y_loc, 0);
+  al_draw_bitmap(textbox, x_loc, y_loc, 0);
   x_loc = SCREEN_W / 2;
-  y_loc += stats_h;
+  y_loc += textbox_h;
   al_draw_text(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
       ALLEGRO_ALIGN_CENTRE, "Any key to continue...");
 
   al_flip_display();
 
   bool waiting = true;
-  int countdown = 600;
+  int countdown = 300;
   al_start_timer(timer);
   while(waiting) {
     ALLEGRO_EVENT ev;
@@ -441,7 +473,9 @@ void level_1::redraw(float y_max) {
         cout << "hit: " << hits << endl;
         f->y(SCREEN_H);
         hero->add_health(-20);
-        _healing_time = 60;
+        if (hero->health() > 0) {
+          _healing_time = 60;
+        }
       } 
       else {
         f->redraw();

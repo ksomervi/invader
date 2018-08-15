@@ -8,11 +8,10 @@
 #include<iostream>
 
 fighter::fighter() {
-  _lives = 3;
+  _lives = DEFAULT_LIVES;
   _max_health = 100;
   _health = _max_health;
 };
-
 
 int fighter::lives() {
   return _lives;
@@ -23,6 +22,14 @@ void fighter::lives(int l) {
 }
 
 void fighter::add_lives(int l) {
+
+  if (l < 0) {
+    if (_lives == 0) {
+      return;
+    }
+    _health = _max_health;
+  }
+
   _lives += l;
 }
 

@@ -27,6 +27,7 @@ class level_1: protected base_level {
     bool init();
     void end_level();
     void play_level();
+    void restart_level();
     void show_stats();
     void redraw(float);
     void update_score();

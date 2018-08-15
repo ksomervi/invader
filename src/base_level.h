@@ -10,6 +10,7 @@ enum Difficulty { EASY, NORMAL, HARD };
 
 class base_level {
   private:
+    bool _complete;
 
   protected:
     ALLEGRO_DISPLAY *display;
@@ -35,6 +36,8 @@ class base_level {
     virtual ~base_level() = 0;
 
     virtual bool play(game *) = 0;
+    bool complete();
+    void complete(bool);
 
 };//end class base_level
 

@@ -3,7 +3,7 @@
 
 #include "basic_object.h"
 
-#define DEFAULT_LIVES 3
+#define DEFAULT_LIVES 4
 
 class fighter: public basic_object {
   private:
