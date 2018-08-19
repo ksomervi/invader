@@ -33,7 +33,7 @@ bool level_1::play(game *env) {
     return false;
   }
 
-  while (hero->health() > 0 and complete() == false) {
+  while (hero->health() > 0 and complete() == false and quit() == false) {
     play_level();
 
     if (hero->health() == 0) {
@@ -102,6 +102,10 @@ bool level_1::init() {
  
 
 void level_1::play_level() {
+  for (auto &k: key) {
+    k = false;
+  }
+
   //const float max_accel = 4;
   //const float max_vel = 8;
   float vel_x = 4.0;
@@ -270,6 +274,7 @@ void level_1::play_level() {
 
         case ALLEGRO_KEY_ESCAPE:
           playing = false;
+          quit(true);
           break;
       }
     }//end else if(ev.type == ALLEGRO_EVENT_KEY_UP)
@@ -308,7 +313,7 @@ void level_1::play_level() {
   }//end while(playing)
 
   al_stop_timer(timer);
-  al_rest(2.0);
+  al_rest(1.0);
   if (al_is_event_queue_empty(event_queue) == false) {
     cout << "pending event ... flushing" << endl;
     al_flush_event_queue(event_queue);
@@ -337,7 +342,17 @@ void level_1::show_stats() {
   float x_loc = al_get_bitmap_width(textbox)/2;
   float y_loc = TITLE_Y;
 
-  if (complete()) {
+  if (quit()) {
+    al_draw_textf(title_font, al_map_rgb(255,255,255), x_loc, y_loc,
+        ALLEGRO_ALIGN_CENTRE, "Level %d Quit", 1);
+
+    y_loc += al_get_font_line_height(title_font);
+
+    al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+      ALLEGRO_ALIGN_CENTRE, "Total Foes: %d", total_foes);
+
+  }
+  else if (complete()) {
     al_draw_textf(title_font, al_map_rgb(255,255,255), x_loc, y_loc,
         ALLEGRO_ALIGN_CENTRE, "Level %d Complete", 1);
 

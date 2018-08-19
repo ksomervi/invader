@@ -10,6 +10,7 @@ enum Difficulty { EASY, NORMAL, HARD };
 
 class base_level {
   private:
+    bool _quit;
     bool _complete;
 
   protected:
@@ -30,6 +31,7 @@ class base_level {
     void play_level();
     void print_stats();
     void redraw(float);
+    void quit(bool);
 
   public:
     base_level();
@@ -39,6 +41,7 @@ class base_level {
     bool complete();
     void complete(bool);
 
+    bool quit();
 };//end class base_level
 
 #endif //!defined(BASE_LEVEL_H)

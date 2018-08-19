@@ -20,6 +20,7 @@ base_level::base_level() {
   textfont = NULL;
 
   _complete = false;
+  _quit = false;
 };//end base_level::base_level()
 
 base_level::~base_level() {
@@ -33,4 +34,12 @@ bool base_level::complete() {
 void base_level::complete(bool b) {
   _complete = b;
 };//end base_level::complete()
+
+bool base_level::quit() {
+  return _quit;
+};//end base_level::quit()
+
+void base_level::quit(bool b) {
+  _quit = b;
+};//end base_level::quit()
 
