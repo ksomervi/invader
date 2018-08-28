@@ -110,8 +110,11 @@ void level_1::play_level() {
   //const float max_vel = 8;
   float vel_x = 4.0;
   float vel_y = 4.0;
+  point_2d gravity(0.0, 1.0);
   float hx = 0.0;
   float hy = 0.0;
+  point_2d h_loc;
+  point_2d h_delta;
 
   float x_min = 4.0;
   float x_max = SCREEN_W - SPRITE_SIZE - x_min;
@@ -126,7 +129,6 @@ void level_1::play_level() {
   int active_foes = 0;
 
   //float fx = 0.0; // currently unused
-  float fy = (SCREEN_W - SPRITE_SIZE) / 2;
 
   std::default_random_engine generator;
   std::uniform_int_distribution<int> distribution(20,100);
@@ -169,20 +171,24 @@ void level_1::play_level() {
       hx = hero->x();
       hy = hero->y();
 
+
       active_foes = 0;
       for (auto &f: foes) {
-        fy = f->y();
+        if (f->active()) {
      
-        if(fy <= y_max) {
-          //foe->y(hy + 1.0);
-          f->y(fy+1.0);
-          active_foes++;
-        }
-        else {
-          //Deactivate foe by setting off screen
-          f->y(SCREEN_H);
-        }
-      }
+          if(f->y() <= y_max) {
+            active_foes++;
+          }
+          else {
+            //Deactivate foe by setting off screen
+            f->active(false);
+          }
+          f->move(gravity);
+        }//end if (f->active())
+      }//end for (auto &f: foes)
+
+      h_loc = hero->location();
+      h_delta = point_2d(0.0, 0.0);
 
       if(key[KEY_UP]) {
         if(hy >= y_min) {
@@ -196,7 +202,8 @@ void level_1::play_level() {
               //vel_y += accel_y;
               //printf("vel_y: %f\n", vel_y);
             //}
-            hero->y(hy-vel_y);//bouncer_y -= 4.0;
+            //hero->y(hy-vel_y);//bouncer_y -= 4.0;
+            h_delta.y(-vel_y);
         }
       }
       else {//key[KEY_UP] == false
@@ -210,22 +217,23 @@ void level_1::play_level() {
               //printf("vel_y: %f\n", vel_y);
             //}
         if(hy <= y_max) {
-          hero->y(hy + 1.0);
+          h_delta.y(1.0);
         }
       }//end if(bouncer_y >= 4.0)
      
       if(key[KEY_DOWN] && hy <= y_max) {
-        hero->y(hy+vel_y); //bouncer_y += 4.0;
+        h_delta.y(vel_y);
       }
 
       if(key[KEY_LEFT] && hx >= x_min) {
-        hero->x(hx-vel_x); //bouncer_x -= 4.0;
+        h_delta -= point_2d(vel_x, 0.0);
       }
 
       if(key[KEY_RIGHT] && hx <= x_max) {
-        hero->x(hx+vel_x); //bouncer_x += 4.0;
+        h_delta += point_2d(vel_x, 0.0);
       }
 
+      hero->move(h_delta);
       redraw_needed = true;
     }//end if(ev.type == ALLEGRO_EVENT_TIMER)
     else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
@@ -286,7 +294,7 @@ void level_1::play_level() {
 
     active_foes = 0;
     for (auto &f: foes) {
-      if (f->y() <= y_max) {
+      if (f->active()) {
         active_foes++;
       }
     }
@@ -323,7 +331,10 @@ void level_1::play_level() {
 
 
 void level_1::show_stats() {
-  int kill_eff = hits*100/total_foes;
+  int kill_eff = 0;
+  if (total_foes) {
+    kill_eff = hits*100/total_foes;
+  }
   cout << "So how did you do?" << endl;
   cout << "  Total foes: " << total_foes << endl;
   cout << "  Total hits: " << hits << " (eff: "
@@ -446,7 +457,7 @@ void level_1::end_level() {
 bool level_1::init_foes(armada &foes, int max) {
   foes.clear();
   foes.resize(max);
-  cout << "initializing foes" << endl;
+  cout << "Initializing foes..." << endl;
 
   int cnt = 0;
   
@@ -466,10 +477,11 @@ bool level_1::init_foes(armada &foes, int max) {
 
 bool level_1::activate_foe(armada &foes, float x) {
   for (auto &f: foes) {
-    if (f->y() == SCREEN_H) {
+    if (f->active() == false) {
       f->y(0);
       f->x(x);
       cout << "foe starting at " << x << endl;
+      f->active(true);
       return true;
     }
   }
@@ -487,6 +499,7 @@ void level_1::redraw(float y_max) {
         hits++;
         cout << "hit: " << hits << endl;
         f->y(SCREEN_H);
+        f->active(false);
         hero->add_health(-20);
         if (hero->health() > 0) {
           _healing_time = 60;

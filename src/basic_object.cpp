@@ -15,13 +15,13 @@ basic_object::basic_object() {
   _w = 0.0;
   _h = 0.0;
   //Initial location, middle of the screen
-   _x = (SCREEN_W - SPRITE_SIZE) / 2.0;
-   _y = (SCREEN_H - SPRITE_SIZE) / 2.0;
+   _loc.x((SCREEN_W - SPRITE_SIZE) / 2.0);
+   _loc.y((SCREEN_H - SPRITE_SIZE) / 2.0);
 
-   _velx = 0.0;
-   _vely = 0.0;
+   _vel = point_2d(0.0, 0.0);
 
    _bm = NULL;
+   _active = false;
 }//end basic_object
 
 
@@ -29,12 +29,11 @@ basic_object::basic_object(float x, float y, float vx, float vy) {
   _w = 0.0;
   _h = 0.0;
   //Initial location, middle of the screen
-  _x = x;
-  _y = y;
-  _velx = vx;
-  _vely = vy;
+  _loc = point_2d(x, y);
+  _vel = point_2d(vx, vy);
 
   _bm = NULL;
+  _active = false;
 }//end basic_object
 
 
@@ -45,29 +44,29 @@ basic_object::~basic_object() {
 }
 
 float basic_object::x() {
-  return _x;
+  return _loc.x();
 }
 
 float basic_object::y() {
-  return _y;
+  return _loc.y();
 }
 
 void basic_object::x(float v) {
-  _x = v;
+  _loc.x(v);
 }
 
 void basic_object::y(float v) {
-  _y = v;
+  _loc.y(v);
 }
 
 void basic_object::redraw() {
-  al_draw_bitmap(_bm, _x, _y, 0);
+  al_draw_bitmap(_bm, _loc.x(), _loc.y(), 0);
 }
 
 void basic_object::draw(float x, float y) {
-  _x = x;
-  _y = y;
-  al_draw_bitmap(_bm, _x, _y, 0);
+  _loc.x(x);
+  _loc.y(y);
+  al_draw_bitmap(_bm, _loc.x(), _loc.y(), 0);
 }
 
 bool basic_object::create_bitmap(const char *filename) {
@@ -101,14 +100,14 @@ void basic_object::active(bool a) {
 }
 
 bool basic_object::collides(basic_object *o) {
-  float dx = fabs(_x - o->_x);
-  float dy = fabs(_y - o->_y);
+  float dx = fabs(_loc.x() - o->_loc.x());
+  float dy = fabs(_loc.y() - o->_loc.y());
   float yr = _h;
   float xr = _w;
-  if (_y > o->_y) {
+  if (_loc.y() > o->_loc.y()) {
     yr = o->_h;
   }
-  if (_x > o->_x) {
+  if (_loc.x() > o->_loc.x()) {
     xr = o->_w;
   }
 
@@ -128,4 +127,54 @@ bool basic_object::collides(basic_object *o) {
   }
   return false;
 }
+
+void basic_object::location(const point_2d& v) {
+  _vel = v;
+}
+
+point_2d basic_object::location() {
+  return _loc;
+}
+
+void basic_object::velocity(const point_2d& v) {
+  _vel = v;
+}
+
+point_2d basic_object::velocity() {
+  return _vel;
+}
+
+void basic_object::velocity_x(float vx) {
+  _vel.x(vx);
+}//end
+
+float basic_object::velocity_x(void) {
+  return _vel.x();
+}//end
+
+
+void basic_object::velocity_y(float vy) {
+  _vel.y(vy);
+}//end
+
+float basic_object::velocity_y(void) {
+  return _vel.y();
+}//end
+
+
+void basic_object::move(float x, float y) {
+  _loc += point_2d(x, y);
+}//end
+
+void basic_object::move(point_2d p) {
+  _loc += p;
+}//end
+
+void basic_object::move_to(float x, float y) {
+  _loc = point_2d(x, y);
+}//end
+
+void basic_object::move_to(point_2d p) {
+  _loc = p;
+}//end
 
