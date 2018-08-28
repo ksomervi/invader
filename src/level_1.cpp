@@ -491,7 +491,7 @@ void level_1::redraw(float y_max) {
   al_clear_to_color(al_map_rgb(0,0,0));
   hero->redraw(); //al_draw_bitmap(bouncer, bouncer_x, bouncer_y, 0);
   for (auto &f: foes) {
-    if (f->y() <= y_max) {
+    if (f->active()) {
       if (f->collides(hero)) {
         hits++;
         cout << "hit: " << hits << endl;
