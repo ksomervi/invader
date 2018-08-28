@@ -3,6 +3,8 @@
 
 #define FPS 60.0
 
+#define DEFAULT_LIVES 4
+
 //const int SPRITE_SIZE = 18;
 #define SPRITE_SIZE 36
 

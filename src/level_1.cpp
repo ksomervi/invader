@@ -118,8 +118,8 @@ void level_1::play_level() {
 
   float x_min = 4.0;
   float x_max = SCREEN_W - SPRITE_SIZE - x_min;
-  float y_min = 4.0;
-  float y_max = SCREEN_H - SPRITE_SIZE - y_min;
+  float y_min = 0.25 * SCREEN_H;
+  float y_max = SCREEN_H - SPRITE_SIZE;
 
   int max_waves = 3;
   int current_wave = 0;
@@ -127,8 +127,6 @@ void level_1::play_level() {
   int max_foes[] = {3, 3, 4};
   int foes_remaining = max_foes[current_wave];
   int active_foes = 0;
-
-  //float fx = 0.0; // currently unused
 
   std::default_random_engine generator;
   std::uniform_int_distribution<int> distribution(20,100);
@@ -168,10 +166,6 @@ void level_1::play_level() {
         }
       }//end if (foes_remaining > 0)
 
-      hx = hero->x();
-      hy = hero->y();
-
-
       active_foes = 0;
       for (auto &f: foes) {
         if (f->active()) {
@@ -186,6 +180,9 @@ void level_1::play_level() {
           f->move(gravity);
         }//end if (f->active())
       }//end for (auto &f: foes)
+
+      hx = hero->x();
+      hy = hero->y();
 
       h_loc = hero->location();
       h_delta = point_2d(0.0, 0.0);
