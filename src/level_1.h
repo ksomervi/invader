@@ -11,17 +11,19 @@
 #include "basic_object.h"
 #include <vector>
 using armada = std::vector<basic_object*>;
+using weapons = std::vector<basic_object*>;
 
 #include "fighter.h"
  
 enum MYKEYS {
-   KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT
+   KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_SPACE
 };
 
 class level_1: protected base_level {
   private:
-    bool key[4] = { false, false, false, false };
+    bool key[5] = { false, false, false, false, false };
     int _healing_time;
+    weapons mines;
 
   protected:
     bool init();
@@ -33,6 +35,8 @@ class level_1: protected base_level {
     void update_score();
     bool init_foes(armada&, int max);
     bool activate_foe(armada&, float);
+    bool deploy_mine(weapons&, int, int);
+    bool init_weapons(weapons&, int);
 
   public:
     level_1();

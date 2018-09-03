@@ -70,9 +70,12 @@ bool level_1::init() {
   
   if (!init_foes(foes, 16)) {
     cerr << "failed to create foes!" << endl;
-    delete hero;
+    //delete hero;
     al_destroy_timer(timer);
     return false;
+  }
+  if (!init_weapons(mines, 5)) {
+    cerr << "failed to create foes!" << endl;
   }
 
   al_set_target_bitmap(al_get_backbuffer(display));
@@ -106,6 +109,7 @@ void level_1::play_level() {
     k = false;
   }
 
+
   //const float max_accel = 4;
   //const float max_vel = 8;
   float vel_x = 4.0;
@@ -127,6 +131,7 @@ void level_1::play_level() {
   int max_foes[] = {3, 3, 4};
   int foes_remaining = max_foes[current_wave];
   int active_foes = 0;
+  int fire_delay = 0;
 
   std::default_random_engine generator;
   std::uniform_int_distribution<int> distribution(20,100);
@@ -145,6 +150,9 @@ void level_1::play_level() {
     al_wait_for_event(event_queue, &ev);
  
     if(ev.type == ALLEGRO_EVENT_TIMER) {
+      if (fire_delay > 0) {
+        fire_delay--;
+      }
       if (_healing_time > 0) {
         _healing_time--;
       }
@@ -230,6 +238,13 @@ void level_1::play_level() {
         h_delta += point_2d(vel_x, 0.0);
       }
 
+      if (key[KEY_SPACE]) {
+        if (fire_delay == 0) {
+          deploy_mine(mines, hx, hy);
+          fire_delay = 30;
+        }
+      }
+
       hero->move(h_delta);
       redraw_needed = true;
     }//end if(ev.type == ALLEGRO_EVENT_TIMER)
@@ -253,6 +268,10 @@ void level_1::play_level() {
         case ALLEGRO_KEY_RIGHT:
           key[KEY_RIGHT] = true;
           break;
+            
+        case ALLEGRO_KEY_SPACE:
+          key[KEY_SPACE] = true;
+          break;
       }
     }//end else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
     else if(ev.type == ALLEGRO_EVENT_KEY_UP) {
@@ -275,6 +294,10 @@ void level_1::play_level() {
 
         case ALLEGRO_KEY_F1:
           cout << "Help" << endl;
+          break;
+
+        case ALLEGRO_KEY_SPACE:
+          key[KEY_SPACE] = false;
           break;
 
         case ALLEGRO_KEY_ESCAPE:
@@ -312,6 +335,12 @@ void level_1::play_level() {
         }
         else {
           complete(true);
+        }
+        //Clear the mines
+        for (auto &m: mines) {
+          if (m->active()) {
+            m->active(false);
+          }
         }
       }
     }
@@ -438,6 +467,12 @@ void level_1::end_level() {
     }
   }
 
+  for (auto &m: mines) {
+    if (m) {
+      delete m;
+    }
+  }
+
   if (timer) {
     cout << "   ... destroying timer" << endl;
     al_destroy_timer(timer);
@@ -472,6 +507,30 @@ bool level_1::init_foes(armada &foes, int max) {
   return true;
 }//end level_1::init_foes()
 
+bool level_1::init_weapons(weapons& mines, int max) {
+  mines.clear();
+  mines.resize(max);
+
+  cout << "Initializing weapons..." << endl;
+
+  int cnt = 0;
+  
+  for (auto& m: mines) {
+    cnt++;
+    m = new basic_object();
+    if (!m->create_bitmap(SPRITE_SIZE, SPRITE_SIZE)) {
+      cout << "failed to create foe" << endl;
+      return false;
+    }
+    m->y(SCREEN_H); // default to off screen
+    m->active(false);
+    al_set_target_bitmap(m->bitmap());
+    al_clear_to_color(LIGHT_YELLOW);
+  }
+  return true;
+}//end level_1::init_weapons()
+
+
 bool level_1::activate_foe(armada &foes, float x) {
   for (auto &f: foes) {
     if (f->active() == false) {
@@ -487,11 +546,40 @@ bool level_1::activate_foe(armada &foes, float x) {
   return false;
 }
 
+bool level_1::deploy_mine(weapons& mines, int x, int y) {
+
+  cout << "deploy mine..." << endl;
+
+  for (auto &m: mines) {
+    if (m->active() == false) {
+      m->x(x);
+      m->y(y);
+      cout << "mine deployed starting at " << x << ", " << y << endl;
+      m->active(true);
+      return true;
+    }
+  }
+  cout << "out of mines" << endl;
+  return false;
+}
+
 void level_1::redraw(float y_max) {
   al_clear_to_color(al_map_rgb(0,0,0));
   hero->redraw(); //al_draw_bitmap(bouncer, bouncer_x, bouncer_y, 0);
   for (auto &f: foes) {
     if (f->active()) {
+      //Check mines
+      for (auto &m: mines) {
+        if (m->active()) {
+          if (f->collides(m)) {
+            cout << "BOOM" << endl;
+            hits++;
+            m->active(false);
+            f->active(false);
+          }
+        }
+      }
+
       if (f->collides(hero)) {
         hits++;
         cout << "hit: " << hits << endl;
@@ -507,6 +595,12 @@ void level_1::redraw(float y_max) {
       }
     }
   }
+
+  for (auto &m: mines) {
+    if (m->active()) {
+      m->redraw();
+    }
+  }//end for (auto &m: mines)
 
   update_score();
 
