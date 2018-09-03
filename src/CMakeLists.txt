@@ -7,6 +7,8 @@ if (UNIX)
     #allegro_dialog
     allegro_font
     allegro_ttf
+    allegro_audio
+    allegro_acodec
     )
 
 endif(UNIX)

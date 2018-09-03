@@ -62,6 +62,22 @@ bool game::init() {
   al_init_ttf_addon(); // initialize the ttf (True Type Font) addon
   al_init_primitives_addon();
 
+  if (!al_install_audio()) {
+    cerr << "failed to initialize audio!" << endl;
+    return false;
+  }
+
+  if (!al_init_acodec_addon()){
+    cerr << "failed to initialize audio codecs!" << endl;
+    return false;
+  }
+
+  if (!al_reserve_samples(1)){
+    cerr << "failed to reserve samples!" << endl;
+    return false;
+  }
+
+
   if(!al_install_keyboard()) {
     cerr << "failed to initialize the keyboard!" << endl;
     return false;

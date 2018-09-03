@@ -78,6 +78,11 @@ bool level_1::init() {
     cerr << "failed to create foes!" << endl;
   }
 
+  hit_sound = al_load_sample("resources/sound/hit1.ogg" );
+  if (!hit_sound) {
+    cerr << "failed to load sound file" << endl;
+  }
+
   al_set_target_bitmap(al_get_backbuffer(display));
  
   event_queue = al_create_event_queue();
@@ -573,6 +578,8 @@ void level_1::redraw(float y_max) {
         if (m->active()) {
           if (f->collides(m)) {
             cout << "BOOM" << endl;
+            al_play_sample(hit_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE,
+                NULL);
             hits++;
             m->active(false);
             f->active(false);

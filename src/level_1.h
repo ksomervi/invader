@@ -24,6 +24,7 @@ class level_1: protected base_level {
     bool key[5] = { false, false, false, false, false };
     int _healing_time;
     weapons mines;
+    ALLEGRO_SAMPLE *hit_sound = NULL;
 
   protected:
     bool init();
