@@ -2,7 +2,7 @@
 #include_directories("${CMAKE_BINARY_DIR}/include")
 if (UNIX)
   message(STATUS "Build for UNIX")
-  set(INVADER_LIBS 
+  set(INVADER_LIBS
     allegro allegro_image allegro_primitives
     #allegro_dialog
     allegro_font
@@ -34,9 +34,17 @@ if (MINGW)
   #target_compile
   #LDFLAGS +=-lzlibstatic
   #LDFLAGS +=-lmsvcrt
-  set(INVADER_LIBS 
-    allegro_monolith-debug-static
-    jpeg libdumb libFLAC libfreetype 
+  set(INVADER_LIBS
+    #allegro_monolith-debug-static
+    allegro-debug-static
+    allegro_image-debug-static
+    allegro_primitives-debug-static
+    #allegro_dialog
+    allegro_font-debug-static
+    allegro_ttf-debug-static
+    allegro_audio-debug-static
+    allegro_acodec-debug-static
+    jpeg libdumb libFLAC libfreetype
     libvorbisfile libvorbis libogg opus opusfile
     libphysfs libpng16 libz dsound gdiplus
     uuid kernel32 winmm psapi opengl32 glu32
@@ -54,11 +62,11 @@ if (MINGW)
 
   message(STATUS "ALLEGRO_LIB: ${ALLEGRO_LIB}")
 
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L${ALLEGRO_LIB_DIR}")  
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L${ALLEGRO_LIB_DIR}")
   #target_link_libraries(invader -L${ALLEGRO_LIB_DIR})
 endif(MINGW)
 
-add_executable(invader 
+add_executable(invader
   main.cpp game.cpp base_level.cpp level_1.cpp basic_object.cpp fighter.cpp
   point_2d.cpp
   )
