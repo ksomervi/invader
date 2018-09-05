@@ -14,7 +14,7 @@
 //using armada = std::vector<basic_object*>;
 
 #include "fighter.h"
- 
+
 class game {
   private:
     ALLEGRO_DISPLAY *display;

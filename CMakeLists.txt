@@ -53,7 +53,7 @@ endfunction(copy_resources_dir_to_build)
 copy_resources_dir_to_build(copy_resource_data
   "${CMAKE_CURRENT_SOURCE_DIR}/resources"
   "${CMAKE_CURRENT_BINARY_DIR}/resources"
-) 
+)
 
   #message(STATUS "CMAKE_EXE_LINKER_FLAGS: ${CMAKE_EXE_LINKER_FLAGS}")
   #message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")

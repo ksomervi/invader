@@ -123,12 +123,12 @@ bool basic_object::collides(basic_object *o) {
   if ((dx<xr) and (dy<yr)) {
 #if 0
     cout << "collision:" << endl << " this("
-      << "w:" << _w << ",h:" << _h << ",x:" << _x << ",y:" << _y 
+      << "w:" << _w << ",h:" << _h << ",x:" << _x << ",y:" << _y
       << ")" << endl;
     cout << " that("
       << "w:" << o->_w << ",h:" << o->_h << ",x:" << o->_x << ",y:" << o->_y
       << ")" << endl;
-    cout << "dx:" << dx << " xr:" << xr << "   dy:" << dy << " yr:" << yr 
+    cout << "dx:" << dx << " xr:" << xr << "   dy:" << dy << " yr:" << yr
       << endl;
 #endif
 

@@ -20,7 +20,7 @@ game::game() {
   //timer = NULL;
   title_font = NULL;
   font = NULL;
-  
+
   hero = NULL;
 
   hits = 0;
@@ -57,7 +57,7 @@ bool game::init() {
     cerr << "failed to initialize allegro!" << endl;
     return false;
   }
- 
+
   al_init_font_addon(); // initialize the font addon
   al_init_ttf_addon(); // initialize the ttf (True Type Font) addon
   al_init_primitives_addon();
@@ -103,15 +103,15 @@ bool game::init() {
 
   hero = new fighter();
   if (!hero->create_bitmap(SPRITE_SIZE, SPRITE_SIZE)) {
-  //if (!hero->create_bitmap("sprites/hero.png")) 
+  //if (!hero->create_bitmap("sprites/hero.png"))
     cerr << "failed to create hero bitmap!" << endl;
     return false;
   }
   al_set_target_bitmap(hero->bitmap());
   al_clear_to_color(al_map_rgb(255, 174, 0));
-  
+
   al_set_target_backbuffer(display);
- 
+
   /*
   event_queue = al_create_event_queue();
   if(!event_queue) {
@@ -119,19 +119,19 @@ bool game::init() {
     delete hero;
     return false;
   }
- 
+
   al_register_event_source(event_queue, al_get_display_event_source(display));
   al_register_event_source(event_queue, al_get_timer_event_source(timer));
   al_register_event_source(event_queue, al_get_keyboard_event_source());
   */
 
   al_clear_to_color(al_map_rgb(0,0,0));
- 
+
   al_flip_display();
 
   return true;
 }//end game::init()
- 
+
 
 void game::play() {
   level_1 *l = new level_1();
@@ -147,7 +147,7 @@ void game::print_score() {
   cout.precision(2);
   cout << std::fixed << kill_eff << "%)" << endl;
 }//end game::print_score()
- 
+
 void game::end() {
   if (hero) {
     delete hero;

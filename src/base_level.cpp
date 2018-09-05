@@ -13,7 +13,7 @@ base_level::base_level() {
   display = NULL;
   event_queue = NULL;
   timer = NULL;
-  
+
   hero = NULL;
 
   hits = 0;
