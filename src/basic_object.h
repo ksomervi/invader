@@ -34,6 +34,7 @@ class basic_object {
     bool active();
     void active(bool);
 
+    void bitmap(ALLEGRO_BITMAP*);
     ALLEGRO_BITMAP* bitmap();
     bool create_bitmap(float, float);
     bool create_bitmap(const char*);
@@ -41,17 +42,17 @@ class basic_object {
     //Perhaps this should be a friend of the class?
     bool collides(basic_object*);
 
-    void location(const point_2d&); 
-    point_2d location(); 
+    void location(const point_2d&);
+    point_2d location();
 
-    void velocity(const point_2d&); 
-    point_2d velocity(); 
+    void velocity(const point_2d&);
+    point_2d velocity();
 
-    void velocity_x(float); 
-    float velocity_x(void); 
+    void velocity_x(float);
+    float velocity_x(void);
 
-    void velocity_y(float); 
-    float velocity_y(void); 
+    void velocity_y(float);
+    float velocity_y(void);
 
     void move(float, float);
     void move(point_2d);

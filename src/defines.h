@@ -27,6 +27,7 @@
 #define BLACK          al_map_rgb(0, 0, 0)
 #define WHITE          al_map_rgb(255, 255, 255)
 #define RED            al_map_rgb(207,  25,  25) //cf1919
+#define BLUE           al_map_rgb( 72,  94, 130)
 //#define GREEN          al_map_rgb( 37, 196,  23)
 #define GREEN          al_map_rgb(153, 204,   0) //99cc00 - brokenlogo green
 #define ORANGE         al_map_rgb(255, 174,   0)

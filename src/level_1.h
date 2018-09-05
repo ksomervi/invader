@@ -14,7 +14,7 @@ using armada = std::vector<basic_object*>;
 using weapons = std::vector<basic_object*>;
 
 #include "fighter.h"
- 
+
 enum MYKEYS {
    KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_SPACE
 };
@@ -23,6 +23,9 @@ class level_1: protected base_level {
   private:
     bool key[5] = { false, false, false, false, false };
     int _healing_time;
+
+    ALLEGRO_BITMAP *mine_bm = NULL;
+    ALLEGRO_BITMAP *foe_bm = NULL;
     weapons mines;
     ALLEGRO_SAMPLE *hit_sound = NULL;
 

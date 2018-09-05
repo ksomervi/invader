@@ -15,20 +15,19 @@ basic_object::basic_object() {
   _w = 0.0;
   _h = 0.0;
   //Initial location, middle of the screen
-   _loc.x((SCREEN_W - SPRITE_SIZE) / 2.0);
-   _loc.y((SCREEN_H - SPRITE_SIZE) / 2.0);
+  _loc.x((SCREEN_W - SPRITE_SIZE) / 2.0);
+  _loc.y((SCREEN_H - SPRITE_SIZE) / 2.0);
 
-   _vel = point_2d(0.0, 0.0);
+  _vel = point_2d(0.0, 0.0);
 
-   _bm = NULL;
-   _active = false;
+  _bm = NULL;
+  _active = false;
 }//end basic_object
 
 
 basic_object::basic_object(float x, float y, float vx, float vy) {
   _w = 0.0;
   _h = 0.0;
-  //Initial location, middle of the screen
   _loc = point_2d(x, y);
   _vel = point_2d(vx, vy);
 
@@ -85,6 +84,16 @@ bool basic_object::create_bitmap(float w, float h) {
   _w = w;
   _bm = al_create_bitmap(w, h);
   return _bm != NULL;
+}
+
+void basic_object::bitmap(ALLEGRO_BITMAP* bm) {
+  _bm = bm;
+  _w = 0.0;
+  _h = 0.0;
+  if (_bm) {
+    _w = al_get_bitmap_width(_bm);
+    _h = al_get_bitmap_height(_bm);
+  }
 }
 
 ALLEGRO_BITMAP* basic_object::bitmap() {
