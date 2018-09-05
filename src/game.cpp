@@ -128,6 +128,8 @@ bool game::init() {
 void game::play() {
   level_1 *l = new level_1();
   l->play(this);
+
+  delete l;
 }
 
 
