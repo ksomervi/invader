@@ -34,6 +34,7 @@ bool level_1::play(game *env) {
   }
 
   while (hero->health() > 0 and complete() == false and quit() == false) {
+    intro(1);
     play_level();
 
     if (hero->health() == 0) {
@@ -98,9 +99,11 @@ bool level_1::init() {
 
   al_clear_to_color(al_map_rgb(0,0,0));
 
+#if 0
   al_draw_text(title_font, al_map_rgb(255,255,255),
       al_get_display_width(display)/2, TITLE_FONTSIZE, ALLEGRO_ALIGN_CENTRE,
       GAME_TITLE);
+#endif
 
   al_flip_display();
 
@@ -172,7 +175,7 @@ void level_1::play_level() {
             total_foes++;
             foes_remaining--;
           }
-          next_foe = distribution(generator);
+          next_foe = distribution(generator) * (1 - current_wave*0.2);
           cout << "next foe in " << next_foe << " cycles" << endl;
         }
       }//end if (foes_remaining > 0)
@@ -609,6 +612,7 @@ void level_1::redraw(float y_max) {
 
       if (f->collides(hero)) {
         hits++;
+        al_play_sample(hit_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
         cout << "hit: " << hits << endl;
         f->y(SCREEN_H);
         f->active(false);

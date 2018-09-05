@@ -27,6 +27,7 @@ class base_level {
     int total_foes;
 
     bool init();
+    void intro(int);
     void end_level();
     void play_level();
     void print_stats();
