@@ -37,7 +37,7 @@ if (MINGW)
   set(INVADER_LIBS 
     allegro_monolith-debug-static
     jpeg libdumb libFLAC libfreetype 
-    libvorbisfile libvorbis libogg
+    libvorbisfile libvorbis libogg opus opusfile
     libphysfs libpng16 libz dsound gdiplus
     uuid kernel32 winmm psapi opengl32 glu32
     user32 comdlg32 gdi32 shell32 ole32
