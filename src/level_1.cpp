@@ -378,6 +378,9 @@ void level_1::show_stats() {
   cout << "  Total hits: " << hits << " (eff: "
     << kill_eff << "%)" << endl;
 
+  ALLEGRO_COLOR box_color = WHITE;
+  ALLEGRO_COLOR text_color = WHITE;
+
   float textbox_h = al_get_font_line_height(title_font) +
     4 * al_get_font_line_height(textfont);
   float textbox_w = 0.8 * SCREEN_W;
@@ -386,51 +389,51 @@ void level_1::show_stats() {
   al_set_target_bitmap(textbox);
   al_clear_to_color(al_map_rgb(0, 0, 0));
   al_draw_rounded_rectangle(0, 0, al_get_bitmap_width(textbox),
-      al_get_bitmap_height(textbox), 10, 10, al_map_rgb(255, 255, 255), 4);
+      al_get_bitmap_height(textbox), 10, 10, box_color, 4);
 
   float x_loc = al_get_bitmap_width(textbox)/2;
   float y_loc = TITLE_Y;
 
   if (quit()) {
-    al_draw_textf(title_font, al_map_rgb(255,255,255), x_loc, y_loc,
+    al_draw_textf(title_font, text_color, x_loc, y_loc,
         ALLEGRO_ALIGN_CENTRE, "Level %d Quit", 1);
 
     y_loc += al_get_font_line_height(title_font);
 
-    al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+    al_draw_textf(textfont, text_color, x_loc, y_loc,
       ALLEGRO_ALIGN_CENTRE, "Total Foes: %d", total_foes);
 
   }
   else if (complete()) {
-    al_draw_textf(title_font, al_map_rgb(255,255,255), x_loc, y_loc,
+    al_draw_textf(title_font, text_color, x_loc, y_loc,
         ALLEGRO_ALIGN_CENTRE, "Level %d Complete", 1);
 
     y_loc += al_get_font_line_height(title_font);
 
-    al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+    al_draw_textf(textfont, text_color, x_loc, y_loc,
       ALLEGRO_ALIGN_CENTRE, "Total Foes: %d", total_foes);
 
   }
   else {
 
-    al_draw_text(title_font, al_map_rgb(255,255,255), x_loc, y_loc,
+    al_draw_text(title_font, text_color, x_loc, y_loc,
       ALLEGRO_ALIGN_CENTRE, "Player died!");
 
     y_loc += al_get_font_line_height(title_font);
 
-    al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+    al_draw_textf(textfont, text_color, x_loc, y_loc,
       ALLEGRO_ALIGN_CENTRE, "Lives remaining: %d", hero->lives());
 
   }
 
   y_loc += al_get_font_line_height(textfont);
 
-  al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+  al_draw_textf(textfont, text_color, x_loc, y_loc,
     ALLEGRO_ALIGN_CENTRE, "Hits: %d", hits);
 
   y_loc += al_get_font_line_height(textfont);
 
-  al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+  al_draw_textf(textfont, text_color, x_loc, y_loc,
     ALLEGRO_ALIGN_CENTRE, "Efficiency: %d%%", kill_eff);
 
   al_set_target_backbuffer(display);
@@ -440,7 +443,7 @@ void level_1::show_stats() {
   al_draw_bitmap(textbox, x_loc, y_loc, 0);
   x_loc = SCREEN_W / 2;
   y_loc += textbox_h;
-  al_draw_text(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+  al_draw_text(textfont, text_color, x_loc, y_loc,
       ALLEGRO_ALIGN_CENTRE, "Any key to continue...");
 
   al_flip_display();
@@ -473,11 +476,12 @@ void level_1::end_level() {
     //delete hero;
   }
 
-  //if (foe_bm) {
-    //al_destroy_bitmap(mine_bm);
-  //}
+  if (foe_bm) {
+    al_destroy_bitmap(mine_bm);
+  }
   for (auto &f: foes) {
     if (f) {
+      f->bitmap(NULL);
       delete f;
     }
   }
@@ -512,17 +516,23 @@ bool level_1::init_foes(armada &foes, int max) {
 
   int cnt = 0;
 
+  foe_bm = al_create_bitmap(SPRITE_SIZE, SPRITE_SIZE);
+
+  if (!foe_bm) {
+    cout << "failed to create bitmap for foe" << endl;
+    return false;
+  }
+
+  al_set_target_bitmap(foe_bm);
+  al_clear_to_color(al_map_rgb(37, 196, 23));
+
   for (auto& f: foes) {
     cnt++;
     f = new basic_object();
-    if (!f->create_bitmap(SPRITE_SIZE, SPRITE_SIZE)) {
-      cout << "failed to create foe" << endl;
-      return false;
-    }
+    f->bitmap(foe_bm);
     f->y(SCREEN_H); // default to off screen
-    al_set_target_bitmap(f->bitmap());
-    al_clear_to_color(al_map_rgb(37, 196, 23));
   }
+  al_set_target_backbuffer(display);
   return true;
 }//end level_1::init_foes()
 
