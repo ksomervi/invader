@@ -58,8 +58,12 @@ bool game::init() {
     return false;
   }
 
-  al_init_font_addon(); // initialize the font addon
-  al_init_ttf_addon(); // initialize the ttf (True Type Font) addon
+  if (load_options(CONFIG_FILE)) {
+    cout << "config file loaded" << endl;
+  }
+
+  _init_fonts();
+
   al_init_primitives_addon();
 
   if (!al_install_audio()) {
@@ -72,7 +76,7 @@ bool game::init() {
     return false;
   }
 
-  if (!al_reserve_samples(1)){
+  if (!al_reserve_samples(4)) {
     cerr << "failed to reserve samples!" << endl;
     return false;
   }
@@ -86,18 +90,6 @@ bool game::init() {
   display = al_create_display(SCREEN_W, SCREEN_H);
   if(!display) {
     cerr << "failed to create display!" << endl;
-    return false;
-  }
-
-  title_font = al_load_ttf_font(FONTNAME, TITLE_FONTSIZE, 0);
-  if (!title_font) {
-    cerr << "Failed to load title font: " << FONTNAME << endl;
-    return false;
-  }
-
-  font = al_load_ttf_font(FONTNAME, SECONDARY_FONTSIZE, 0);
-  if (!font) {
-    cerr << "Failed to load secondary font: " << FONTNAME << endl;
     return false;
   }
 
@@ -148,11 +140,50 @@ void game::print_score() {
   cout << std::fixed << kill_eff << "%)" << endl;
 }//end game::print_score()
 
+bool game::load_options(const char* filename) {
+  _cfg = al_load_config_file(CONFIG_FILE);
+  return (_cfg != NULL);
+}
+
+const char* game::option(const char* section, const char* key) {
+  return al_get_config_value(_cfg, section, key);
+}//end game::option
+
+
+ALLEGRO_SAMPLE* game::get_sound(const char* option_key) {
+  ALLEGRO_SAMPLE *s = al_load_sample(option("MEDIA", option_key));
+
+  return s;
+}
+
+bool game::_init_fonts() {
+  al_init_font_addon(); // initialize the font addon
+  al_init_ttf_addon(); // initialize the ttf (True Type Font) addon
+
+  title_font = al_load_ttf_font(option("FONT", "fontpath"),
+                                atoi(option("FONT", "title_fontsize")), 0);
+  if (!title_font) {
+    cerr << "Failed to load title font: " << option("FONT", "fontpath") << endl;
+    return false;
+  }
+
+  //font = al_load_ttf_font(FONTNAME, SECONDARY_FONTSIZE, 0);
+  font = al_load_ttf_font(option("FONT", "fontpath"),
+                          atoi(option("FONT", "secondary_fontsize")), 0);
+  if (!font) {
+    cerr << "Failed to load secondary font: " << option("FONT", "fontpath") << endl;
+    return false;
+  }
+
+  return true;
+}//end game::_init_fonts()
+
 void game::end() {
   if (hero) {
     delete hero;
   }
 
+  al_destroy_config(_cfg);
   al_destroy_font(title_font);
   al_destroy_font(font);
 

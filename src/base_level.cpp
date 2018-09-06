@@ -10,6 +10,7 @@ using std::cerr;
 using std::endl;
 
 base_level::base_level() {
+  env = NULL;
   display = NULL;
   event_queue = NULL;
   timer = NULL;

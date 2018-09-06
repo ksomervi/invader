@@ -14,6 +14,7 @@ class base_level {
     bool _complete;
 
   protected:
+    game *env;
     ALLEGRO_DISPLAY *display;
     ALLEGRO_EVENT_QUEUE *event_queue;
     ALLEGRO_TIMER *timer;

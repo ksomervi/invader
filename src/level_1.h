@@ -8,13 +8,15 @@
 
 #include "base_level.h"
 
-#include "basic_object.h"
-#include <vector>
-using armada = std::vector<basic_object*>;
+//#include "basic_object.h"
+//#include <vector>
+//using armada = std::vector<basic_object*>;
+// FIXME: move this to the fighter
 using weapons = std::vector<basic_object*>;
 
-#include "fighter.h"
+//#include "fighter.h"
 
+// KIXME: move control input to its own class
 enum MYKEYS {
    KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_SPACE
 };
@@ -28,6 +30,7 @@ class level_1: protected base_level {
     ALLEGRO_BITMAP *foe_bm = NULL;
     weapons mines;
     ALLEGRO_SAMPLE *hit_sound = NULL;
+    ALLEGRO_SAMPLE *deploy_sound = NULL;
 
   protected:
     bool init();

@@ -13,12 +13,8 @@
 //const int SCREEN_H = 480;
 #define SCREEN_H  480
 
-#define RESOURCE_PATH  "resources"
-
-//const char * fontname = "resources/fonts/Carter_One/CarterOne.ttf";
-#define FONTNAME  "resources/fonts/Carter_One/CarterOne.ttf"
-#define TITLE_FONTSIZE 42
-#define SECONDARY_FONTSIZE 24
+#define RESOURCE_PATH  "resources/"
+#define CONFIG_FILE  "resources/invader.cfg"
 
 #define TITLE_Y 4
 

@@ -23,7 +23,8 @@ level_1::level_1() {
 level_1::~level_1() {
 }
 
-bool level_1::play(game *env) {
+bool level_1::play(game *g) {
+  env = g;
   display = env->get_display();
   title_font = env->get_font(0);
   textfont = env->get_font(1);
@@ -78,8 +79,13 @@ bool level_1::init() {
     cerr << "failed to create foes!" << endl;
   }
 
-  hit_sound = al_load_sample("resources/sound/hit1.ogg" );
+  hit_sound = env->get_sound("collision"); //("resources/sound/hit1.ogg" );
   if (!hit_sound) {
+    cerr << "failed to load sound file" << endl;
+  }
+
+  deploy_sound = env->get_sound("mine"); //("resources/sound/hit1.ogg" );
+  if (!deploy_sound) {
     cerr << "failed to load sound file" << endl;
   }
 
@@ -584,6 +590,8 @@ bool level_1::deploy_mine(weapons& mines, int x, int y) {
       m->y(y);
       cout << "mine deployed starting at " << x << ", " << y << endl;
       m->active(true);
+      al_play_sample(deploy_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE,
+                     NULL);
       return true;
     }
   }
