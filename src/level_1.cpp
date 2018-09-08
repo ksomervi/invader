@@ -477,7 +477,8 @@ void level_1::end_level() {
   }
 
   if (foe_bm) {
-    al_destroy_bitmap(mine_bm);
+    al_destroy_bitmap(foe_bm);
+    foe_bm = NULL;
   }
   for (auto &f: foes) {
     if (f) {
@@ -488,6 +489,7 @@ void level_1::end_level() {
 
   if (mine_bm) {
     al_destroy_bitmap(mine_bm);
+    mine_bm = NULL;
   }
   for (auto &m: mines) {
     if (m) {
@@ -516,23 +518,26 @@ bool level_1::init_foes(armada &foes, int max) {
 
   int cnt = 0;
 
-  foe_bm = al_create_bitmap(SPRITE_SIZE, SPRITE_SIZE);
+  foe_bm = al_load_bitmap(env->option("SPRITES", "creeper"));
+  cout << "Loaded foe bitmap: " << env->option("SPRITES", "creeper") << endl;
 
   if (!foe_bm) {
-    cout << "failed to create bitmap for foe" << endl;
-    return false;
+    cout << "failed to load bitmap for foe" << endl;
+    foe_bm = al_create_bitmap(SPRITE_SIZE, SPRITE_SIZE);
+
+    al_set_target_bitmap(foe_bm);
+    al_clear_to_color(al_map_rgb(37, 196, 23));
+    al_set_target_backbuffer(display);
   }
 
-  al_set_target_bitmap(foe_bm);
-  al_clear_to_color(al_map_rgb(37, 196, 23));
-
   for (auto& f: foes) {
+    cout << ".";
     cnt++;
     f = new basic_object();
     f->bitmap(foe_bm);
     f->y(SCREEN_H); // default to off screen
   }
-  al_set_target_backbuffer(display);
+  cout << endl;
   return true;
 }//end level_1::init_foes()
 

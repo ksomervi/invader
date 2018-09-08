@@ -64,6 +64,7 @@ bool game::init() {
 
   _init_fonts();
 
+  al_init_image_addon();
   al_init_primitives_addon();
 
   if (!al_install_audio()) {
