@@ -8,9 +8,10 @@
 
 #include <random>
 #include <iostream>
-using std::cout;
 using std::cerr;
 using std::endl;
+#include <string>
+using std::string;
 
 #include "level_1.h"
 
@@ -25,7 +26,8 @@ game::game() {
 
   hits = 0;
   total_foes = 0;
-}
+
+}//end game::game()
 
 
 ALLEGRO_DISPLAY *game::get_display() {
@@ -51,7 +53,7 @@ fighter* game::get_player() {
 
 bool game::init() {
 
-  cout << "Initializing game..." << endl;
+  cerr  << "Initializing game..." << endl;
 
   if(!al_init()) {
     cerr << "failed to initialize allegro!" << endl;
@@ -59,7 +61,7 @@ bool game::init() {
   }
 
   if (load_options(CONFIG_FILE)) {
-    cout << "config file loaded" << endl;
+    cerr  << "config file loaded" << endl;
   }
 
   _init_fonts();
@@ -136,11 +138,11 @@ void game::play() {
 
 void game::print_score() {
   float kill_eff = float(hits)*100.0/total_foes;
-  cout << "So how did you do?" << endl;
-  cout << "  Total foes: " << total_foes << endl;
-  cout << "  Total hits: " << hits << " (eff: ";
-  cout.precision(2);
-  cout << std::fixed << kill_eff << "%)" << endl;
+  cerr  << "So how did you do?" << endl;
+  cerr  << "  Total foes: " << total_foes << endl;
+  cerr  << "  Total hits: " << hits << " (eff: ";
+  cerr .precision(2);
+  cerr  << std::fixed << kill_eff << "%)" << endl;
 }//end game::print_score()
 
 bool game::load_options(const char* filename) {
@@ -154,10 +156,20 @@ const char* game::option(const char* section, const char* key) {
 
 
 ALLEGRO_SAMPLE* game::get_sound(const char* option_key) {
-  ALLEGRO_SAMPLE *s = al_load_sample(option("MEDIA", option_key));
-
+  string path = option("MEDIA", option_key);
+  cerr  << "Loading sound: " << "MEDIA::" << option_key
+    << ":" << path << endl;
+  ALLEGRO_SAMPLE *s = al_load_sample(path.c_str());
   return s;
-}
+}//end game::get_sound()
+
+ALLEGRO_BITMAP* game::get_sprite(const char* option_key) {
+  string path = option("SPRITES", option_key);
+  cerr  << "Loading bitmap: " << "SPRITES::" << option_key
+    << ":" << path << endl;
+  ALLEGRO_BITMAP *bm = al_load_bitmap(path.c_str());
+  return bm;
+}//end game::get_sprite()
 
 bool game::_init_fonts() {
   al_init_font_addon(); // initialize the font addon

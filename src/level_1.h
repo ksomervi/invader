@@ -16,7 +16,7 @@ using weapons = std::vector<basic_object*>;
 
 //#include "fighter.h"
 
-// KIXME: move control input to its own class
+// FIXME: move control input to its own class
 enum MYKEYS {
    KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_SPACE
 };

@@ -10,12 +10,7 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 
-//#include "basic_object.h"
-//#include <vector>
-//using armada = std::vector<basic_object*>;
-
 #include "fighter.h"
-
 
 class game {
   private:
@@ -44,6 +39,7 @@ class game {
     ALLEGRO_FONT *get_font(int);
     fighter* get_player();
     ALLEGRO_SAMPLE* get_sound(const char*);
+    ALLEGRO_BITMAP* get_sprite(const char*);
 
     bool init();
     void play();

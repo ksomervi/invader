@@ -13,8 +13,8 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
-#include <sstream>
-using std::ostringstream;
+#include <string>
+using std::string;
 
 level_1::level_1() {
   _healing_time = 0;
@@ -518,8 +518,7 @@ bool level_1::init_foes(armada &foes, int max) {
 
   int cnt = 0;
 
-  foe_bm = al_load_bitmap(env->option("SPRITES", "creeper"));
-  cout << "Loaded foe bitmap: " << env->option("SPRITES", "creeper") << endl;
+  foe_bm = env->get_sprite("creeper");
 
   if (!foe_bm) {
     cout << "failed to load bitmap for foe" << endl;
@@ -547,22 +546,26 @@ bool level_1::init_weapons(weapons& mines, int max) {
 
   cout << "Initializing weapons..." << endl;
 
-  mine_bm = al_create_bitmap(SPRITE_SIZE, SPRITE_SIZE);
+  mine_bm = env->get_sprite("mine");
 
   if (!mine_bm) {
+    mine_bm = al_create_bitmap(SPRITE_SIZE, SPRITE_SIZE);
     cout << "failed to create bitmap for mine" << endl;
-    return false;
+
+    al_set_target_bitmap(mine_bm);
+    al_clear_to_color(LIGHT_YELLOW);
+
+    float line_width = 8.2;
+    al_draw_circle(SPRITE_SIZE/2, SPRITE_SIZE/2, (SPRITE_SIZE - line_width)/2,
+        RED, line_width);
+    al_draw_filled_triangle(5, 5, SPRITE_SIZE-5, 5, SPRITE_SIZE/2,
+        SPRITE_SIZE-5, BLUE);
+    al_draw_filled_triangle(5, SPRITE_SIZE-5, SPRITE_SIZE-5, SPRITE_SIZE-5,
+        SPRITE_SIZE/2, 5, BLUE);
+
+    al_convert_mask_to_alpha(mine_bm, LIGHT_YELLOW);
+    al_set_target_backbuffer(display);
   }
-
-  al_set_target_bitmap(mine_bm);
-  al_clear_to_color(LIGHT_YELLOW);
-
-  float line_width = 8.2;
-  al_draw_circle(SPRITE_SIZE/2, SPRITE_SIZE/2, (SPRITE_SIZE - line_width)/2, RED, line_width);
-  al_draw_filled_triangle(5, 5, SPRITE_SIZE-5, 5, SPRITE_SIZE/2, SPRITE_SIZE-5, BLUE);
-  al_draw_filled_triangle(5, SPRITE_SIZE-5, SPRITE_SIZE-5, SPRITE_SIZE-5, SPRITE_SIZE/2, 5, BLUE);
-
-  al_convert_mask_to_alpha(mine_bm, LIGHT_YELLOW);
 
   int cnt = 0;
 
@@ -573,8 +576,6 @@ bool level_1::init_weapons(weapons& mines, int max) {
     m->y(SCREEN_H); // default to off screen
     m->active(false);
   }
-
-  al_set_target_backbuffer(display);
 
   return true;
 }//end level_1::init_weapons()
