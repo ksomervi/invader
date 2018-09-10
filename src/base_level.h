@@ -12,6 +12,7 @@ class base_level {
   private:
     bool _quit;
     bool _complete;
+    static logger *_log;
 
   protected:
     game *env;

@@ -69,6 +69,7 @@ endif(MINGW)
 add_executable(invader
   main.cpp game.cpp base_level.cpp level_1.cpp basic_object.cpp fighter.cpp
   point_2d.cpp
+  logger.cpp
   )
 
 target_link_libraries(invader ${INVADER_LIBS})
