@@ -9,7 +9,6 @@
 
 #include <random>
 #include <iostream>
-using std::cout;
 using std::cerr;
 using std::endl;
 
@@ -17,7 +16,7 @@ using std::endl;
 using std::string;
 
 level_1::level_1() {
-  _healing_time = 0;
+  //_healing_time = 0;
 }
 
 level_1::~level_1() {
@@ -94,7 +93,7 @@ bool level_1::init() {
   event_queue = al_create_event_queue();
   if(!event_queue) {
     cerr << "failed to create event_queue!" << endl;
-    delete hero;
+    //delete hero;
     al_destroy_timer(timer);
     return false;
   }
@@ -165,13 +164,6 @@ void level_1::play_level() {
       if (fire_delay > 0) {
         fire_delay--;
       }
-      if (_healing_time > 0) {
-        _healing_time--;
-      }
-      else {
-        _healing_time = 60;
-        hero->add_health(2);
-      }
       if (foes_remaining > 0) {
         if (next_foe > 0) {
           next_foe--;
@@ -182,7 +174,7 @@ void level_1::play_level() {
             foes_remaining--;
           }
           next_foe = distribution(generator) * (1 - current_wave*0.2);
-          cout << "next foe in " << next_foe << " cycles" << endl;
+          cerr << "next foe in " << next_foe << " cycles" << endl;
         }
       }//end if (foes_remaining > 0)
 
@@ -305,7 +297,7 @@ void level_1::play_level() {
           break;
 
         case ALLEGRO_KEY_F1:
-          cout << "Help" << endl;
+          cerr << "Help" << endl;
           break;
 
         case ALLEGRO_KEY_SPACE:
@@ -331,6 +323,8 @@ void level_1::play_level() {
       }
     }
 
+    hero->update();
+
     if (hero->health() == 0) {
       foes_remaining = 0;
     }
@@ -338,7 +332,7 @@ void level_1::play_level() {
     if (foes_remaining == 0 and active_foes == 0) {
       playing = false;
       if (hero->health()) {
-        cout << "Completed wave: " << current_wave << endl;
+        cerr << "Completed wave: " << current_wave << endl;
         current_wave++;
         if (current_wave < max_waves) {
           foes_remaining = max_foes[current_wave];
@@ -361,7 +355,7 @@ void level_1::play_level() {
   al_stop_timer(timer);
   al_rest(1.0);
   if (al_is_event_queue_empty(event_queue) == false) {
-    cout << "pending event ... flushing" << endl;
+    cerr << "pending event ... flushing" << endl;
     al_flush_event_queue(event_queue);
   }
 
@@ -373,9 +367,9 @@ void level_1::show_stats() {
   if (total_foes) {
     kill_eff = hits*100/total_foes;
   }
-  cout << "So how did you do?" << endl;
-  cout << "  Total foes: " << total_foes << endl;
-  cout << "  Total hits: " << hits << " (eff: "
+  cerr << "So how did you do?" << endl;
+  cerr << "  Total foes: " << total_foes << endl;
+  cerr << "  Total hits: " << hits << " (eff: "
     << kill_eff << "%)" << endl;
 
   ALLEGRO_COLOR box_color = WHITE;
@@ -471,9 +465,12 @@ void level_1::show_stats() {
 }//end level_1::show_stats()
 
 void level_1::end_level() {
-  cout << "ending level..." << endl;
+  cerr << "ending level..." << endl;
   if (hero) {
-    //delete hero;
+    //Cleanup the bitmap we allocated
+    ALLEGRO_BITMAP *bm = hero->bitmap();
+    al_destroy_bitmap(bm);
+    hero->bitmap(NULL);
   }
 
   if (foe_bm) {
@@ -499,29 +496,29 @@ void level_1::end_level() {
   }
 
   if (timer) {
-    cout << "   ... destroying timer" << endl;
+    cerr << "   ... destroying timer" << endl;
     al_destroy_timer(timer);
   }
 
   if (event_queue) {
-    cout << "   ... destroying event_queue" << endl;
+    cerr << "   ... destroying event_queue" << endl;
     al_destroy_event_queue(event_queue);
   }
 
   return;
-}//end level_1::end()
+}//end level_1::end_level()
 
 bool level_1::init_foes(armada &foes, int max) {
   foes.clear();
   foes.resize(max);
-  cout << "Initializing foes..." << endl;
+  cerr << "Initializing foes..." << endl;
 
   int cnt = 0;
 
   foe_bm = env->get_sprite("creeper");
 
   if (!foe_bm) {
-    cout << "failed to load bitmap for foe" << endl;
+    cerr << "failed to load bitmap for foe" << endl;
     foe_bm = al_create_bitmap(SPRITE_SIZE, SPRITE_SIZE);
 
     al_set_target_bitmap(foe_bm);
@@ -530,13 +527,13 @@ bool level_1::init_foes(armada &foes, int max) {
   }
 
   for (auto& f: foes) {
-    cout << ".";
+    cerr << ".";
     cnt++;
     f = new basic_object();
     f->bitmap(foe_bm);
     f->y(SCREEN_H); // default to off screen
   }
-  cout << endl;
+  cerr << endl;
   return true;
 }//end level_1::init_foes()
 
@@ -544,13 +541,13 @@ bool level_1::init_weapons(weapons& mines, int max) {
   mines.clear();
   mines.resize(max);
 
-  cout << "Initializing weapons..." << endl;
+  cerr << "Initializing weapons..." << endl;
 
   mine_bm = env->get_sprite("mine");
 
   if (!mine_bm) {
     mine_bm = al_create_bitmap(SPRITE_SIZE, SPRITE_SIZE);
-    cout << "failed to create bitmap for mine" << endl;
+    cerr << "failed to create bitmap for mine" << endl;
 
     al_set_target_bitmap(mine_bm);
     al_clear_to_color(LIGHT_YELLOW);
@@ -586,32 +583,32 @@ bool level_1::activate_foe(armada &foes, float x) {
     if (f->active() == false) {
       f->y(0);
       f->x(x);
-      cout << "foe starting at " << x << endl;
+      cerr << "foe starting at " << x << endl;
       f->active(true);
       return true;
     }
   }
 
-  cout << "all foes active" << endl;
+  cerr << "all foes active" << endl;
   return false;
 }
 
 bool level_1::deploy_mine(weapons& mines, int x, int y) {
 
-  cout << "deploy mine..." << endl;
+  cerr << "deploy mine..." << endl;
 
   for (auto &m: mines) {
     if (m->active() == false) {
       m->x(x);
       m->y(y);
-      cout << "mine deployed starting at " << x << ", " << y << endl;
+      cerr << "mine deployed starting at " << x << ", " << y << endl;
       m->active(true);
       al_play_sample(deploy_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE,
                      NULL);
       return true;
     }
   }
-  cout << "out of mines" << endl;
+  cerr << "out of mines" << endl;
   return false;
 }
 
@@ -624,7 +621,7 @@ void level_1::redraw(float y_max) {
       for (auto &m: mines) {
         if (m->active()) {
           if (f->collides(m)) {
-            cout << "BOOM" << endl;
+            cerr << "BOOM" << endl;
             al_play_sample(hit_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE,
                 NULL);
             hits++;
@@ -637,13 +634,16 @@ void level_1::redraw(float y_max) {
       if (f->collides(hero)) {
         hits++;
         al_play_sample(hit_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-        cout << "hit: " << hits << endl;
+        cerr << "hit: " << hits << endl;
         f->y(SCREEN_H);
         f->active(false);
+        hero->take_hit(20);
+        /*
         hero->add_health(-20);
         if (hero->health() > 0) {
           _healing_time = 60;
         }
+        */
       }
       else {
         f->redraw();

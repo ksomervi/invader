@@ -11,7 +11,12 @@ fighter::fighter() {
   _lives = DEFAULT_LIVES;
   _max_health = 100;
   _health = _max_health;
+  _healing_time = 0;
+  _healing = false;
 };
+
+fighter::~fighter() {
+}
 
 int fighter::lives() {
   return _lives;
@@ -49,13 +54,36 @@ void fighter::add_health(int h) {
     _health = 0;
     std::cout << "player died! restart level" << std::endl;
   }
-
-  if (_health > _max_health) {
-    _health = _max_health;
+  else if (_health < _max_health) {
+    _healing = true;
+    _healing_time = 60;
   }
+  else {
+    _healing = false;
+    if (_health > _max_health) {
+      _health = _max_health;
+    }
+  }
+}//end fighter::add_health()
+
+
+void fighter::take_hit(int damage) {
+  add_health(-1*damage);
 }
+
 
 float fighter::percent_health() {
   return float(_health) / _max_health;
 }
+
+void fighter::update() {
+  if (_healing) {
+    if (_healing_time > 0) {
+      _healing_time--;
+    }
+    else {
+      this->add_health(2);
+    }
+  }
+}//end update()
 

@@ -10,9 +10,12 @@ class fighter: public basic_object {
     int _lives;
     int _health;
     int _max_health;
+    int _healing_time;
+    bool _healing;
 
   public:
     fighter();
+    ~fighter();
     int lives();
     void lives(int);
     void add_lives(int);
@@ -20,7 +23,10 @@ class fighter: public basic_object {
     int health();
     int max_health();
     void add_health(int);
+    void take_hit(int);
     float percent_health();
+
+    void update();
 
 };//end class fighter
 #endif //!defined(FIGHTER_H)

@@ -42,6 +42,9 @@ basic_object::~basic_object() {
   }
 }
 
+void basic_object::update() {
+}
+
 float basic_object::x() {
   return _loc.x();
 }

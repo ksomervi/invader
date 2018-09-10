@@ -23,7 +23,7 @@ class basic_object {
   public:
     basic_object();
     basic_object(float, float, float, float);
-    ~basic_object();
+    virtual ~basic_object();
     void redraw();
     void draw(float, float);
     float x();
@@ -58,6 +58,8 @@ class basic_object {
     void move(point_2d);
     void move_to(float, float);
     void move_to(point_2d);
+
+    virtual void update();
 
 };//end class basic_object
 

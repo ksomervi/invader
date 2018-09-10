@@ -24,7 +24,7 @@ enum MYKEYS {
 class level_1: protected base_level {
   private:
     bool key[5] = { false, false, false, false, false };
-    int _healing_time;
+    //int _healing_time;
 
     ALLEGRO_BITMAP *mine_bm = NULL;
     ALLEGRO_BITMAP *foe_bm = NULL;
