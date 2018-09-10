@@ -27,7 +27,7 @@ COMPILE = ${CXX} ${CXXFLAGS}
 ${TARGET}: ${OBJS}
 	${COMPILE} -o $@ ${OBJS} ${LDFLAGS}
 
-demo: demo.o basic_object.o fighter.o
+demo: demo.o basic_object.o fighter.o point_2d.o
 	${COMPILE} -o $@ $^ ${LDFLAGS}
 
 neat:

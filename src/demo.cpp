@@ -255,6 +255,16 @@ int main(int argc, char **argv) {
           cout << "Help" << endl;
           break;
 
+        case ALLEGRO_KEY_P:
+          if (al_get_timer_started(timer)) {
+            al_stop_timer(timer);
+          }
+          else {
+            al_resume_timer(timer);
+          }
+          continue;
+          break;
+
         case ALLEGRO_KEY_ESCAPE:
           playing = false;
           break;
