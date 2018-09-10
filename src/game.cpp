@@ -27,6 +27,8 @@ game::game() {
   hits = 0;
   total_foes = 0;
 
+  _log = new logger(logger::NOTE);
+
 }//end game::game()
 
 
@@ -53,15 +55,15 @@ fighter* game::get_player() {
 
 bool game::init() {
 
-  cerr  << "Initializing game..." << endl;
+  _log->note("Initializing game...");
 
   if(!al_init()) {
-    cerr << "failed to initialize allegro!" << endl;
+    _log->error("failed to initialize allegro!");
     return false;
   }
 
   if (load_options(CONFIG_FILE)) {
-    cerr  << "config file loaded" << endl;
+    _log->note("config file loaded");
   }
 
   _init_fonts();
@@ -70,36 +72,36 @@ bool game::init() {
   al_init_primitives_addon();
 
   if (!al_install_audio()) {
-    cerr << "failed to initialize audio!" << endl;
+    _log->error("failed to initialize audio!");
     return false;
   }
 
   if (!al_init_acodec_addon()){
-    cerr << "failed to initialize audio codecs!" << endl;
+    _log->error("failed to initialize audio codecs!");
     return false;
   }
 
   if (!al_reserve_samples(4)) {
-    cerr << "failed to reserve samples!" << endl;
+    _log->error("failed to reserve samples!");
     return false;
   }
 
 
   if(!al_install_keyboard()) {
-    cerr << "failed to initialize the keyboard!" << endl;
+    _log->error("failed to initialize the keyboard!");
     return false;
   }
 
   display = al_create_display(SCREEN_W, SCREEN_H);
   if(!display) {
-    cerr << "failed to create display!" << endl;
+    _log->error("failed to create display!");
     return false;
   }
 
   hero = new fighter();
   if (!hero->create_bitmap(SPRITE_SIZE, SPRITE_SIZE)) {
   //if (!hero->create_bitmap("sprites/hero.png"))
-    cerr << "failed to create hero bitmap!" << endl;
+    _log->error("failed to create hero bitmap!");
     return false;
   }
   al_set_target_bitmap(hero->bitmap());

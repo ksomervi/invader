@@ -10,10 +10,12 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 
+#include "logger.h"
 #include "fighter.h"
 
 class game {
   private:
+    logger *_log;
     ALLEGRO_CONFIG *_cfg;
     ALLEGRO_DISPLAY *display;
     //ALLEGRO_EVENT_QUEUE *event_queue;
