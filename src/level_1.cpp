@@ -59,19 +59,24 @@ bool level_1::init() {
 
   //TODO: we should get the hero from the game environment
   //hero = new fighter();
-  if (!hero->create_bitmap(SPRITE_SIZE, SPRITE_SIZE)) {
-  //if (!hero->create_bitmap("sprites/hero.png"))
+  ALLEGRO_BITMAP *h_bm = env->get_sprite("hero");
+  if (!h_bm) {
+    if (!hero->create_bitmap(SPRITE_SIZE, SPRITE_SIZE)) {
     cerr << "failed to create hero bitmap!" << endl;
-    al_destroy_timer(timer);
     return false;
-  }
+    }
 
-  al_set_target_bitmap(hero->bitmap());
-  al_clear_to_color(al_map_rgb(255, 174, 0));
+    //Setup and mockup sprite
+    al_set_target_bitmap(hero->bitmap());
+    al_clear_to_color(al_map_rgb(255, 174, 0));
+    al_set_target_backbuffer(display);
+  }
+  else {
+    hero->bitmap(h_bm);
+  }
 
   if (!init_foes(foes, 16)) {
     cerr << "failed to create foes!" << endl;
-    al_destroy_timer(timer);
     return false;
   }
   if (!init_weapons(mines, 5)) {
@@ -88,13 +93,9 @@ bool level_1::init() {
     cerr << "failed to load sound file" << endl;
   }
 
-  al_set_target_bitmap(al_get_backbuffer(display));
-
   event_queue = al_create_event_queue();
   if(!event_queue) {
     cerr << "failed to create event_queue!" << endl;
-    //delete hero;
-    al_destroy_timer(timer);
     return false;
   }
 
@@ -627,6 +628,7 @@ void level_1::redraw(float y_max) {
             hits++;
             m->active(false);
             f->active(false);
+            f->y(SCREEN_H);
           }
         }
       }
