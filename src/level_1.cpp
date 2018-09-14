@@ -152,7 +152,6 @@ void level_1::play_level() {
   std::default_random_engine x_generator;
   std::uniform_real_distribution<float> x_distribution(x_min, x_max);
 
-  bool redraw_needed = true;
   bool playing = true;
 
   al_start_timer(timer);
@@ -201,31 +200,11 @@ void level_1::play_level() {
       h_delta = point_2d(0.0, 0.0);
 
       if(key[KEY_UP]) {
-        if(hy >= y_min) {
-            //bouncer_y -= 4.0;
-            //if (accel_y < max_accel) {
-              //accel_y += 0.2;
-              //printf("accel_y: %f\n", accel_y);
-            //}
-
-            //if (vel_y < max_vel) {
-              //vel_y += accel_y;
-              //printf("vel_y: %f\n", vel_y);
-            //}
-            //hero->y(hy-vel_y);//bouncer_y -= 4.0;
-            h_delta.y(-vel_y);
+        if (hy >= y_min) {
+          h_delta.y(-vel_y);
         }
       }
-      else {//key[KEY_UP] == false
-            //if (accel_y > -(max_accel)) {
-              //accel_y -= 0.02;
-              //printf("accel_y: %f\n", accel_y);
-            //}
-
-            //if (vel_y > -8) {
-              //vel_y += accel_y;
-              //printf("vel_y: %f\n", vel_y);
-            //}
+      else {
         if(hy <= y_max) {
           h_delta.y(1.0);
         }
@@ -251,7 +230,8 @@ void level_1::play_level() {
       }
 
       hero->move(h_delta);
-      redraw_needed = true;
+      hero->update();
+      this->redraw(y_max);
     }//end if(ev.type == ALLEGRO_EVENT_TIMER)
     else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
       break;
@@ -305,6 +285,16 @@ void level_1::play_level() {
           key[KEY_SPACE] = false;
           break;
 
+        case ALLEGRO_KEY_P:
+          if (al_get_timer_started(timer)) {
+            al_stop_timer(timer);
+          }
+          else {
+            al_resume_timer(timer);
+          }
+          continue;
+          break;
+
         case ALLEGRO_KEY_ESCAPE:
           playing = false;
           quit(true);
@@ -312,10 +302,12 @@ void level_1::play_level() {
       }
     }//end else if(ev.type == ALLEGRO_EVENT_KEY_UP)
 
+    /*
     if(redraw_needed && al_is_event_queue_empty(event_queue)) {
       redraw_needed = false;
       this->redraw(y_max);
     }
+    */
 
     active_foes = 0;
     for (auto &f: foes) {
@@ -324,7 +316,7 @@ void level_1::play_level() {
       }
     }
 
-    hero->update();
+    //hero->update();
 
     if (hero->health() == 0) {
       foes_remaining = 0;
@@ -640,12 +632,6 @@ void level_1::redraw(float y_max) {
         f->y(SCREEN_H);
         f->active(false);
         hero->take_hit(20);
-        /*
-        hero->add_health(-20);
-        if (hero->health() > 0) {
-          _healing_time = 60;
-        }
-        */
       }
       else {
         f->redraw();
