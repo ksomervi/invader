@@ -140,8 +140,8 @@ bool basic_object::collides(basic_object *o) {
   return false;
 }
 
-void basic_object::location(const point_2d& v) {
-  _vel = v;
+void basic_object::location(const point_2d& l) {
+  _loc = l;
 }
 
 point_2d basic_object::location() {
