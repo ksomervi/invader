@@ -217,18 +217,22 @@ int main(int argc, char **argv) {
     else if(ev.type == ALLEGRO_EVENT_KEY_DOWN) {
       switch(ev.keyboard.keycode) {
         case ALLEGRO_KEY_UP:
+        case ALLEGRO_KEY_W:
           key[KEY_UP] = true;
           break;
 
         case ALLEGRO_KEY_DOWN:
+        case ALLEGRO_KEY_S:
           key[KEY_DOWN] = true;
           break;
             
         case ALLEGRO_KEY_LEFT: 
+	case ALLEGRO_KEY_A:
           key[KEY_LEFT] = true;
           break;
             
         case ALLEGRO_KEY_RIGHT:
+	case ALLEGRO_KEY_D:
           key[KEY_RIGHT] = true;
           break;
       }
@@ -236,18 +240,22 @@ int main(int argc, char **argv) {
     else if(ev.type == ALLEGRO_EVENT_KEY_UP) {
       switch(ev.keyboard.keycode) {
         case ALLEGRO_KEY_UP:
+	case ALLEGRO_KEY_W:
           key[KEY_UP] = false;
           break;
 
         case ALLEGRO_KEY_DOWN:
+	case ALLEGRO_KEY_S:
           key[KEY_DOWN] = false;
           break;
 
         case ALLEGRO_KEY_LEFT: 
+	case ALLEGRO_KEY_A:
           key[KEY_LEFT] = false;
           break;
 
         case ALLEGRO_KEY_RIGHT:
+	case ALLEGRO_KEY_D:
           key[KEY_RIGHT] = false;
           break;
 

@@ -2,24 +2,30 @@
 # Copyright Kevin Somervill
 # August 3, 2018
 
+HOST=$(shell uname -o)
+
+ifeq "$(HOST)" "Msys"
+	include mingw64.mk
+else
+
+INCLUDE = -I../../allegro-mingw-gcc6.2.0-x64-static-5.2.2/allegor/include
 LDFLAGS =-lallegro -lallegro_image -lallegro_primitives
 #LDFLAGS += -lallegro_dialog
 LDFLAGS += -lallegro_font
 LDFLAGS += -lallegro_ttf
 
-TARGET = invader
-
-SRCS = main.cpp game.cpp base_level.cpp level_1.cpp basic_object.cpp fighter.cpp
-
-OBJS = $(subst .cpp,.o,${SRCS})
-
 CXX = g++
 
 CXXFLAGS=-std=c++11 -Wall -g
+endif
 
-#INCLUDE = -I../src
+SRCS = main.cpp game.cpp base_level.cpp level_1.cpp basic_object.cpp fighter.cpp
+SRCS += logger.cpp point_2d.cpp
+OBJS = $(subst .cpp,.o,${SRCS})
 
 COMPILE = ${CXX} ${CXXFLAGS}
+
+TARGET = invader
 
 .cpp.o:
 	${COMPILE} -c $?
@@ -27,7 +33,7 @@ COMPILE = ${CXX} ${CXXFLAGS}
 ${TARGET}: ${OBJS}
 	${COMPILE} -o $@ ${OBJS} ${LDFLAGS}
 
-demo: demo.o basic_object.o fighter.o
+demo: demo.o basic_object.o fighter.o point_2d.o
 	${COMPILE} -o $@ $^ ${LDFLAGS}
 
 neat:
