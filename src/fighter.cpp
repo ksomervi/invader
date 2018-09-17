@@ -76,6 +76,33 @@ float fighter::percent_health() {
   return float(_health) / _max_health;
 }
 
+void fighter::bound(const point_2d &min, const point_2d &max) {
+  std::cerr << " bound: (" << min.x() << ", " << min.y()
+    << ") - ("<< max.x() << ", " << max.y() << ")" << std::endl;
+
+  _min_bounds = min;
+  _max_bounds = max;
+}
+
+void fighter::move(const point_2d &offset) {
+  point_2d next_loc(location() + offset);
+
+  if (next_loc.x() < _min_bounds.x()) {
+    next_loc.x(_min_bounds.x());
+  }
+  if (next_loc.x() > _max_bounds.x()) {
+    next_loc.x(_max_bounds.x());
+  }
+  if (next_loc.y() < _min_bounds.y()) {
+    next_loc.y(_min_bounds.y());
+  }
+  if (next_loc.y() > _max_bounds.y()) {
+    next_loc.y(_max_bounds.y());
+  }
+
+  location(next_loc);
+}//end
+
 void fighter::update() {
   if (_healing) {
     if (_healing_time > 0) {

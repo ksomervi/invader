@@ -12,9 +12,9 @@ class point_2d {
     point_2d(const point_2d&);
 
     void x(float);
-    float x(void);
+    float x(void) const;
     void y(float);
-    float y(void);
+    float y(void) const;
 
     bool operator==(const point_2d&);
     bool operator!=(const point_2d&);

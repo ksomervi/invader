@@ -27,11 +27,11 @@ void point_2d::y(float v) {
   _y = v;
 }
 
-float point_2d::x() {
+float point_2d::x() const {
   return _x;
 }
 
-float point_2d::y() {
+float point_2d::y() const {
   return _y;
 }
 
