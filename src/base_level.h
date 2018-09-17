@@ -2,6 +2,7 @@
 #define BASE_LEVEL_H
 
 #include "game.h"
+#include "controller.h"
 #include "fighter.h"
 #include <vector>
 using armada = std::vector<basic_object*>;
@@ -21,6 +22,8 @@ class base_level {
     ALLEGRO_TIMER *timer;
     ALLEGRO_FONT *title_font;
     ALLEGRO_FONT *textfont;
+
+    controller *input;
 
     fighter *hero;
     armada foes;
@@ -43,6 +46,11 @@ class base_level {
     virtual bool play(game *) = 0;
     bool complete();
     void complete(bool);
+
+    bool is_paused();
+    void toggle_pause();
+    void pause_play();
+    void resume_play();
 
     bool quit();
 };//end class base_level

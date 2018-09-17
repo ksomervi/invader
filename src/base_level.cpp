@@ -111,3 +111,26 @@ void base_level::quit(bool b) {
   _quit = b;
 };//end base_level::quit()
 
+bool base_level::is_paused() {
+  return al_get_timer_started(timer);
+}//end base_level::is_paused()
+
+void base_level::toggle_pause() {
+  if (al_get_timer_started(timer)) {
+    al_stop_timer(timer);
+  }
+  else {
+    al_resume_timer(timer);
+  }
+}//end base_level::toggle_pause()
+
+void base_level::pause_play() {
+  if (al_get_timer_started(timer)) {
+    al_stop_timer(timer);
+  }
+}//end base_level::pause_play()
+
+void base_level::resume_play() {
+  al_resume_timer(timer);
+}//end base_level::resume_play()
+

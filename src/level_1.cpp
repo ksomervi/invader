@@ -16,7 +16,6 @@ using std::endl;
 using std::string;
 
 level_1::level_1() {
-  //_healing_time = 0;
 }
 
 level_1::~level_1() {
@@ -28,6 +27,7 @@ bool level_1::play(game *g) {
   title_font = env->get_font(0);
   textfont = env->get_font(1);
   hero = env->get_player();
+  input = new controller();
 
   if (! this->init()) {
     return false;
@@ -57,8 +57,6 @@ bool level_1::init() {
     return false;
   }
 
-  //TODO: we should get the hero from the game environment
-  //hero = new fighter();
   ALLEGRO_BITMAP *h_bm = env->get_sprite("hero");
   if (!h_bm) {
     if (!hero->create_bitmap(SPRITE_SIZE, SPRITE_SIZE)) {
@@ -105,12 +103,6 @@ bool level_1::init() {
 
   al_clear_to_color(al_map_rgb(0,0,0));
 
-#if 0
-  al_draw_text(title_font, al_map_rgb(255,255,255),
-      al_get_display_width(display)/2, TITLE_FONTSIZE, ALLEGRO_ALIGN_CENTRE,
-      GAME_TITLE);
-#endif
-
   al_flip_display();
 
   return true;
@@ -122,13 +114,9 @@ void level_1::play_level() {
     k = false;
   }
 
-  //const float max_accel = 4;
-  //const float max_vel = 8;
   float vel_x = 4.0;
   float vel_y = 4.0;
   point_2d gravity(0.0, 1.0);
-  float hx = 0.0;
-  float hy = 0.0;
   point_2d h_loc;
   point_2d h_delta;
 
@@ -136,6 +124,7 @@ void level_1::play_level() {
   float x_max = SCREEN_W - SPRITE_SIZE - x_min;
   float y_min = 0.25 * SCREEN_H;
   float y_max = SCREEN_H - SPRITE_SIZE;
+  hero->bound(point_2d(x_min, y_min), point_2d(x_max, y_max));
 
   int max_waves = 3;
   int current_wave = 0;
@@ -193,42 +182,24 @@ void level_1::play_level() {
         }//end if (f->active())
       }//end for (auto &f: foes)
 
-      hx = hero->x();
-      hy = hero->y();
 
       h_loc = hero->location();
       h_delta = point_2d(0.0, 0.0);
 
-      if(key[KEY_UP]) {
-        if (hy >= y_min) {
-          h_delta.y(-vel_y);
-        }
-      }
-      else {
-        if(hy <= y_max) {
-          h_delta.y(1.0);
-        }
-      }//end if(bouncer_y >= 4.0)
-
-      if(key[KEY_DOWN] && hy <= y_max) {
-        h_delta.y(vel_y);
-      }
-
-      if(key[KEY_LEFT] && hx >= x_min) {
-        h_delta -= point_2d(vel_x, 0.0);
-      }
-
-      if(key[KEY_RIGHT] && hx <= x_max) {
-        h_delta += point_2d(vel_x, 0.0);
-      }
-
-      if (key[KEY_SPACE]) {
+      if (input->fire()) {
         if (fire_delay == 0) {
-          deploy_mine(mines, hx, hy);
+          deploy_mine(mines, hero->x(), hero->y());
           fire_delay = 30;
         }
       }
 
+      if (input->direction() != point_2d()) {
+        h_delta.x(input->direction().x() * vel_x);
+        h_delta.y(input->direction().y() * vel_y);
+      }
+      else {
+        h_delta = gravity;
+      }
       hero->move(h_delta);
       hero->update();
       this->redraw(y_max);
@@ -236,71 +207,20 @@ void level_1::play_level() {
     else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
       break;
     }//end else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
-    else if(ev.type == ALLEGRO_EVENT_KEY_DOWN) {
-      switch(ev.keyboard.keycode) {
-        case ALLEGRO_KEY_UP:
-          key[KEY_UP] = true;
-          break;
-
-        case ALLEGRO_KEY_DOWN:
-          key[KEY_DOWN] = true;
-          break;
-
-        case ALLEGRO_KEY_LEFT:
-          key[KEY_LEFT] = true;
-          break;
-
-        case ALLEGRO_KEY_RIGHT:
-          key[KEY_RIGHT] = true;
-          break;
-
-        case ALLEGRO_KEY_SPACE:
-          key[KEY_SPACE] = true;
-          break;
+    else if (input->handle_event(ev)) {
+      if (input->quit()) {
+        playing = false;
+        quit(true);
       }
-    }//end else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
-    else if(ev.type == ALLEGRO_EVENT_KEY_UP) {
-      switch(ev.keyboard.keycode) {
-        case ALLEGRO_KEY_UP:
-          key[KEY_UP] = false;
-          break;
-
-        case ALLEGRO_KEY_DOWN:
-          key[KEY_DOWN] = false;
-          break;
-
-        case ALLEGRO_KEY_LEFT:
-          key[KEY_LEFT] = false;
-          break;
-
-        case ALLEGRO_KEY_RIGHT:
-          key[KEY_RIGHT] = false;
-          break;
-
-        case ALLEGRO_KEY_F1:
-          cerr << "Help" << endl;
-          break;
-
-        case ALLEGRO_KEY_SPACE:
-          key[KEY_SPACE] = false;
-          break;
-
-        case ALLEGRO_KEY_P:
-          if (al_get_timer_started(timer)) {
-            al_stop_timer(timer);
-          }
-          else {
-            al_resume_timer(timer);
-          }
-          continue;
-          break;
-
-        case ALLEGRO_KEY_ESCAPE:
-          playing = false;
-          quit(true);
-          break;
-      }
-    }//end else if(ev.type == ALLEGRO_EVENT_KEY_UP)
+      else if (input->pause_event()) {
+        if (al_get_timer_started(timer)) {
+          pause_play();
+        }
+        else {
+          resume_play();
+        }
+      }//end else if (input->pause_event())
+    }
 
     /*
     if(redraw_needed && al_is_event_queue_empty(event_queue)) {
@@ -498,6 +418,7 @@ void level_1::end_level() {
     al_destroy_event_queue(event_queue);
   }
 
+  delete input;
   return;
 }//end level_1::end_level()
 
