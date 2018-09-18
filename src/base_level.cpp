@@ -52,7 +52,7 @@ void base_level::intro(int level) {
       count_delay--;
     }
     else {
-      count_delay = 60;
+      count_delay = 40;
       cerr << "  " << wait_delay;
 
       al_set_target_bitmap(textbox);

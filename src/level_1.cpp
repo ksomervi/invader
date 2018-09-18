@@ -81,12 +81,12 @@ bool level_1::init() {
     cerr << "failed to create foes!" << endl;
   }
 
-  hit_sound = env->get_sound("collision"); //("resources/sound/hit1.ogg" );
+  hit_sound = env->get_sound("collision");
   if (!hit_sound) {
     cerr << "failed to load sound file" << endl;
   }
 
-  deploy_sound = env->get_sound("mine"); //("resources/sound/hit1.ogg" );
+  deploy_sound = env->get_sound("mine");
   if (!deploy_sound) {
     cerr << "failed to load sound file" << endl;
   }
@@ -222,21 +222,12 @@ void level_1::play_level() {
       }//end else if (input->pause_event())
     }
 
-    /*
-    if(redraw_needed && al_is_event_queue_empty(event_queue)) {
-      redraw_needed = false;
-      this->redraw(y_max);
-    }
-    */
-
     active_foes = 0;
     for (auto &f: foes) {
       if (f->active()) {
         active_foes++;
       }
     }
-
-    //hero->update();
 
     if (hero->health() == 0) {
       foes_remaining = 0;
@@ -361,20 +352,21 @@ void level_1::show_stats() {
   while(waiting) {
     ALLEGRO_EVENT ev;
     al_wait_for_event(event_queue, &ev);
-    if(ev.type == ALLEGRO_EVENT_TIMER) {
-      countdown--;
-    }
-    else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-      waiting = false;
-    }//end else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
-    else if(ev.type == ALLEGRO_EVENT_KEY_DOWN) {
-      waiting = false;
+    switch(ev.type) {
+      case ALLEGRO_EVENT_TIMER:
+        countdown--;
+        break;
+
+      case ALLEGRO_EVENT_DISPLAY_CLOSE:
+      case ALLEGRO_EVENT_KEY_DOWN:
+        waiting = false;
+        break;
     }
 
     if (countdown == 0) {
       waiting = false;
     }
-  }
+  }//end while(waiting)
 }//end level_1::show_stats()
 
 void level_1::end_level() {
@@ -584,8 +576,7 @@ void level_1::draw_text(const char *s, float x, float y, flag) {
 void level_1::update_score() {
   float x_base = al_get_display_width(display) - 220;
   float x_loc = x_base;
-  //float line_height = SECONDARY_FONTSIZE + 4;
-  float y_loc = TITLE_Y;// + line_height;
+  float y_loc = TITLE_Y;
 
   ALLEGRO_COLOR text_color = WHITE;
 
@@ -607,7 +598,6 @@ void level_1::update_score() {
   al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
       ALLEGRO_ALIGN_RIGHT, "%d", hero->lives());
 
-  //x_loc -= 100;
   x_loc = x_base;
   y_loc += y_step;
   al_draw_text(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
@@ -621,8 +611,8 @@ void level_1::update_score() {
     fill_color = RED;
   }
   if (h_bar_fill > 0.0) {
-    al_draw_filled_rounded_rectangle(x_loc, y_loc, x_loc+h_bar_fill, y_loc+y_step,
-      5, 5, fill_color);
+    al_draw_filled_rounded_rectangle(x_loc, y_loc,
+        x_loc+h_bar_fill, y_loc+y_step, 5, 5, fill_color);
   }
 
   al_draw_rounded_rectangle(x_loc, y_loc, x_loc+h_bar_len, y_loc+y_step,
@@ -630,7 +620,6 @@ void level_1::update_score() {
 
   al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc+h_bar_len/2.0, y_loc,
       ALLEGRO_ALIGN_CENTRE, "%d", hero->max_health());
-
 
   x_loc -= 100;
   x_loc = x_base;

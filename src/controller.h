@@ -4,19 +4,11 @@
 #include <allegro5/allegro.h>
 #include <map>
 
-#include <iostream>
-using std::cerr;
-using std::endl;
-
 #include "point_2d.h"
 
 class controller{
   private:
-    enum CTRL_KEYS {
-      KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_SPACE
-    };
 
-    bool _key[5];
     std::map<int, bool> _key_pressed;
     point_2d _dir;
 
