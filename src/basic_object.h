@@ -26,6 +26,8 @@ class basic_object {
     virtual ~basic_object();
     void redraw();
     void draw(float, float);
+    float w();
+    float h();
     float x();
     float y();
     void x(float);

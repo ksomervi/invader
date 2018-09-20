@@ -53,6 +53,14 @@ float basic_object::y() {
   return _loc.y();
 }
 
+float basic_object::w() {
+  return _w;
+}
+
+float basic_object::h() {
+  return _h;
+}
+
 void basic_object::x(float v) {
   _loc.x(v);
 }
