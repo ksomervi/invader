@@ -54,11 +54,17 @@ float basic_object::y() {
 }
 
 float basic_object::w() {
-  return _w;
+  if (_bm) {
+    return al_get_bitmap_width(_bm);
+  }
+  return 0.0;
 }
 
 float basic_object::h() {
-  return _h;
+  if (_bm) {
+    return al_get_bitmap_height(_bm);
+  }
+  return 0.0;
 }
 
 void basic_object::x(float v) {
