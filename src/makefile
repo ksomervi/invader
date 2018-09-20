@@ -33,12 +33,12 @@ TARGET = invader
 ${TARGET}: ${OBJS}
 	${COMPILE} -o $@ ${OBJS} ${LDFLAGS}
 
-demo: demo.o basic_object.o fighter.o point_2d.o
+sandbox: sandbox.o basic_object.o fighter.o point_2d.o
 	${COMPILE} -o $@ $^ ${LDFLAGS}
 
 neat:
 	-rm -f *.o *~
 
 clean: neat
-	-rm -f ${TARGET} demo
+	-rm -f ${TARGET} sandbox
 

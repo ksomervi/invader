@@ -1,4 +1,4 @@
-/* \file demo.cpp
+/* \file sandbox.cpp
  *
  * Scrap program to test features and objects.
  *
@@ -7,6 +7,7 @@
  */
 #include <stdio.h>
 #include <allegro5/allegro.h>
+#include <allegro5/allegro_primitives.h>
 #include <vector>
 #include <random>
 #include <iostream>
@@ -54,7 +55,7 @@ int main(int argc, char **argv) {
   float y_min = 4.0;
   float y_max = SCREEN_H - SPRITE_SIZE - y_min;
 
-  float fx = 0.0;
+  //float fx = 0.0;
   float fy = (SCREEN_W - SPRITE_SIZE) / 2;
 
   std::default_random_engine generator;
@@ -89,6 +90,8 @@ int main(int argc, char **argv) {
     al_destroy_timer(timer);
     return -1;
   }
+
+  al_init_primitives_addon();
  
   hero = new fighter();
   if (!hero->create_bitmap(SPRITE_SIZE, SPRITE_SIZE)) {
@@ -283,7 +286,11 @@ int main(int argc, char **argv) {
       redraw = false;
  
       al_clear_to_color(al_map_rgb(0,0,0));
-      hero->redraw(); //al_draw_bitmap(bouncer, bouncer_x, bouncer_y, 0);
+      ALLEGRO_COLOR line_color = LIGHT_YELLOW;
+
+      float hx = hero->x() + hero->w()/2;
+      float hy = hero->y() + hero->h()/2;
+
       for (auto &f: foes) {
         if (f->y() <= y_max) {
           if (f->collides(hero)) {
@@ -292,11 +299,14 @@ int main(int argc, char **argv) {
             f->y(SCREEN_H);
           } 
           else {
+            al_draw_line(hx, hy, f->x()+f->w()/2, f->y()+f->h()/2, line_color, 2.0);
+
             f->redraw();
             //foe->draw(fx, fy);
           }
         }
       }
+      hero->redraw(); //al_draw_bitmap(bouncer, bouncer_x, bouncer_y, 0);
       al_flip_display();
     }
   }
