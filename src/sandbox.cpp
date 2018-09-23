@@ -21,10 +21,8 @@ using armada = std::vector<basic_object*>;
 
 bool init_foes(armada &, int max);
 bool activate_foe(armada&, float);
+void toggle_pause(ALLEGRO_TIMER *);
  
-//const float FPS = 60.0;
-//const int SCREEN_W = 640;
-//const int SCREEN_H = 480;
 enum MYKEYS {
    KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT
 };
@@ -243,22 +241,22 @@ int main(int argc, char **argv) {
     else if(ev.type == ALLEGRO_EVENT_KEY_UP) {
       switch(ev.keyboard.keycode) {
         case ALLEGRO_KEY_UP:
-	case ALLEGRO_KEY_W:
+        case ALLEGRO_KEY_W:
           key[KEY_UP] = false;
           break;
 
         case ALLEGRO_KEY_DOWN:
-	case ALLEGRO_KEY_S:
+        case ALLEGRO_KEY_S:
           key[KEY_DOWN] = false;
           break;
 
         case ALLEGRO_KEY_LEFT: 
-	case ALLEGRO_KEY_A:
+        case ALLEGRO_KEY_A:
           key[KEY_LEFT] = false;
           break;
 
         case ALLEGRO_KEY_RIGHT:
-	case ALLEGRO_KEY_D:
+        case ALLEGRO_KEY_D:
           key[KEY_RIGHT] = false;
           break;
 
@@ -267,12 +265,7 @@ int main(int argc, char **argv) {
           break;
 
         case ALLEGRO_KEY_P:
-          if (al_get_timer_started(timer)) {
-            al_stop_timer(timer);
-          }
-          else {
-            al_resume_timer(timer);
-          }
+          toggle_pause(timer);
           continue;
           break;
 
@@ -300,9 +293,7 @@ int main(int argc, char **argv) {
           } 
           else {
             al_draw_line(hx, hy, f->x()+f->w()/2, f->y()+f->h()/2, line_color, 2.0);
-
             f->redraw();
-            //foe->draw(fx, fy);
           }
         }
       }
@@ -363,4 +354,13 @@ bool activate_foe(armada &foes, float x) {
 
 void draw_foes(armada &foes) {
 
+}
+
+void toggle_pause(ALLEGRO_TIMER *t) {
+  if (al_get_timer_started(t)) {
+    al_stop_timer(t);
+  }
+  else {
+    al_resume_timer(t);
+  }
 }
