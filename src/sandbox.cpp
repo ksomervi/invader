@@ -4,6 +4,10 @@
  *
  * Completely ripped from the keyboard example at:
  *   https://wiki.allegro.cc/index.php?title=Basic_Keyboard_Example
+ *
+ *
+ * Collisions references:
+ *  -
  */
 #include <stdio.h>
 #include <allegro5/allegro.h>
@@ -22,10 +26,23 @@ using armada = std::vector<basic_object*>;
 bool init_foes(armada &, int max);
 bool activate_foe(armada&, float);
 void toggle_pause(ALLEGRO_TIMER *);
- 
+
 enum MYKEYS {
    KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT
 };
+
+class segment {
+  public:
+    point_2d e1;
+    point_2d e2;
+
+    segment();
+    segment(point_2d &a, point_2d &b) {
+    };
+};
+
+bool line_intersects(const segment &, const segment &);
+bool line_rect_intersects(segment &, basic_object *);
 
 int main(int argc, char **argv) {
   ALLEGRO_DISPLAY *display = NULL;
@@ -292,7 +309,9 @@ int main(int argc, char **argv) {
             f->y(SCREEN_H);
           } 
           else {
-            al_draw_line(hx, hy, f->x()+f->w()/2, f->y()+f->h()/2, line_color, 2.0);
+            // Add test for line intersecting another foe
+            al_draw_line(hx, hy, f->x()+f->w()/2, f->y()+f->h()/2,
+                line_color, 2.0);
             f->redraw();
           }
         }
@@ -363,4 +382,71 @@ void toggle_pause(ALLEGRO_TIMER *t) {
   else {
     al_resume_timer(t);
   }
+}
+
+// Taken from http://www.jeffreythompson.org/collision-detection/line-line.php
+bool line_intersects(const segment &s1, const segment &s2) {
+  float x1 = s1.e1.x();
+  float y1 = s1.e1.y();
+  float x2 = s1.e2.x();
+  float y2 = s1.e2.y();
+  float x3 = s2.e1.x();
+  float y3 = s2.e1.y();
+  float x4 = s2.e2.x();
+  float y4 = s2.e2.y();
+
+  //
+  // float uA = ((x4-x3)*(y1-y3) - (y4-y3)*(x1-x3))
+  //            / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
+  //
+  // float uB = ((x2-x1)*(y1-y3) - (y2-y1)*(x1-x3))
+  //            / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
+  //
+  // float ref = ((s2.e2.y()-s2.e1.y())*(s1.e2.x()-s1.e1.x())
+  //             - (s2.e2.x()-s2.e1.x())*(s1.e2.y()-s1.e1.y()));
+
+  float uA = ((x4-x3)*(y1-y3) - (y4-y3)*(x1-x3))
+              / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
+
+  float uB = ((x2-x1)*(y1-y3) - (y2-y1)*(x1-x3))
+              / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
+
+  if (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1) {
+    return true;
+  }
+  return false;
+
+  // To get the point of intersection
+  //float intersectionX = x1 + (uA * (x2-x1));
+  //float intersectionY = y1 + (uA * (y2-y1));
+}
+
+bool line_rect_intersects(segment &s, basic_object *o) {
+  point_2d tl(o->x(), o->y()); //top left
+  point_2d tr(o->x()+o->w(), o->y()); //top right
+  //Top edge
+  //segment test(tl, tr);
+  //if (line_intersects(s, test)) {
+  if (line_intersects(s, segment (tl, tr))) {
+    return true;
+  }
+
+  point_2d bl(o->x(), o->y()+o->h()); //bottom left
+  //Left edge
+  if (line_intersects(s, segment (tl, bl))) {
+    return true;
+  }
+
+  point_2d br(o->x()+o->w(), o->y()+o->h()); //bottom right
+  //Bottom edge
+  if (line_intersects(s, segment (bl, br))) {
+    return true;
+  }
+
+  //Right edge
+  if (line_intersects(s, segment (tr, br))) {
+    return true;
+  }
+
+  return false;
 }
