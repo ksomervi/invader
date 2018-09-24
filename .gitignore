@@ -2,5 +2,10 @@
 *.o
 *~
 
+# miscellaneous executable testing
+src/sandbox
+
+# directories
 build
+doc
 
