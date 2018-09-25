@@ -9,23 +9,24 @@ class basic_object {
   private:
     float _w;
     float _h;
-    //float _x;
-    //float _y;
-    point_2d _loc;
+    int _id;
 
-    //float _velx;
-    //float _vely;
-    point_2d _vel;
-
-    bool _active;
     ALLEGRO_BITMAP *_bm;
+
+  protected:
+    point_2d _loc;
+    point_2d _vel;
+    bool _active;
+    point_2d _min_bounds;
+    point_2d _max_bounds;
 
   public:
     basic_object();
     basic_object(float, float, float, float);
     virtual ~basic_object();
     void redraw();
-    void draw(float, float);
+    void draw(const point_2d&);
+    void bound(const point_2d&, const point_2d&);
     float w();
     float h();
     float x();
@@ -56,12 +57,13 @@ class basic_object {
     void velocity_y(float);
     float velocity_y(void);
 
-    void move(float, float);
     void move(point_2d);
-    void move_to(float, float);
     void move_to(point_2d);
 
     virtual void update();
+
+    void id(const int&);
+    int id();
 
 };//end class basic_object
 

@@ -13,7 +13,6 @@ using weapons = std::vector<basic_object*>;
 
 class level_1: protected base_level {
   private:
-    bool key[5] = { false, false, false, false, false };
 
     ALLEGRO_BITMAP *mine_bm = NULL;
     ALLEGRO_BITMAP *foe_bm = NULL;
@@ -21,16 +20,19 @@ class level_1: protected base_level {
     ALLEGRO_SAMPLE *hit_sound = NULL;
     ALLEGRO_SAMPLE *deploy_sound = NULL;
 
+    point_2d _min_bounds;
+    point_2d _max_bounds;
+
   protected:
     bool init();
     void end_level();
     void play_level();
     void restart_level();
     void show_stats();
-    void redraw(float);
+    void check_collisions();
+    void redraw();
     void update_score();
-    bool init_foes(armada&, int max);
-    bool activate_foe(armada&, float);
+    bool init_foes(int);
     bool deploy_mine(weapons&, int, int);
     bool init_weapons(weapons&, int);
 

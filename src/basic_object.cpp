@@ -43,7 +43,17 @@ basic_object::~basic_object() {
 }
 
 void basic_object::update() {
+  std::cerr << "*";
 }
+
+void basic_object::bound(const point_2d &min, const point_2d &max) {
+  std::cerr << " bound: (" << min.x() << ", " << min.y()
+    << ") - ("<< max.x() << ", " << max.y() << ")" << std::endl;
+
+  _min_bounds = min;
+  _max_bounds = max;
+}
+
 
 float basic_object::x() {
   return _loc.x();
@@ -79,9 +89,8 @@ void basic_object::redraw() {
   al_draw_bitmap(_bm, _loc.x(), _loc.y(), 0);
 }
 
-void basic_object::draw(float x, float y) {
-  _loc.x(x);
-  _loc.y(y);
+void basic_object::draw(const point_2d &p) {
+  _loc = p;
   al_draw_bitmap(_bm, _loc.x(), _loc.y(), 0);
 }
 
@@ -178,7 +187,6 @@ float basic_object::velocity_x(void) {
   return _vel.x();
 }//end
 
-
 void basic_object::velocity_y(float vy) {
   _vel.y(vy);
 }//end
@@ -187,20 +195,19 @@ float basic_object::velocity_y(void) {
   return _vel.y();
 }//end
 
-
-void basic_object::move(float x, float y) {
-  _loc += point_2d(x, y);
-}//end
-
 void basic_object::move(point_2d p) {
   _loc += p;
-}//end
-
-void basic_object::move_to(float x, float y) {
-  _loc = point_2d(x, y);
 }//end
 
 void basic_object::move_to(point_2d p) {
   _loc = p;
 }//end
+
+void basic_object::id(const int &i) {
+  _id = i;
+}
+
+int basic_object::id() {
+  return _id;
+}
 

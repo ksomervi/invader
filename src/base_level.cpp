@@ -16,9 +16,9 @@ base_level::base_level() {
   timer = NULL;
 
   hero = NULL;
+  _foes = NULL;
 
   hits = 0;
-  total_foes = 0;
 
   title_font = NULL;
   textfont = NULL;
@@ -52,7 +52,7 @@ void base_level::intro(int level) {
       count_delay--;
     }
     else {
-      count_delay = 40;
+      count_delay = 15;
       cerr << "  " << wait_delay;
 
       al_set_target_bitmap(textbox);

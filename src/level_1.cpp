@@ -6,6 +6,7 @@
 
 #include <allegro5/allegro.h>
 #include "level_1.h"
+#include "enemy.h"
 
 #include <random>
 #include <iostream>
@@ -16,6 +17,14 @@ using std::endl;
 using std::string;
 
 level_1::level_1() {
+  // Playable region
+  float x_min = 4.0;
+  float x_max = SCREEN_W - SPRITE_SIZE - x_min;
+  float y_min = 0.25 * SCREEN_H;
+  float y_max = SCREEN_H - SPRITE_SIZE;
+
+  _min_bounds = point_2d(x_min, y_min);
+  _max_bounds = point_2d(x_max, y_max);
 }
 
 level_1::~level_1() {
@@ -73,12 +82,12 @@ bool level_1::init() {
     hero->bitmap(h_bm);
   }
 
-  if (!init_foes(foes, 16)) {
+  if (!init_foes(16)) {
     cerr << "failed to create foes!" << endl;
     return false;
   }
   if (!init_weapons(mines, 5)) {
-    cerr << "failed to create foes!" << endl;
+    cerr << "failed to create weapons!" << endl;
   }
 
   hit_sound = env->get_sound("collision");
@@ -110,28 +119,19 @@ bool level_1::init() {
 
 
 void level_1::play_level() {
-  for (auto &k: key) {
-    k = false;
-  }
 
   float vel_x = 4.0;
   float vel_y = 4.0;
   point_2d gravity(0.0, 1.0);
-  point_2d h_loc;
   point_2d h_delta;
 
-  float x_min = 4.0;
-  float x_max = SCREEN_W - SPRITE_SIZE - x_min;
-  float y_min = 0.25 * SCREEN_H;
-  float y_max = SCREEN_H - SPRITE_SIZE;
-  hero->bound(point_2d(x_min, y_min), point_2d(x_max, y_max));
+  hero->bound(_min_bounds, _max_bounds);
 
   int max_waves = 3;
   int current_wave = 0;
   //int max_foes[] = {32, 42, 60};
   int max_foes[] = {3, 3, 4};
   int foes_remaining = max_foes[current_wave];
-  int active_foes = 0;
   int fire_delay = 0;
 
   std::default_random_engine generator;
@@ -139,7 +139,7 @@ void level_1::play_level() {
   int next_foe = 120;
 
   std::default_random_engine x_generator;
-  std::uniform_real_distribution<float> x_distribution(x_min, x_max);
+  std::uniform_real_distribution<float> x_distribution(_min_bounds.x(), _max_bounds.x());
 
   bool playing = true;
 
@@ -158,8 +158,7 @@ void level_1::play_level() {
           next_foe--;
         }
         else {
-          if (activate_foe(foes, x_distribution(x_generator))) {
-            total_foes++;
+          if (_foes->deploy(x_distribution(x_generator))) {
             foes_remaining--;
           }
           next_foe = distribution(generator) * (1 - current_wave*0.2);
@@ -167,24 +166,9 @@ void level_1::play_level() {
         }
       }//end if (foes_remaining > 0)
 
-      active_foes = 0;
-      for (auto &f: foes) {
-        if (f->active()) {
+      _foes->update();
 
-          if(f->y() <= y_max) {
-            active_foes++;
-          }
-          else {
-            //Deactivate foe by setting off screen
-            f->active(false);
-          }
-          f->move(gravity);
-        }//end if (f->active())
-      }//end for (auto &f: foes)
-
-
-      h_loc = hero->location();
-      h_delta = point_2d(0.0, 0.0);
+      h_delta = gravity;
 
       if (input->fire()) {
         if (fire_delay == 0) {
@@ -197,12 +181,12 @@ void level_1::play_level() {
         h_delta.x(input->direction().x() * vel_x);
         h_delta.y(input->direction().y() * vel_y);
       }
-      else {
-        h_delta = gravity;
-      }
       hero->move(h_delta);
       hero->update();
-      this->redraw(y_max);
+
+      check_collisions();
+
+      redraw();
     }//end if(ev.type == ALLEGRO_EVENT_TIMER)
     else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
       break;
@@ -222,18 +206,11 @@ void level_1::play_level() {
       }//end else if (input->pause_event())
     }
 
-    active_foes = 0;
-    for (auto &f: foes) {
-      if (f->active()) {
-        active_foes++;
-      }
-    }
-
     if (hero->health() == 0) {
       foes_remaining = 0;
     }
 
-    if (foes_remaining == 0 and active_foes == 0) {
+    if (foes_remaining == 0 and _foes->get_active().empty()) {
       playing = false;
       if (hero->health()) {
         cerr << "Completed wave: " << current_wave << endl;
@@ -268,6 +245,7 @@ void level_1::play_level() {
 
 void level_1::show_stats() {
   int kill_eff = 0;
+  int total_foes = _foes->deployed();
   if (total_foes) {
     kill_eff = hits*100/total_foes;
   }
@@ -382,12 +360,15 @@ void level_1::end_level() {
     al_destroy_bitmap(foe_bm);
     foe_bm = NULL;
   }
-  for (auto &f: foes) {
+  for (auto &f: *_foes) {
     if (f) {
       f->bitmap(NULL);
       delete f;
+      f = NULL;
     }
   }
+
+  delete _foes;
 
   if (mine_bm) {
     al_destroy_bitmap(mine_bm);
@@ -414,12 +395,12 @@ void level_1::end_level() {
   return;
 }//end level_1::end_level()
 
-bool level_1::init_foes(armada &foes, int max) {
-  foes.clear();
-  foes.resize(max);
+bool level_1::init_foes(int max) {
   cerr << "Initializing foes..." << endl;
 
-  int cnt = 0;
+  point_2d init_vel(0.0, 1.0);
+
+  _foes = new armada(); //entity_store();
 
   foe_bm = env->get_sprite("creeper");
 
@@ -432,14 +413,17 @@ bool level_1::init_foes(armada &foes, int max) {
     al_set_target_backbuffer(display);
   }
 
-  for (auto& f: foes) {
+  enemy *f = NULL;
+  for (int i=0; i<max; i++) {
     cerr << ".";
-    cnt++;
-    f = new basic_object();
+    f = new enemy();
     f->bitmap(foe_bm);
-    f->y(SCREEN_H); // default to off screen
+    f->velocity(init_vel);
+    f->bound(point_2d(), _max_bounds);
+    _foes->add(f);
   }
   cerr << endl;
+  cerr << "Active foes: " << _foes->get_active().size() << endl;
   return true;
 }//end level_1::init_foes()
 
@@ -484,6 +468,7 @@ bool level_1::init_weapons(weapons& mines, int max) {
 }//end level_1::init_weapons()
 
 
+/*
 bool level_1::activate_foe(armada &foes, float x) {
   for (auto &f: foes) {
     if (f->active() == false) {
@@ -498,6 +483,7 @@ bool level_1::activate_foe(armada &foes, float x) {
   cerr << "all foes active" << endl;
   return false;
 }
+*/
 
 bool level_1::deploy_mine(weapons& mines, int x, int y) {
 
@@ -507,7 +493,7 @@ bool level_1::deploy_mine(weapons& mines, int x, int y) {
     if (m->active() == false) {
       m->x(x);
       m->y(y);
-      cerr << "mine deployed starting at " << x << ", " << y << endl;
+      cerr << "mine deployed at " << x << ", " << y << endl;
       m->active(true);
       al_play_sample(deploy_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE,
                      NULL);
@@ -518,39 +504,32 @@ bool level_1::deploy_mine(weapons& mines, int x, int y) {
   return false;
 }
 
-void level_1::redraw(float y_max) {
-  al_clear_to_color(al_map_rgb(0,0,0));
-
-  for (auto &f: foes) {
-    if (f->active()) {
-      //Check mines
-      for (auto &m: mines) {
-        if (m->active()) {
-          if (f->collides(m)) {
-            cerr << "BOOM" << endl;
-            al_play_sample(hit_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE,
-                NULL);
-            hits++;
-            m->active(false);
-            f->active(false);
-            f->y(SCREEN_H);
-          }
-        }
-      }
-
-      if (f->collides(hero)) {
+void level_1::check_collisions() {
+  //check for collisions
+  for (auto &m: mines) {
+    if (m->active()) {
+      if (_foes->collides(m)) {
+        cerr << "BOOM" << endl;
+        al_play_sample(hit_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE,
+            NULL);
         hits++;
-        al_play_sample(hit_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-        cerr << "hit: " << hits << endl;
-        f->y(SCREEN_H);
-        f->active(false);
-        hero->take_hit(20);
-      }
-      else {
-        f->redraw();
+        m->active(false);
       }
     }
   }
+  if (_foes->collides(hero)) {
+    hits++;
+    al_play_sample(hit_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+    cerr << "hit: " << hits << endl;
+    hero->take_hit(20);
+  }
+}//end level_1::check_collisions()
+
+
+void level_1::redraw() {
+  al_clear_to_color(al_map_rgb(0,0,0));
+
+  _foes->redraw();
 
   for (auto &m: mines) {
     if (m->active()) {
@@ -583,6 +562,7 @@ void level_1::update_score() {
   int kill_eff = 0;
   float y_step = al_get_font_line_height(textfont);
 
+  int total_foes = _foes->deployed();
   if (total_foes > 0) {
     kill_eff = hits*100/total_foes;
   }
@@ -660,7 +640,7 @@ void level_1::update_score() {
 
   x_loc += 14;
   al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
-      ALLEGRO_ALIGN_LEFT, "%d", mines.size());
+      ALLEGRO_ALIGN_LEFT, "%d", int(mines.size()));
 
 
 }//end level_1::update_score()

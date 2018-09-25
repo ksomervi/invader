@@ -5,7 +5,8 @@
 #include "controller.h"
 #include "fighter.h"
 #include <vector>
-using armada = std::vector<basic_object*>;
+#include "entity_store.h"
+using armada = entity_store;
 
 enum Difficulty { EASY, NORMAL, HARD };
 
@@ -26,10 +27,9 @@ class base_level {
     controller *input;
 
     fighter *hero;
-    armada foes;
+    armada *_foes;
 
     int hits;
-    int total_foes;
 
     bool init();
     void intro(int);
