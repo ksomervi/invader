@@ -12,13 +12,10 @@ class fighter: public basic_object {
     int _max_health;
     int _healing_time;
     bool _healing;
-    point_2d _min_bounds;
-    point_2d _max_bounds;
 
   public:
     fighter();
     ~fighter();
-    void bound(const point_2d&, const point_2d&);
     int lives();
     void lives(int);
     void add_lives(int);
