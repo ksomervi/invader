@@ -31,12 +31,7 @@ class base_level {
 
     int hits;
 
-    bool init();
-    void intro(int);
-    void end_level();
-    void play_level();
-    void print_stats();
-    void redraw(float);
+    void intro(int, float);
     void quit(bool);
 
   public:

@@ -43,7 +43,7 @@ bool level_1::play(game *g) {
   }
 
   while (hero->health() > 0 and complete() == false and quit() == false) {
-    intro(1);
+    intro(1, 0.4);
     play_level();
 
     if (hero->health() == 0) {
@@ -82,12 +82,13 @@ bool level_1::init() {
     hero->bitmap(h_bm);
   }
 
+  if (!hero->ready_weapons(5)) {
+    cerr << "failed to ready weapons!" << endl;
+  }
+
   if (!init_foes(16)) {
     cerr << "failed to create foes!" << endl;
     return false;
-  }
-  if (!init_weapons(mines, 5)) {
-    cerr << "failed to create weapons!" << endl;
   }
 
   hit_sound = env->get_sound("collision");
@@ -132,7 +133,6 @@ void level_1::play_level() {
   //int max_foes[] = {32, 42, 60};
   int max_foes[] = {3, 3, 4};
   int foes_remaining = max_foes[current_wave];
-  int fire_delay = 0;
 
   std::default_random_engine generator;
   std::uniform_int_distribution<int> distribution(20,100);
@@ -150,15 +150,12 @@ void level_1::play_level() {
     al_wait_for_event(event_queue, &ev);
 
     if(ev.type == ALLEGRO_EVENT_TIMER) {
-      if (fire_delay > 0) {
-        fire_delay--;
-      }
       if (foes_remaining > 0) {
         if (next_foe > 0) {
           next_foe--;
         }
         else {
-          if (_foes->deploy(x_distribution(x_generator))) {
+          if (_foes->deploy(x_distribution(x_generator), 0.0)) {
             foes_remaining--;
           }
           next_foe = distribution(generator) * (1 - current_wave*0.2);
@@ -171,10 +168,7 @@ void level_1::play_level() {
       h_delta = gravity;
 
       if (input->fire()) {
-        if (fire_delay == 0) {
-          deploy_mine(mines, hero->x(), hero->y());
-          fire_delay = 30;
-        }
+        hero->fire_weapon();
       }
 
       if (input->direction() != point_2d()) {
@@ -224,11 +218,7 @@ void level_1::play_level() {
           complete(true);
         }
         //Clear the mines
-        for (auto &m: mines) {
-          if (m->active()) {
-            m->active(false);
-          }
-        }
+        //hero->clear_weapons();
       }
     }
   }//end while(playing)
@@ -370,17 +360,6 @@ void level_1::end_level() {
 
   delete _foes;
 
-  if (mine_bm) {
-    al_destroy_bitmap(mine_bm);
-    mine_bm = NULL;
-  }
-  for (auto &m: mines) {
-    if (m) {
-      m->bitmap(NULL);
-      delete m;
-    }
-  }
-
   if (timer) {
     cerr << "   ... destroying timer" << endl;
     al_destroy_timer(timer);
@@ -427,96 +406,17 @@ bool level_1::init_foes(int max) {
   return true;
 }//end level_1::init_foes()
 
-bool level_1::init_weapons(weapons& mines, int max) {
-  mines.clear();
-  mines.resize(max);
-
-  cerr << "Initializing weapons..." << endl;
-
-  mine_bm = env->get_sprite("mine");
-
-  if (!mine_bm) {
-    mine_bm = al_create_bitmap(SPRITE_SIZE, SPRITE_SIZE);
-    cerr << "failed to create bitmap for mine" << endl;
-
-    al_set_target_bitmap(mine_bm);
-    al_clear_to_color(LIGHT_YELLOW);
-
-    float line_width = 8.2;
-    al_draw_circle(SPRITE_SIZE/2, SPRITE_SIZE/2, (SPRITE_SIZE - line_width)/2,
-        RED, line_width);
-    al_draw_filled_triangle(5, 5, SPRITE_SIZE-5, 5, SPRITE_SIZE/2,
-        SPRITE_SIZE-5, BLUE);
-    al_draw_filled_triangle(5, SPRITE_SIZE-5, SPRITE_SIZE-5, SPRITE_SIZE-5,
-        SPRITE_SIZE/2, 5, BLUE);
-
-    al_convert_mask_to_alpha(mine_bm, LIGHT_YELLOW);
-    al_set_target_backbuffer(display);
-  }
-
-  int cnt = 0;
-
-  for (auto& m: mines) {
-    cnt++;
-    m = new basic_object();
-    m->bitmap(mine_bm);
-    m->y(SCREEN_H); // default to off screen
-    m->active(false);
-  }
-
-  return true;
-}//end level_1::init_weapons()
-
-
-/*
-bool level_1::activate_foe(armada &foes, float x) {
-  for (auto &f: foes) {
-    if (f->active() == false) {
-      f->y(0);
-      f->x(x);
-      cerr << "foe starting at " << x << endl;
-      f->active(true);
-      return true;
-    }
-  }
-
-  cerr << "all foes active" << endl;
-  return false;
-}
-*/
-
-bool level_1::deploy_mine(weapons& mines, int x, int y) {
-
-  cerr << "deploy mine..." << endl;
-
-  for (auto &m: mines) {
-    if (m->active() == false) {
-      m->x(x);
-      m->y(y);
-      cerr << "mine deployed at " << x << ", " << y << endl;
-      m->active(true);
-      al_play_sample(deploy_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE,
-                     NULL);
-      return true;
-    }
-  }
-  cerr << "out of mines" << endl;
-  return false;
-}
-
 void level_1::check_collisions() {
   //check for collisions
-  for (auto &m: mines) {
-    if (m->active()) {
-      if (_foes->collides(m)) {
-        cerr << "BOOM" << endl;
-        al_play_sample(hit_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE,
-            NULL);
-        hits++;
-        m->active(false);
-      }
-    }
+  int mine_hits = _foes->check_collisions(&(hero->get_deployed_mines()));
+
+  if (mine_hits > 0) {
+    hits += mine_hits;
+    cerr << "BOOM" << endl;
+    al_play_sample(hit_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE,
+          NULL);
   }
+
   if (_foes->collides(hero)) {
     hits++;
     al_play_sample(hit_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
@@ -530,12 +430,6 @@ void level_1::redraw() {
   al_clear_to_color(al_map_rgb(0,0,0));
 
   _foes->redraw();
-
-  for (auto &m: mines) {
-    if (m->active()) {
-      m->redraw();
-    }
-  }//end for (auto &m: mines)
 
   hero->redraw();
 
@@ -625,12 +519,7 @@ void level_1::update_score() {
       ALLEGRO_ALIGN_LEFT, "Mines:");
 
   x_loc += 100;
-  int ready = 0;
-  for (auto& m: mines) {
-    if (m->active() == false) {
-      ready++;
-    }
-  }
+  int ready = hero->get_deployed_mines().size();
   al_draw_textf(textfont, text_color, x_loc, y_loc,
       ALLEGRO_ALIGN_RIGHT, "%d", ready);
 
@@ -640,8 +529,7 @@ void level_1::update_score() {
 
   x_loc += 14;
   al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
-      ALLEGRO_ALIGN_LEFT, "%d", int(mines.size()));
-
+      ALLEGRO_ALIGN_LEFT, "%d", hero->max_weapons());
 
 }//end level_1::update_score()
 

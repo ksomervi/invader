@@ -8,15 +8,11 @@
 
 #include "base_level.h"
 
-// FIXME: move this to the fighter
-using weapons = std::vector<basic_object*>;
-
 class level_1: protected base_level {
   private:
 
     ALLEGRO_BITMAP *mine_bm = NULL;
     ALLEGRO_BITMAP *foe_bm = NULL;
-    weapons mines;
     ALLEGRO_SAMPLE *hit_sound = NULL;
     ALLEGRO_SAMPLE *deploy_sound = NULL;
 
@@ -33,8 +29,6 @@ class level_1: protected base_level {
     void redraw();
     void update_score();
     bool init_foes(int);
-    bool deploy_mine(weapons&, int, int);
-    bool init_weapons(weapons&, int);
 
   public:
     level_1();

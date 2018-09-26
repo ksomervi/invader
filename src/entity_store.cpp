@@ -48,6 +48,10 @@ _pool& entity_store::get_active() {
   return _active;
 }
 
+int entity_store::count() {
+  return _store.size();
+}
+
 void entity_store::add(basic_object* o) {
   _store.push_back(o);
 }
@@ -56,13 +60,17 @@ int entity_store::deployed() {
   return _next_id;
 }
 
-bool entity_store::deploy(const float &x) {
+bool entity_store::deploy(const float &x, const float &y) {
+  return deploy(point_2d(x, y));
+}
+
+bool entity_store::deploy(const point_2d &p) {
   for (auto &f: _store) {
     if (f->active() == false) {
-      f->move_to(point_2d(x, 0.0));
+      f->move_to(p);
       f->id(++_next_id);
       f->active(true);
-      cerr << "foe[" << _next_id << "] starting at " << x << endl;
+      cerr << "foe[" << _next_id << "] starting at " << p.x() << endl;
       _active.push_back(f);
       cerr << "active enemy: " << _active.size() << endl;
       return true;
@@ -105,7 +113,7 @@ bool entity_store::collides(basic_object *other) {
     if (o->collides(other)) {
       cerr << "collided with enemy: " << o->id() << endl;
       o->active(false);
-      _active.erase(it);
+      it = _active.erase(it);
       return true;
     }
     else {
@@ -113,6 +121,24 @@ bool entity_store::collides(basic_object *other) {
     }
   }
   return false;
+}
+
+int entity_store::check_collisions(_pool *other) {
+  int rv = 0;
+  basic_object *o = NULL;
+
+  for (auto it=other->begin(); it!=other->end();) {
+    o = *it;
+    if (collides(o)) {
+      rv++;
+      o->active(false);
+      it = other->erase(it);
+    }
+    else {
+      it++;
+    }
+  }//end for (auto it=other->_active.begin(); it!=other->_active.end();)
+  return rv;
 }
 
 _pool::iterator entity_store::begin() {

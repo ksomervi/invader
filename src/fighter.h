@@ -1,24 +1,39 @@
 #ifndef FIGHTER_H
 #define FIGHTER_H
 
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_primitives.h>
 #include "basic_object.h"
-
-//#define DEFAULT_LIVES 4
+#include "entity_store.h"
 
 class fighter: public basic_object {
   private:
+    using weapons = entity_store;
+
     int _lives;
     int _health;
     int _max_health;
     int _healing_time;
     bool _healing;
 
+    weapons *_mines;
+    ALLEGRO_BITMAP *_mine_bm;
+    int _fire_delay;
+
   public:
     fighter();
     ~fighter();
+    void redraw();
+
     int lives();
     void lives(int);
     void add_lives(int);
+
+    bool ready_weapons(const int&);
+    bool fire_weapon();
+    void clear_mines();
+    int max_weapons();
+    _pool& get_deployed_mines();
 
     int health();
     int max_health();

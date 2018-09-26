@@ -20,13 +20,16 @@ class entity_store {
     ~entity_store();
 
     _pool& get_active();
+    int count();
 
     void add(basic_object*);
     int deployed();
-    bool deploy(const float &);
+    bool deploy(const float &, const float &);
+    bool deploy(const point_2d&);
 
     void update();
     bool collides(basic_object *);
+    int check_collisions(_pool *);
     void redraw();
 
     _pool::iterator begin();
