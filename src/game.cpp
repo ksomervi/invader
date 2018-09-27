@@ -16,42 +16,23 @@ using std::string;
 #include "level_1.h"
 
 game::game() {
-  display = NULL;
+  //display = NULL;
   //event_queue = NULL;
   //timer = NULL;
-  title_font = NULL;
-  font = NULL;
+  //title_font = NULL;
+  //font = NULL;
 
-  hero = NULL;
+  //hero = NULL;
 
   hits = 0;
   total_foes = 0;
 
-  _log = new logger(logger::NOTE);
+  _rm = new resource_manager();
+  _log = _rm->get_logger();
 
 }//end game::game()
 
 
-ALLEGRO_DISPLAY *game::get_display() {
-  return display;
-}
-
-ALLEGRO_FONT *game::get_font(int f=1) {
-  switch(f) {
-    case 0:
-      return title_font;
-      break;
-
-    case 1:
-    default:
-      return font;
-      break;
-  };
-}
-
-fighter* game::get_player() {
-  return hero;
-}
 
 bool game::init() {
 
@@ -62,67 +43,32 @@ bool game::init() {
     return false;
   }
 
-  if (load_options(CONFIG_FILE)) {
-    _log->note("config file loaded");
-  }
-
-  _init_fonts();
-
   al_init_image_addon();
   al_init_primitives_addon();
-
-  if (!al_install_audio()) {
-    _log->error("failed to initialize audio!");
-    return false;
-  }
-
-  if (!al_init_acodec_addon()){
-    _log->error("failed to initialize audio codecs!");
-    return false;
-  }
-
-  if (!al_reserve_samples(4)) {
-    _log->error("failed to reserve samples!");
-    return false;
-  }
-
 
   if(!al_install_keyboard()) {
     _log->error("failed to initialize the keyboard!");
     return false;
   }
 
-  display = al_create_display(SCREEN_W, SCREEN_H);
-  if(!display) {
-    _log->error("failed to create display!");
+  if (!_rm->init_resources(load_options(CONFIG_FILE))) {
     return false;
   }
 
-  hero = new fighter();
+  //hero = new fighter();
+  //hero->init(this);
+  /*
   if (!hero->create_bitmap(SPRITE_SIZE, SPRITE_SIZE)) {
-  //if (!hero->create_bitmap("sprites/hero.png"))
     _log->error("failed to create hero bitmap!");
     return false;
   }
   al_set_target_bitmap(hero->bitmap());
   al_clear_to_color(al_map_rgb(255, 174, 0));
-
-  al_set_target_backbuffer(display);
-
-  /*
-  event_queue = al_create_event_queue();
-  if(!event_queue) {
-    cerr << "failed to create event_queue!" << endl;
-    delete hero;
-    return false;
-  }
-
-  al_register_event_source(event_queue, al_get_display_event_source(display));
-  al_register_event_source(event_queue, al_get_timer_event_source(timer));
-  al_register_event_source(event_queue, al_get_keyboard_event_source());
   */
 
-  al_clear_to_color(al_map_rgb(0,0,0));
+  al_set_target_backbuffer(_rm->get_display());
+
+  al_clear_to_color(BLACK);
 
   al_flip_display();
 
@@ -132,12 +78,12 @@ bool game::init() {
 
 void game::play() {
   level_1 *l = new level_1();
-  l->play(this);
+  l->play(_rm);
 
   delete l;
 }
 
-
+/*
 void game::print_score() {
   float kill_eff = float(hits)*100.0/total_foes;
   cerr  << "So how did you do?" << endl;
@@ -146,10 +92,11 @@ void game::print_score() {
   cerr .precision(2);
   cerr  << std::fixed << kill_eff << "%)" << endl;
 }//end game::print_score()
+*/
 
-bool game::load_options(const char* filename) {
+ALLEGRO_CONFIG* game::load_options(const char* filename) {
   _cfg = al_load_config_file(CONFIG_FILE);
-  return (_cfg != NULL);
+  return _cfg;
 }
 
 const char* game::option(const char* section, const char* key) {
@@ -157,6 +104,7 @@ const char* game::option(const char* section, const char* key) {
 }//end game::option
 
 
+/*
 ALLEGRO_SAMPLE* game::get_sound(const char* option_key) {
   string path = option("MEDIA", option_key);
   cerr  << "Loading sound: " << "MEDIA::" << option_key
@@ -194,8 +142,10 @@ bool game::_init_fonts() {
 
   return true;
 }//end game::_init_fonts()
+*/
 
 void game::end() {
+  /*
   if (hero) {
     delete hero;
   }
@@ -207,6 +157,7 @@ void game::end() {
   if (display) {
     al_destroy_display(display);
   }
+  */
 
   return;
 }//end game::end()

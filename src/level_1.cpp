@@ -30,12 +30,12 @@ level_1::level_1() {
 level_1::~level_1() {
 }
 
-bool level_1::play(game *g) {
-  env = g;
-  display = env->get_display();
-  title_font = env->get_font(0);
-  textfont = env->get_font(1);
-  hero = env->get_player();
+bool level_1::play(resource_manager *rm) {
+  _rm = rm;
+  display = _rm->get_display();
+  title_font = _rm->get_font(0);
+  textfont = _rm->get_font(1);
+  hero = _rm->get_player();
   input = new controller();
 
   if (! this->init()) {
@@ -66,7 +66,10 @@ bool level_1::init() {
     return false;
   }
 
-  ALLEGRO_BITMAP *h_bm = env->get_sprite("hero");
+  //resources.push_back(resource(resource::rtype, const char*));
+
+  /*
+  ALLEGRO_BITMAP *h_bm = _rm->get_sprite("hero");
   if (!h_bm) {
     if (!hero->create_bitmap(SPRITE_SIZE, SPRITE_SIZE)) {
     cerr << "failed to create hero bitmap!" << endl;
@@ -82,21 +85,26 @@ bool level_1::init() {
     hero->bitmap(h_bm);
   }
 
+  //5 mines
+  //_rm->get_sprite("mine");
   if (!hero->ready_weapons(5)) {
     cerr << "failed to ready weapons!" << endl;
   }
+  */
+  hero->init(_rm);
 
   if (!init_foes(16)) {
     cerr << "failed to create foes!" << endl;
     return false;
   }
 
-  hit_sound = env->get_sound("collision");
+  //FIXME: these should be associated with the objects
+  hit_sound = _rm->get_sound("collision");
   if (!hit_sound) {
     cerr << "failed to load sound file" << endl;
   }
 
-  deploy_sound = env->get_sound("mine");
+  deploy_sound = _rm->get_sound("mine");
   if (!deploy_sound) {
     cerr << "failed to load sound file" << endl;
   }
@@ -381,7 +389,7 @@ bool level_1::init_foes(int max) {
 
   _foes = new armada(); //entity_store();
 
-  foe_bm = env->get_sprite("creeper");
+  foe_bm = _rm->get_sprite("creeper");
 
   if (!foe_bm) {
     cerr << "failed to load bitmap for foe" << endl;
