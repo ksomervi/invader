@@ -142,7 +142,6 @@ bool fighter::init(resource_manager *rm) {
     //Setup and mockup sprite
     al_set_target_bitmap(bitmap());
     al_clear_to_color(ORANGE);
-    //al_set_target_backbuffer(display);
     al_restore_state(&state);
   }
   else {
@@ -182,7 +181,6 @@ bool fighter::ready_weapons(basic_object *proto, const int &max) {
         SPRITE_SIZE/2, 5, BLUE);
 
     al_convert_mask_to_alpha(_mine_bm, LIGHT_YELLOW);
-    //al_set_target_backbuffer(display);
     al_restore_state(&state);
   }
 

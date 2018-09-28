@@ -8,8 +8,6 @@ using std::endl;
 resource_manager::resource_manager() {
   _cfg = NULL;
   _display = NULL;
-  //event_queue = NULL;
-  //timer = NULL;
   _title_font = NULL;
   _textfont = NULL;
 
@@ -19,6 +17,14 @@ resource_manager::resource_manager() {
 
 }//end resource_manager::resource_manager()
 
+resource_manager::~resource_manager() {
+
+  if (_player) {
+    delete player;
+  }
+
+  delete _log;
+}
 
 logger* resource_manager::get_logger() {
   return _log;

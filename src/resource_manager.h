@@ -32,7 +32,7 @@ class resource_manager {
 
   public:
     resource_manager();
-    //~resource_manager();
+    ~resource_manager();
     bool init_resources(ALLEGRO_CONFIG*);
     const char* option(const char*, const char*);
 
