@@ -3,6 +3,9 @@
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
+
+class fighter;
+#include "resource_manager.h"
 #include "basic_object.h"
 #include "entity_store.h"
 
@@ -23,13 +26,14 @@ class fighter: public basic_object {
   public:
     fighter();
     ~fighter();
+    bool init(resource_manager *);
     void redraw();
 
     int lives();
     void lives(int);
     void add_lives(int);
 
-    bool ready_weapons(const int&);
+    bool ready_weapons(basic_object*, const int&);
     bool fire_weapon();
     void clear_mines();
     int max_weapons();

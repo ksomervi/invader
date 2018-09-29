@@ -6,6 +6,8 @@
 
 #include "fighter.h"
 #include<iostream>
+using std::cerr;
+using std::endl;
 
 fighter::fighter() {
   _lives = DEFAULT_LIVES;
@@ -128,16 +130,46 @@ void fighter::update() {
 
 }//end fighter::update()
 
-bool fighter::ready_weapons(const int &max) {
-  _mines = new weapons();
-  //mine_bm = env->get_sprite("mine");
-
-  if (!_mine_bm) {
+bool fighter::init(resource_manager *rm) {
+  ALLEGRO_BITMAP *bm = rm->get_sprite("hero");
+  if (!bm) {
+    if (!create_bitmap(SPRITE_SIZE, SPRITE_SIZE)) {
+      cerr << "failed to create hero bitmap!" << endl;
+      return false;
+    }
     ALLEGRO_STATE state;
     al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
-    _mine_bm = al_create_bitmap(SPRITE_SIZE, SPRITE_SIZE);
+    //Setup and mockup sprite
+    al_set_target_bitmap(bitmap());
+    al_clear_to_color(ORANGE);
+    al_restore_state(&state);
+  }
+  else {
+    bitmap(bm);
+  }
 
-    al_set_target_bitmap(_mine_bm);
+  basic_object proto;
+  proto.bitmap(rm->get_sprite("mine"));
+
+  if (! ready_weapons(&proto, 5)) {
+    return false;
+  }
+
+  proto.bitmap(NULL);
+  
+  return true;
+}//end fighter::init()
+
+bool fighter::ready_weapons(basic_object *proto, const int &max) {
+  _mines = new weapons();
+
+  if (!proto->bitmap()) {
+    ALLEGRO_STATE state;
+    al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
+
+    proto->bitmap(al_create_bitmap(SPRITE_SIZE, SPRITE_SIZE));
+
+    al_set_target_bitmap(proto->bitmap());
     al_clear_to_color(LIGHT_YELLOW);
 
     float line_width = 8.2;
@@ -149,14 +181,13 @@ bool fighter::ready_weapons(const int &max) {
         SPRITE_SIZE/2, 5, BLUE);
 
     al_convert_mask_to_alpha(_mine_bm, LIGHT_YELLOW);
-    //al_set_target_backbuffer(display);
     al_restore_state(&state);
   }
 
   basic_object *m = NULL;
   for (int i=0; i<max; i++) {
     m = new basic_object();
-    m->bitmap(_mine_bm);
+    m->bitmap(proto->bitmap());
     _mines->add(m);
   }
 

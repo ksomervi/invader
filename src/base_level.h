@@ -17,7 +17,7 @@ class base_level {
     static logger *_log;
 
   protected:
-    game *env;
+    resource_manager *_rm;
     ALLEGRO_DISPLAY *display;
     ALLEGRO_EVENT_QUEUE *event_queue;
     ALLEGRO_TIMER *timer;
@@ -38,7 +38,7 @@ class base_level {
     base_level();
     virtual ~base_level() = 0;
 
-    virtual bool play(game *) = 0;
+    virtual bool play(resource_manager *) = 0;
     bool complete();
     void complete(bool);
 

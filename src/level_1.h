@@ -10,7 +10,6 @@
 
 class level_1: protected base_level {
   private:
-
     ALLEGRO_BITMAP *mine_bm = NULL;
     ALLEGRO_BITMAP *foe_bm = NULL;
     ALLEGRO_SAMPLE *hit_sound = NULL;
@@ -34,7 +33,7 @@ class level_1: protected base_level {
     level_1();
     ~level_1();
 
-    bool play(game *);
+    bool play(resource_manager *);
 
 };//end class level_1
 
