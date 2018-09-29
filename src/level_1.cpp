@@ -92,6 +92,7 @@ bool level_1::init() {
   }
   */
   hero->init(_rm);
+  hero->bound(_min_bounds, _max_bounds);
 
   if (!init_foes(16)) {
     cerr << "failed to create foes!" << endl;
@@ -134,7 +135,8 @@ void level_1::play_level() {
   point_2d gravity(0.0, 1.0);
   point_2d h_delta;
 
-  hero->bound(_min_bounds, _max_bounds);
+  input->init();
+  hero->clear_weapons();
 
   int max_waves = 3;
   int current_wave = 0;
@@ -173,20 +175,23 @@ void level_1::play_level() {
 
       _foes->update();
 
-      h_delta = gravity;
+      if (hero->health()) {
+        h_delta = gravity;
 
-      if (input->fire()) {
-        hero->fire_weapon();
-      }
+        if (input->fire() && hero->fire_weapon()) {
+          al_play_sample(deploy_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+        }
 
-      if (input->direction() != point_2d()) {
+        //if (input->direction() != point_2d()) {
         h_delta.x(input->direction().x() * vel_x);
         h_delta.y(input->direction().y() * vel_y);
-      }
-      hero->move(h_delta);
-      hero->update();
+        h_delta += gravity;
+        //}
+        hero->move(h_delta);
+        hero->update();
 
-      check_collisions();
+        check_collisions();
+      }
 
       redraw();
     }//end if(ev.type == ALLEGRO_EVENT_TIMER)
@@ -230,6 +235,7 @@ void level_1::play_level() {
       }
     }
   }//end while(playing)
+
 
   al_stop_timer(timer);
   al_rest(1.0);

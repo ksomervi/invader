@@ -18,6 +18,8 @@ fighter::fighter() {
   _mines = NULL;
   _mine_bm = NULL;
   _fire_delay = 0;
+  _m_st = STILL;
+  _rot = 0.0;
 };
 
 fighter::~fighter() {
@@ -88,6 +90,7 @@ void fighter::add_health(int h) {
 
 void fighter::take_hit(int damage) {
   add_health(-1*damage);
+  cerr << "hit: " << _health << endl;
 }
 
 
@@ -97,6 +100,29 @@ float fighter::percent_health() {
 
 void fighter::move(const point_2d &offset) {
   point_2d next_loc(location() + offset);
+  float rot_inc = 0.05;
+
+  if (offset.x() < -0.1) {
+    if (_rot > -0.75) {
+      _rot -= rot_inc;
+    }
+    _m_st = LEFT;
+  }
+  else if (offset.x() > 0.1) {
+    if (_rot < 0.75) {
+      _rot += rot_inc;
+    }
+    _m_st = RIGHT;
+  }
+  else {
+    if (_rot < 0.0) {
+      _rot += rot_inc;
+    }
+    else if (_rot > 0.0) {
+      _rot -= rot_inc;
+    }
+    _m_st = STILL;
+  }
 
   if (next_loc.x() < _min_bounds.x()) {
     next_loc.x(_min_bounds.x());
@@ -204,6 +230,12 @@ bool fighter::fire_weapon() {
   return false;
 }//end fighter::fire_weapon()
 
+    
+void fighter::clear_weapons() {
+  _mines->clear_active();
+}
+
+
 int fighter::max_weapons() {
   return _mines->count();
 }//end fighter::max_weapons()
@@ -215,6 +247,25 @@ _pool& fighter::get_deployed_mines() {
 void fighter::redraw() {
   _mines->redraw();
 
-  basic_object::redraw();
+  if (_health == 0) {
+    return;
+  }
+
+  float cx = w()/2;
+  float cy = h()/2;
+
+  float dx = _loc.x() + cx;
+  float dy = _loc.y() + cy;
+
+  switch (_m_st) {
+    case LEFT:
+    case RIGHT:
+      al_draw_rotated_bitmap(bitmap(), cx, cy, dx, dy, _rot, 0);
+      break;
+
+    case STILL:
+    default:
+      basic_object::redraw();
+  }
 }
 

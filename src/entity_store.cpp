@@ -48,6 +48,14 @@ _pool& entity_store::get_active() {
   return _active;
 }
 
+void entity_store::clear_active() {
+  auto it = _active.begin();
+  while (it != _active.end()) {
+    (*it)->active(false);
+    it = _active.erase(it);
+  }
+}
+
 int entity_store::count() {
   return _store.size();
 }

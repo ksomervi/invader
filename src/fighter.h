@@ -12,6 +12,9 @@ class fighter;
 class fighter: public basic_object {
   private:
     using weapons = entity_store;
+    enum move_state { STILL, LEFT, RIGHT };
+    move_state _m_st;
+    float _rot;
 
     int _lives;
     int _health;
@@ -35,7 +38,7 @@ class fighter: public basic_object {
 
     bool ready_weapons(basic_object*, const int&);
     bool fire_weapon();
-    void clear_mines();
+    void clear_weapons();
     int max_weapons();
     _pool& get_deployed_mines();
 
