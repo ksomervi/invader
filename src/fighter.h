@@ -5,9 +5,10 @@
 #include <allegro5/allegro_primitives.h>
 
 class fighter;
-#include "resource_manager.h"
 #include "basic_object.h"
+#include "controller.h"
 #include "entity_store.h"
+#include "resource_manager.h"
 
 class fighter: public basic_object {
   private:
@@ -15,6 +16,7 @@ class fighter: public basic_object {
     enum move_state { STILL, LEFT, RIGHT };
     move_state _m_st;
     float _rot;
+    ALLEGRO_SAMPLE *_deploy_sound;
 
     int _lives;
     int _health;
@@ -48,7 +50,7 @@ class fighter: public basic_object {
     void take_hit(int);
     float percent_health();
 
-    void update();
+    void update(controller*);
     void move(const point_2d&);
 
 };//end class fighter

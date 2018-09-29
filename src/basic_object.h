@@ -24,7 +24,7 @@ class basic_object {
     basic_object();
     basic_object(float, float, float, float);
     virtual ~basic_object();
-    void redraw();
+    void redraw(const float& =0.0);
     void draw(const point_2d&);
     void bound(const point_2d&, const point_2d&);
     float w();

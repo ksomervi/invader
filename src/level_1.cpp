@@ -68,29 +68,6 @@ bool level_1::init() {
 
   //resources.push_back(resource(resource::rtype, const char*));
 
-  /*
-  ALLEGRO_BITMAP *h_bm = _rm->get_sprite("hero");
-  if (!h_bm) {
-    if (!hero->create_bitmap(SPRITE_SIZE, SPRITE_SIZE)) {
-    cerr << "failed to create hero bitmap!" << endl;
-    return false;
-    }
-
-    //Setup and mockup sprite
-    al_set_target_bitmap(hero->bitmap());
-    al_clear_to_color(al_map_rgb(255, 174, 0));
-    al_set_target_backbuffer(display);
-  }
-  else {
-    hero->bitmap(h_bm);
-  }
-
-  //5 mines
-  //_rm->get_sprite("mine");
-  if (!hero->ready_weapons(5)) {
-    cerr << "failed to ready weapons!" << endl;
-  }
-  */
   hero->init(_rm);
   hero->bound(_min_bounds, _max_bounds);
 
@@ -102,11 +79,6 @@ bool level_1::init() {
   //FIXME: these should be associated with the objects
   hit_sound = _rm->get_sound("collision");
   if (!hit_sound) {
-    cerr << "failed to load sound file" << endl;
-  }
-
-  deploy_sound = _rm->get_sound("mine");
-  if (!deploy_sound) {
     cerr << "failed to load sound file" << endl;
   }
 
@@ -129,14 +101,7 @@ bool level_1::init() {
 
 
 void level_1::play_level() {
-
-  float vel_x = 4.0;
-  float vel_y = 4.0;
-  point_2d gravity(0.0, 1.0);
-  point_2d h_delta;
-
   input->init();
-  hero->clear_weapons();
 
   int max_waves = 3;
   int current_wave = 0;
@@ -148,7 +113,6 @@ void level_1::play_level() {
   std::uniform_int_distribution<int> distribution(20,100);
   int next_foe = 120;
 
-  std::default_random_engine x_generator;
   std::uniform_real_distribution<float> x_distribution(_min_bounds.x(), _max_bounds.x());
 
   bool playing = true;
@@ -165,7 +129,7 @@ void level_1::play_level() {
           next_foe--;
         }
         else {
-          if (_foes->deploy(x_distribution(x_generator), 0.0)) {
+          if (_foes->deploy(x_distribution(generator), 0.0)) {
             foes_remaining--;
           }
           next_foe = distribution(generator) * (1 - current_wave*0.2);
@@ -176,20 +140,7 @@ void level_1::play_level() {
       _foes->update();
 
       if (hero->health()) {
-        h_delta = gravity;
-
-        if (input->fire() && hero->fire_weapon()) {
-          al_play_sample(deploy_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-        }
-
-        //if (input->direction() != point_2d()) {
-        h_delta.x(input->direction().x() * vel_x);
-        h_delta.y(input->direction().y() * vel_y);
-        h_delta += gravity;
-        //}
-        hero->move(h_delta);
-        hero->update();
-
+        hero->update(input);
         check_collisions();
       }
 
@@ -230,12 +181,11 @@ void level_1::play_level() {
         else {
           complete(true);
         }
-        //Clear the mines
-        //hero->clear_weapons();
       }
-    }
+      //Clear the mines
+      hero->clear_weapons();
+    }//end if (foes_remaining == 0 and _foes->get_active().empty())
   }//end while(playing)
-
 
   al_stop_timer(timer);
   al_rest(1.0);

@@ -20,6 +20,7 @@ fighter::fighter() {
   _fire_delay = 0;
   _m_st = STILL;
   _rot = 0.0;
+  _deploy_sound = NULL;
 };
 
 fighter::~fighter() {
@@ -100,30 +101,6 @@ float fighter::percent_health() {
 
 void fighter::move(const point_2d &offset) {
   point_2d next_loc(location() + offset);
-  float rot_inc = 0.05;
-
-  if (offset.x() < -0.1) {
-    if (_rot > -0.75) {
-      _rot -= rot_inc;
-    }
-    _m_st = LEFT;
-  }
-  else if (offset.x() > 0.1) {
-    if (_rot < 0.75) {
-      _rot += rot_inc;
-    }
-    _m_st = RIGHT;
-  }
-  else {
-    if (_rot < 0.0) {
-      _rot += rot_inc;
-    }
-    else if (_rot > 0.0) {
-      _rot -= rot_inc;
-    }
-    _m_st = STILL;
-  }
-
   if (next_loc.x() < _min_bounds.x()) {
     next_loc.x(_min_bounds.x());
   }
@@ -140,7 +117,78 @@ void fighter::move(const point_2d &offset) {
   location(next_loc);
 }//end
 
-void fighter::update() {
+void fighter::update(controller *c) {
+  float max_vx = 5.0;
+  float max_vy = 5.0;
+  float rot_inc = 0.05;
+  float v_inc = 0.5;
+  point_2d g(0.0, 1.0);
+
+  if (c->fire() && fire_weapon()) {
+    ;
+  }
+
+  point_2d m = c->direction();
+
+  _vel.x(_vel.x()+m.x());
+
+  if (m.x() < -0.1) {
+    if (_rot > -0.75) {
+      _rot -= rot_inc;
+    }
+
+    if (_vel.x() < -max_vx) {
+      _vel.x(-max_vx);
+    }
+    _m_st = LEFT;
+  }
+  else if (m.x() > 0.1) {
+    if (_rot < 0.75) {
+      _rot += rot_inc;
+    }
+    if (_vel.x() > max_vx) {
+      _vel.x(max_vx);
+    }
+    _m_st = RIGHT;
+  }
+  else {
+    if (_rot < 0.0) {
+      _rot += rot_inc;
+    }
+    else if (_rot > 0.0) {
+      _rot -= rot_inc;
+    }
+    if (_vel.x() > 0.0) {
+      _vel.x(_vel.x()-(v_inc/2));
+    }
+    else if (_vel.x() < 0.0) {
+      _vel.x(_vel.x()+(v_inc/2));
+    }
+    _m_st = STILL;
+  }
+
+  _vel.y(_vel.y()+m.y());
+  if (m.y() < -0.1) {
+    if (_vel.y() < -max_vy) {
+      _vel.y(-max_vy);
+    }
+  }
+  else if (m.y() > 0.1) {
+    if (_vel.y() > max_vy) {
+      _vel.y(max_vy);
+    }
+  }
+  else {
+    if (_vel.y() > g.y()) {
+      _vel.y(_vel.y()-v_inc);
+    }
+    else if (_vel.y() < g.y()) {
+      _vel.y(_vel.y()+v_inc);
+    }
+  }
+
+  move(_vel);
+
   if (_healing) {
     if (_healing_time > 0) {
       _healing_time--;
@@ -182,7 +230,12 @@ bool fighter::init(resource_manager *rm) {
   }
 
   proto.bitmap(NULL);
-  
+
+  _deploy_sound = rm->get_sound("mine");
+  if (!_deploy_sound) {
+    cerr << "failed to load sound file" << endl;
+  }
+
   return true;
 }//end fighter::init()
 
@@ -223,6 +276,7 @@ bool fighter::ready_weapons(basic_object *proto, const int &max) {
 bool fighter::fire_weapon() {
   if (_fire_delay == 0) {
     if (_mines->deploy(_loc)) {
+      al_play_sample(_deploy_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
       _fire_delay = 30;
       return true;
     }
@@ -230,7 +284,7 @@ bool fighter::fire_weapon() {
   return false;
 }//end fighter::fire_weapon()
 
-    
+
 void fighter::clear_weapons() {
   _mines->clear_active();
 }
@@ -251,21 +305,6 @@ void fighter::redraw() {
     return;
   }
 
-  float cx = w()/2;
-  float cy = h()/2;
-
-  float dx = _loc.x() + cx;
-  float dy = _loc.y() + cy;
-
-  switch (_m_st) {
-    case LEFT:
-    case RIGHT:
-      al_draw_rotated_bitmap(bitmap(), cx, cy, dx, dy, _rot, 0);
-      break;
-
-    case STILL:
-    default:
-      basic_object::redraw();
-  }
+  basic_object::redraw(_rot);
 }
 

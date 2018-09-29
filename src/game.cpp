@@ -5,9 +5,6 @@
  */
 
 #include "game.h"
-
-#include <random>
-
 #include "level_1.h"
 
 game::game() {

@@ -85,8 +85,14 @@ void basic_object::y(float v) {
   _loc.y(v);
 }
 
-void basic_object::redraw() {
-  al_draw_bitmap(_bm, _loc.x(), _loc.y(), 0);
+void basic_object::redraw(const float &rotation) {
+  float cx = w()/2;
+  float cy = h()/2;
+
+  float dx = _loc.x() + cx;
+  float dy = _loc.y() + cy;
+
+  al_draw_rotated_bitmap(_bm, cx, cy, dx, dy, rotation, 0);
 }
 
 void basic_object::draw(const point_2d &p) {
