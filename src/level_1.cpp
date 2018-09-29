@@ -33,8 +33,8 @@ level_1::~level_1() {
 bool level_1::play(resource_manager *rm) {
   _rm = rm;
   display = _rm->get_display();
-  title_font = _rm->get_font(0);
-  textfont = _rm->get_font(1);
+  title_font = _rm->get_font(TITLE);
+  textfont = _rm->get_font();
   hero = _rm->get_player();
   input = new controller();
 

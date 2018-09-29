@@ -7,11 +7,6 @@
 #include "game.h"
 
 #include <random>
-#include <iostream>
-using std::cerr;
-using std::endl;
-#include <string>
-using std::string;
 
 #include "level_1.h"
 

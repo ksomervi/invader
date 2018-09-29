@@ -6,14 +6,15 @@ class resource {
 
   public:
     enum rtype { NONE, PLAYER, AUDIO, TEXTURE, FONT, DISPLAY };
-    resource(rtype, const char*);
     resource();
+    resource(rtype, const char*);
+    virtual ~resource() = 0;
+
     rtype type();
     void type(rtype); //one of bitmap, sound, game object
 
-    //basic_object * 
-
-
+    bool load(rtype, const char*);
+    bool load(rtype, string&);
 
 };//end class resource
 

@@ -11,10 +11,11 @@
 
 class resource_manager;
 
-#include <unordered_map>
 #include "logger.h"
 #include "fighter.h"
 //#include "resource.h"
+
+enum fonttype { NONE, TITLE, TEXT, SMALL };
 
 class resource_manager {
   private:
@@ -23,6 +24,7 @@ class resource_manager {
     ALLEGRO_DISPLAY *_display;
     ALLEGRO_FONT *_title_font;
     ALLEGRO_FONT *_textfont;
+    //enum rtype { NONE, PLAYER, AUDIO, TEXTURE, FONT, DISPLAY };
 
     fighter *_player;
     static resource_manager &_rm;
@@ -38,7 +40,7 @@ class resource_manager {
 
     logger *get_logger();
     ALLEGRO_DISPLAY *get_display();
-    ALLEGRO_FONT *get_font(int);
+    ALLEGRO_FONT *get_font(fonttype=NONE);
     fighter* get_player();
     ALLEGRO_SAMPLE* get_sound(const char*);
     ALLEGRO_BITMAP* get_sprite(const char*);

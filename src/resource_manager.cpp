@@ -20,7 +20,7 @@ resource_manager::resource_manager() {
 resource_manager::~resource_manager() {
 
   if (_player) {
-    delete player;
+    delete _player;
   }
 
   delete _log;
@@ -113,14 +113,14 @@ fighter* resource_manager::get_player() {
   return _player;
 }
 
-
-ALLEGRO_FONT *resource_manager::get_font(int f=1) {
+ALLEGRO_FONT *resource_manager::get_font(fonttype f) {
   switch(f) {
-    case 0:
+    case TITLE:
       return _title_font;
       break;
 
-    case 1:
+    case NONE:
+    case TEXT:
     default:
       return _textfont;
       break;
