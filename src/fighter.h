@@ -5,8 +5,9 @@
 #include <allegro5/allegro_primitives.h>
 
 class fighter;
+#include "entity.h"
 #include "basic_object.h"
-#include "controller.h"
+#include "player_controller.h"
 #include "entity_store.h"
 #include "resource_manager.h"
 
@@ -50,7 +51,8 @@ class fighter: public basic_object {
     void take_hit(int);
     float percent_health();
 
-    void update(controller*);
+    bool handle_event(ALLEGRO_EVENT &);
+    void update() override;
     void move(const point_2d&);
 
 };//end class fighter

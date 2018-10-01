@@ -24,26 +24,7 @@ basic_object::basic_object() {
   _active = false;
 }//end basic_object
 
-
-basic_object::basic_object(float x, float y, float vx, float vy) {
-  _w = 0.0;
-  _h = 0.0;
-  _loc = point_2d(x, y);
-  _vel = point_2d(vx, vy);
-
-  _bm = NULL;
-  _active = false;
-}//end basic_object
-
-
 basic_object::~basic_object() {
-  if (_bm) {
-    al_destroy_bitmap(_bm);
-  }
-}
-
-void basic_object::update() {
-  std::cerr << "*";
 }
 
 void basic_object::bound(const point_2d &min, const point_2d &max) {
@@ -53,7 +34,6 @@ void basic_object::bound(const point_2d &min, const point_2d &max) {
   _min_bounds = min;
   _max_bounds = max;
 }
-
 
 float basic_object::x() {
   return _loc.x();

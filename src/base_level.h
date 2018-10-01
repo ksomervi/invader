@@ -2,7 +2,7 @@
 #define BASE_LEVEL_H
 
 #include "game.h"
-#include "controller.h"
+#include "game_controller.h"
 #include "fighter.h"
 #include <vector>
 #include "entity_store.h"
@@ -24,7 +24,7 @@ class base_level {
     ALLEGRO_FONT *title_font;
     ALLEGRO_FONT *textfont;
 
-    controller *input;
+    game_controller *input;
 
     fighter *hero;
     armada *_foes;

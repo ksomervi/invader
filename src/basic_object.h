@@ -2,7 +2,12 @@
 #define BASIC_OBJECT_H
 
 #include <allegro5/allegro.h>
+
 #include "defines.h"
+
+class basic_object;
+
+#include "controller.h"
 #include "point_2d.h"
 
 class basic_object {
@@ -14,6 +19,7 @@ class basic_object {
     ALLEGRO_BITMAP *_bm;
 
   protected:
+    controller * _ctrl;
     point_2d _loc;
     point_2d _vel;
     bool _active;
@@ -22,8 +28,10 @@ class basic_object {
 
   public:
     basic_object();
-    basic_object(float, float, float, float);
-    virtual ~basic_object();
+
+    virtual ~basic_object() = 0;
+    virtual void update() = 0;
+
     void redraw(const float& =0.0);
     void draw(const point_2d&);
     void bound(const point_2d&, const point_2d&);
@@ -60,7 +68,6 @@ class basic_object {
     void move(point_2d);
     void move_to(point_2d);
 
-    virtual void update();
 
     void id(const int&);
     int id();

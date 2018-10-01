@@ -21,6 +21,8 @@ fighter::fighter() {
   _m_st = STILL;
   _rot = 0.0;
   _deploy_sound = NULL;
+
+  _ctrl = new player_controller();
 };
 
 fighter::~fighter() {
@@ -38,6 +40,12 @@ fighter::~fighter() {
 
     delete _mines;
   }
+
+  delete _ctrl;
+}
+
+bool fighter::handle_event(ALLEGRO_EVENT &ev) {
+  return _ctrl->handle_event(ev);
 }
 
 int fighter::lives() {
@@ -117,18 +125,24 @@ void fighter::move(const point_2d &offset) {
   location(next_loc);
 }//end
 
-void fighter::update(controller *c) {
+//void fighter::update(controller *c) { }
+
+void fighter::update() {
   float max_vx = 5.0;
   float max_vy = 5.0;
   float rot_inc = 0.05;
   float v_inc = 0.5;
   point_2d g(0.0, 1.0);
 
-  if (c->fire() && fire_weapon()) {
+  _ctrl->update(this);
+
+  /*
+  if (_ctrl->fire() && fire_weapon()) {
     ;
   }
+  */
 
-  point_2d m = c->direction();
+  point_2d m = _ctrl->direction();
 
   _vel.x(_vel.x()+m.x());
 
@@ -222,7 +236,7 @@ bool fighter::init(resource_manager *rm) {
     bitmap(bm);
   }
 
-  basic_object proto;
+  entity proto;
   proto.bitmap(rm->get_sprite("mine"));
 
   if (! ready_weapons(&proto, 5)) {
@@ -235,6 +249,8 @@ bool fighter::init(resource_manager *rm) {
   if (!_deploy_sound) {
     cerr << "failed to load sound file" << endl;
   }
+
+  _ctrl->init();
 
   return true;
 }//end fighter::init()
@@ -265,7 +281,7 @@ bool fighter::ready_weapons(basic_object *proto, const int &max) {
 
   basic_object *m = NULL;
   for (int i=0; i<max; i++) {
-    m = new basic_object();
+    m = new entity();
     m->bitmap(proto->bitmap());
     _mines->add(m);
   }

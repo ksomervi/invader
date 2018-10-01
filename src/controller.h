@@ -4,31 +4,25 @@
 #include <allegro5/allegro.h>
 #include <map>
 
+class controller;
+#include "basic_object.h"
 #include "point_2d.h"
 
-class controller{
+class controller {
   private:
 
-    std::map<int, bool> _key_pressed;
+  protected:
     point_2d _dir;
-
 
   public:
     controller();
-    ~controller();
+    virtual ~controller() = 0;
 
-    void init();
-    bool handle_event(ALLEGRO_EVENT &);
+    virtual void init();
+    virtual bool handle_event(ALLEGRO_EVENT &) = 0;
 
-    point_2d direction();
-    float up();
-    float down();
-    float left();
-    float right();
-    bool fire();
-
-    bool pause_event();
-    bool quit();
+    virtual point_2d direction() = 0;
+    virtual void update(basic_object *) = 0;
 
 };//end class controller
 

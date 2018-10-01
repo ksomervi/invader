@@ -36,7 +36,7 @@ bool level_1::play(resource_manager *rm) {
   title_font = _rm->get_font(TITLE);
   textfont = _rm->get_font();
   hero = _rm->get_player();
-  input = new controller();
+  input = new game_controller();
 
   if (! this->init()) {
     return false;
@@ -65,8 +65,6 @@ bool level_1::init() {
     cerr << "failed to create timer!" << endl;
     return false;
   }
-
-  //resources.push_back(resource(resource::rtype, const char*));
 
   hero->init(_rm);
   hero->bound(_min_bounds, _max_bounds);
@@ -140,7 +138,7 @@ void level_1::play_level() {
       _foes->update();
 
       if (hero->health()) {
-        hero->update(input);
+        hero->update();
         check_collisions();
       }
 
@@ -163,6 +161,9 @@ void level_1::play_level() {
         }
       }//end else if (input->pause_event())
     }
+    else if (!hero->handle_event(ev)) {
+      cerr << "WARNING: unhandled event: " << ev.type << endl;
+    }//end else if (!hero->handle_event(ev))
 
     if (hero->health() == 0) {
       foes_remaining = 0;
