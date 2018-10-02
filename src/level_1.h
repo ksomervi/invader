@@ -13,7 +13,7 @@ class level_1: protected base_level {
     ALLEGRO_BITMAP *mine_bm = NULL;
     ALLEGRO_BITMAP *foe_bm = NULL;
     ALLEGRO_SAMPLE *hit_sound = NULL;
-    ALLEGRO_SAMPLE *deploy_sound = NULL;
+    ALLEGRO_SAMPLE *bg_sound = NULL;
 
     point_2d _min_bounds;
     point_2d _max_bounds;

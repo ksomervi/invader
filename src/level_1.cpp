@@ -80,6 +80,11 @@ bool level_1::init() {
     cerr << "failed to load sound file" << endl;
   }
 
+  bg_sound = _rm->get_sound("bg_audio");
+  if (bg_sound) {
+    al_play_sample(bg_sound, 0.8, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
+  }
+
   event_queue = al_create_event_queue();
   if(!event_queue) {
     cerr << "failed to create event_queue!" << endl;
@@ -304,6 +309,9 @@ void level_1::show_stats() {
 
 void level_1::end_level() {
   cerr << "ending level..." << endl;
+
+  al_stop_samples();
+
   if (hero) {
     //Cleanup the bitmap we allocated
     ALLEGRO_BITMAP *bm = hero->bitmap();
@@ -336,6 +344,7 @@ void level_1::end_level() {
   }
 
   delete input;
+
   return;
 }//end level_1::end_level()
 
