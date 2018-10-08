@@ -14,5 +14,13 @@ entity::~entity() {
 
 void entity::update() {
   // Use internal control component
+  if (_active) {
+    if (_loc.y() < 0) {
+      _active = false;
+    }
+    else {
+      _loc += _vel;
+    }
+  }
 }
 

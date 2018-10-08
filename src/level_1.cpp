@@ -374,6 +374,7 @@ bool level_1::init_foes(int max) {
 void level_1::check_collisions() {
   //check for collisions
   int mine_hits = _foes->check_collisions(&(hero->get_deployed_mines()));
+  mine_hits += _foes->check_collisions(&(hero->get_deployed_blasts()));
 
   if (mine_hits > 0) {
     hits += mine_hits;

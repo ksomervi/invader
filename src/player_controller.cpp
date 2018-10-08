@@ -44,6 +44,10 @@ void player_controller::update(basic_object *o) {
   if (_key_pressed[ALLEGRO_KEY_SPACE]) {
     ((fighter*)o)->fire_weapon();
   }
+
+  if (_key_pressed[ALLEGRO_KEY_C]) {
+    ((fighter*)o)->next_weapon();
+  }
 }//end player_controller::update(basic_object *o)
 
 point_2d player_controller::direction() {

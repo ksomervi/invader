@@ -26,8 +26,15 @@ class fighter: public basic_object {
     bool _healing;
 
     weapons *_mines;
+    weapons *_blaster;
+    weapons *_active_wpn;
+    ALLEGRO_BITMAP *_blaster_bm;
     ALLEGRO_BITMAP *_mine_bm;
     int _fire_delay;
+    int _sel_delay;
+
+    const int _mine_delay = 30;
+    const int _blaster_delay = 30;
 
   public:
     fighter();
@@ -41,9 +48,11 @@ class fighter: public basic_object {
 
     bool ready_weapons(basic_object*, const int&);
     bool fire_weapon();
+    void next_weapon();
     void clear_weapons();
     int max_weapons();
     _pool& get_deployed_mines();
+    _pool& get_deployed_blasts();
 
     int health();
     int max_health();

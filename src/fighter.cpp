@@ -17,7 +17,10 @@ fighter::fighter() {
   _healing = false;
   _mines = NULL;
   _mine_bm = NULL;
+  _blaster = NULL;
+  _blaster_bm = NULL;
   _fire_delay = 0;
+  _sel_delay = 0;
   _m_st = STILL;
   _rot = 0.0;
   _deploy_sound = NULL;
@@ -36,9 +39,26 @@ fighter::~fighter() {
         m->bitmap(NULL);
         delete m;
       }
+      m = NULL;
     }
 
     delete _mines;
+  }
+
+  if (_blaster) {
+    if (_blaster_bm) {
+      al_destroy_bitmap(_blaster_bm);
+      _blaster_bm = NULL;
+    }
+    for (auto &b: *_blaster) {
+      if (b) {
+        b->bitmap(NULL);
+        delete b;
+      }
+      b = NULL;
+    }
+
+    delete _blaster;
   }
 
   delete _ctrl;
@@ -134,17 +154,13 @@ void fighter::update() {
   float v_inc = 0.5;
   point_2d g(0.0, 1.0);
 
-  _ctrl->update(this);
+  _blaster->update();
 
-  /*
-  if (_ctrl->fire() && fire_weapon()) {
-    ;
-  }
-  */
+  _ctrl->update(this);
 
   point_2d m = _ctrl->direction();
 
-  _vel.x(_vel.x()+m.x());
+  _vel += m;
 
   if (m.x() < -0.1) {
     if (_rot > -0.75) {
@@ -181,7 +197,6 @@ void fighter::update() {
     _m_st = STILL;
   }
 
-  _vel.y(_vel.y()+m.y());
   if (m.y() < -0.1) {
     if (_vel.y() < -max_vy) {
       _vel.y(-max_vy);
@@ -214,6 +229,9 @@ void fighter::update() {
 
   if (_fire_delay) {
     _fire_delay--;
+  }
+  if (_sel_delay) {
+    _sel_delay--;
   }
 
 }//end fighter::update()
@@ -257,6 +275,7 @@ bool fighter::init(resource_manager *rm) {
 
 bool fighter::ready_weapons(basic_object *proto, const int &max) {
   _mines = new weapons();
+  _active_wpn = _mines;
 
   if (!proto->bitmap()) {
     ALLEGRO_STATE state;
@@ -285,13 +304,33 @@ bool fighter::ready_weapons(basic_object *proto, const int &max) {
     m->bitmap(proto->bitmap());
     _mines->add(m);
   }
+  m = NULL;
+
+  _blaster_bm = al_create_bitmap(8, 8);
+  if (!_blaster_bm) {
+    return false;
+  }
+  _blaster = new weapons();
+  ALLEGRO_STATE state;
+  al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
+
+  al_set_target_bitmap(_blaster_bm);
+  al_clear_to_color(LIGHT_YELLOW);
+  al_restore_state(&state);
+
+  for (int i=0; i<20; i++) {
+    m = new entity();
+    m->bitmap(_blaster_bm);
+    m->velocity(point_2d(0.0, -6.0));
+    _blaster->add(m);
+  }
 
   return true;
 }//end fighter::ready_weapons()
 
 bool fighter::fire_weapon() {
   if (_fire_delay == 0) {
-    if (_mines->deploy(_loc)) {
+    if (_active_wpn->deploy(_loc)) {
       al_play_sample(_deploy_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
       _fire_delay = 30;
       return true;
@@ -299,6 +338,20 @@ bool fighter::fire_weapon() {
   }
   return false;
 }//end fighter::fire_weapon()
+
+void fighter::next_weapon() {
+  if (_sel_delay == 0) {
+    _sel_delay = 20;
+    if (_active_wpn != _mines) {
+      _active_wpn = _mines;
+      cerr << "mines active!" << endl;
+    }
+    else {
+      _active_wpn = _blaster;
+      cerr << "blaster active!" << endl;
+    }
+  }
+}//end fighter::next_weapon()
 
 
 void fighter::clear_weapons() {
@@ -314,8 +367,13 @@ _pool& fighter::get_deployed_mines() {
   return _mines->get_active();
 }
 
+_pool& fighter::get_deployed_blasts() {
+  return _blaster->get_active();
+}
+
 void fighter::redraw() {
   _mines->redraw();
+  _blaster->redraw();
 
   if (_health == 0) {
     return;
