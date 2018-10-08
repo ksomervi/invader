@@ -34,7 +34,7 @@ class fighter: public basic_object {
     int _sel_delay;
 
     const int _mine_delay = 30;
-    const int _blaster_delay = 30;
+    const int _blaster_delay = 10;
 
   public:
     fighter();

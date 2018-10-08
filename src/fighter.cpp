@@ -257,6 +257,8 @@ bool fighter::init(resource_manager *rm) {
   entity proto;
   proto.bitmap(rm->get_sprite("mine"));
 
+  //_blaster_bm = rm->get_sprite("blaster");
+
   if (! ready_weapons(&proto, 5)) {
     return false;
   }
@@ -306,22 +308,20 @@ bool fighter::ready_weapons(basic_object *proto, const int &max) {
   }
   m = NULL;
 
-  _blaster_bm = al_create_bitmap(8, 8);
-  if (!_blaster_bm) {
-    return false;
-  }
   _blaster = new weapons();
-  ALLEGRO_STATE state;
-  al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
-
-  al_set_target_bitmap(_blaster_bm);
-  al_clear_to_color(LIGHT_YELLOW);
-  al_restore_state(&state);
+  if (!_blaster_bm) {
+    _blaster_bm = al_create_bitmap(6, 6);
+    ALLEGRO_STATE state;
+    al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
+    al_set_target_bitmap(_blaster_bm);
+    al_clear_to_color(LIGHT_BLUE);
+    al_restore_state(&state);
+  }
 
   for (int i=0; i<20; i++) {
     m = new entity();
     m->bitmap(_blaster_bm);
-    m->velocity(point_2d(0.0, -6.0));
+    m->velocity(point_2d(0.0, -8.0));
     _blaster->add(m);
   }
 
@@ -330,9 +330,14 @@ bool fighter::ready_weapons(basic_object *proto, const int &max) {
 
 bool fighter::fire_weapon() {
   if (_fire_delay == 0) {
-    if (_active_wpn->deploy(_loc)) {
+    if (_active_wpn->deploy(_loc + point_2d((w()-6)/2, h()/2))) {
       al_play_sample(_deploy_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-      _fire_delay = 30;
+      if (_active_wpn == _mines) {
+        _fire_delay = _mine_delay;
+      }
+      else {
+        _fire_delay = _blaster_delay;
+      }
       return true;
     }
   }
