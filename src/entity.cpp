@@ -7,6 +7,7 @@
 #include "entity.h"
 
 entity::entity() {
+  _ctrl = NULL;
 }//end entity
 
 entity::~entity() {
@@ -15,11 +16,13 @@ entity::~entity() {
 void entity::update() {
   // Use internal control component
   if (_active) {
-    if (_loc.y() < 0) {
-      _active = false;
+    if (_ctrl) {
+      _ctrl->update(this);
     }
-    else {
-      _loc += _vel;
+    move(_vel);
+
+    if (_loc.y() < _min_bounds.y()) {
+      _active = false;
     }
   }
 }

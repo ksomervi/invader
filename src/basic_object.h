@@ -30,6 +30,10 @@ class basic_object {
     basic_object();
 
     virtual ~basic_object() = 0;
+
+    void set_controller(controller*);
+    controller* get_controller();
+
     virtual void update() = 0;
 
     void redraw(const float& =0.0);

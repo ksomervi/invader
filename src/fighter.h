@@ -6,9 +6,8 @@
 
 class fighter;
 #include "entity.h"
-#include "basic_object.h"
-#include "player_controller.h"
 #include "entity_store.h"
+#include "player_controller.h"
 #include "resource_manager.h"
 
 class fighter: public basic_object {

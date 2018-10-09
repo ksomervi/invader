@@ -27,6 +27,14 @@ basic_object::basic_object() {
 basic_object::~basic_object() {
 }
 
+void basic_object::set_controller(controller *c) {
+  _ctrl = c;
+}
+
+controller* basic_object::get_controller() {
+  return _ctrl;
+}
+
 void basic_object::bound(const point_2d &min, const point_2d &max) {
   std::cerr << " bound: (" << min.x() << ", " << min.y()
     << ") - ("<< max.x() << ", " << max.y() << ")" << std::endl;

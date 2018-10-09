@@ -74,6 +74,7 @@ add_executable(invader
   enemy.cpp
   point_2d.cpp
   controller.cpp player_controller.cpp game_controller.cpp enemy_controller.cpp
+  mine_controller.cpp
   logger.cpp
   )
 

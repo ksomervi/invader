@@ -9,6 +9,8 @@
 using std::cerr;
 using std::endl;
 
+#include "mine_controller.h"
+
 fighter::fighter() {
   _lives = DEFAULT_LIVES;
   _max_health = 100;
@@ -30,6 +32,7 @@ fighter::fighter() {
 
 fighter::~fighter() {
   if (_mines) {
+    //FIXME: delete controller for mines
     if (_mine_bm) {
       al_destroy_bitmap(_mine_bm);
       _mine_bm = NULL;
@@ -145,8 +148,6 @@ void fighter::move(const point_2d &offset) {
   location(next_loc);
 }//end
 
-//void fighter::update(controller *c) { }
-
 void fighter::update() {
   float max_vx = 5.0;
   float max_vy = 5.0;
@@ -154,6 +155,7 @@ void fighter::update() {
   float v_inc = 0.5;
   point_2d g(0.0, 1.0);
 
+  _mines->update();
   _blaster->update();
 
   _ctrl->update(this);
@@ -256,6 +258,7 @@ bool fighter::init(resource_manager *rm) {
 
   entity proto;
   proto.bitmap(rm->get_sprite("mine"));
+  proto.set_controller(new mine_controller());
 
   //_blaster_bm = rm->get_sprite("blaster");
 
@@ -304,6 +307,7 @@ bool fighter::ready_weapons(basic_object *proto, const int &max) {
   for (int i=0; i<max; i++) {
     m = new entity();
     m->bitmap(proto->bitmap());
+    m->set_controller(proto->get_controller());
     _mines->add(m);
   }
   m = NULL;
