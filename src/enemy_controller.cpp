@@ -37,9 +37,9 @@ point_2d enemy_controller::direction() {
   return _dir;
 }//end enemy_controller::direction()
 
-void enemy_controller::update(basic_object *o) {
+void enemy_controller::update(base_object *o) {
   _dir = o->velocity();
 
   o->velocity(direction());
-}//end enemy_controller::update(basic_object *)
+}//end enemy_controller::update(base_object *)
 

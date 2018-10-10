@@ -49,9 +49,9 @@ point_2d mine_controller::direction() {
   return _dir;
 }//end mine_controller::direction()
 
-void mine_controller::update(basic_object *o) {
+void mine_controller::update(base_object *o) {
   _dir = o->velocity();
 
   o->velocity(direction());
-}//end mine_controller::update(basic_object *)
+}//end mine_controller::update(base_object *)
 

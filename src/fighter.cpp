@@ -258,7 +258,7 @@ bool fighter::init(resource_manager *rm) {
 
   entity proto;
   proto.bitmap(rm->get_sprite("mine"));
-  proto.set_controller(new mine_controller());
+  proto.controller(new mine_controller());
 
   //_blaster_bm = rm->get_sprite("blaster");
 
@@ -278,7 +278,7 @@ bool fighter::init(resource_manager *rm) {
   return true;
 }//end fighter::init()
 
-bool fighter::ready_weapons(basic_object *proto, const int &max) {
+bool fighter::ready_weapons(base_object *proto, const int &max) {
   _mines = new weapons();
   _active_wpn = _mines;
 
@@ -303,11 +303,11 @@ bool fighter::ready_weapons(basic_object *proto, const int &max) {
     al_restore_state(&state);
   }
 
-  basic_object *m = NULL;
+  base_object *m = NULL;
   for (int i=0; i<max; i++) {
     m = new entity();
     m->bitmap(proto->bitmap());
-    m->set_controller(proto->get_controller());
+    m->controller(proto->controller());
     _mines->add(m);
   }
   m = NULL;
@@ -388,6 +388,6 @@ void fighter::redraw() {
     return;
   }
 
-  basic_object::redraw(_rot);
+  base_object::redraw(_rot);
 }
 

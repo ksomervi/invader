@@ -4,17 +4,17 @@
 #include <allegro5/allegro.h>
 #include <map>
 
-#include "controller.h"
+#include "base_controller.h"
 #include "point_2d.h"
 
-class game_controller : public controller {
+class game_controller : public base_controller {
   private:
 
     std::map<int, bool> _key_pressed;
     point_2d _dir;
 
     point_2d direction() override;
-    void update(basic_object *) override;
+    void update(base_object *) override;
 
   public:
     game_controller();

@@ -5,9 +5,9 @@
 #include <deque>
 #include <random>
 
-#include "basic_object.h"
+#include "base_object.h"
 
-using _pool = std::deque< basic_object* >;
+using _pool = std::deque< base_object* >;
 
 class entity_store {
   private:
@@ -22,14 +22,14 @@ class entity_store {
     _pool& get_active();
     int count();
 
-    void add(basic_object*);
+    void add(base_object*);
     int deployed();
     void clear_active();
     bool deploy(const float &, const float &);
     bool deploy(const point_2d&);
 
     void update();
-    bool collides(basic_object *);
+    bool collides(base_object *);
     int check_collisions(_pool *);
     void redraw();
 

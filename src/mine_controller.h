@@ -6,9 +6,9 @@
 #include <map>
 #include <random>
 
-#include "controller.h"
+#include "base_controller.h"
 
-class mine_controller : public controller {
+class mine_controller : public base_controller {
   private:
     int _mv_count;
     bool _x_side;
@@ -23,7 +23,7 @@ class mine_controller : public controller {
     void init() override;
 
     point_2d direction() override;
-    void update(basic_object *) override;
+    void update(base_object *) override;
 
 };//end class mine_controller
 

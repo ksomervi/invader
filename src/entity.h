@@ -2,9 +2,9 @@
 #define ENTITY_H
 
 #include <allegro5/allegro.h>
-#include "basic_object.h"
+#include "base_object.h"
 
-class entity : public basic_object {
+class entity : public base_object {
   private:
 
   public:

@@ -18,8 +18,8 @@
 using std::cout;
 using std::endl;
 
-#include "basic_object.h"
-using armada = std::vector<basic_object*>;
+#include "base_object.h"
+using armada = std::vector<base_object*>;
 
 #include "fighter.h"
 
@@ -42,7 +42,7 @@ class segment {
 };
 
 bool line_intersects(const segment &, const segment &);
-bool line_rect_intersects(segment &, basic_object *);
+bool line_rect_intersects(segment &, base_object *);
 
 int main(int argc, char **argv) {
   ALLEGRO_DISPLAY *display = NULL;
@@ -345,7 +345,7 @@ bool init_foes(armada &foes, int max) {
   
   for (auto& f: foes) {
     cnt++;
-    f = new basic_object();
+    f = new base_object();
     if (!f->create_bitmap(SPRITE_SIZE, SPRITE_SIZE)) {
       cout << "failed to create foe" << endl;
       return false;
@@ -421,7 +421,7 @@ bool line_intersects(const segment &s1, const segment &s2) {
   //float intersectionY = y1 + (uA * (y2-y1));
 }
 
-bool line_rect_intersects(segment &s, basic_object *o) {
+bool line_rect_intersects(segment &s, base_object *o) {
   point_2d tl(o->x(), o->y()); //top left
   point_2d tr(o->x()+o->w(), o->y()); //top right
   //Top edge

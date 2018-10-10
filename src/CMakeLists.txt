@@ -67,13 +67,13 @@ if (MINGW)
 endif(MINGW)
 
 add_executable(invader
-  main.cpp game.cpp base_level.cpp level_1.cpp basic_object.cpp fighter.cpp
+  main.cpp game.cpp base_level.cpp level_1.cpp base_object.cpp fighter.cpp
   entity.cpp
   entity_store.cpp
   resource_manager.cpp
-  enemy.cpp
+  enemy.cpp enemy_controller.cpp
   point_2d.cpp
-  controller.cpp player_controller.cpp game_controller.cpp enemy_controller.cpp
+  base_controller.cpp player_controller.cpp game_controller.cpp
   mine_controller.cpp
   logger.cpp
   )

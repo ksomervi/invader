@@ -10,7 +10,7 @@ class fighter;
 #include "player_controller.h"
 #include "resource_manager.h"
 
-class fighter: public basic_object {
+class fighter: public base_object {
   private:
     using weapons = entity_store;
     enum move_state { STILL, LEFT, RIGHT };
@@ -45,7 +45,7 @@ class fighter: public basic_object {
     void lives(int);
     void add_lives(int);
 
-    bool ready_weapons(basic_object*, const int&);
+    bool ready_weapons(base_object*, const int&);
     bool fire_weapon();
     void next_weapon();
     void clear_weapons();

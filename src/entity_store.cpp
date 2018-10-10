@@ -31,7 +31,7 @@ class entity_store::entity_store(int sz) {
   for (auto& e: _pool) {
     cerr << ".";
     cnt++;
-    e = new basic_object();
+    e = new base_object();
     e->bitmap(foe_bm);
     e->y(SCREEN_H); // default to off screen
   }
@@ -60,7 +60,7 @@ int entity_store::count() {
   return _store.size();
 }
 
-void entity_store::add(basic_object* o) {
+void entity_store::add(base_object* o) {
   _store.push_back(o);
 }
 
@@ -90,7 +90,7 @@ bool entity_store::deploy(const point_2d &p) {
 }
 
 void entity_store::update() {
-  basic_object *o = NULL;
+  base_object *o = NULL;
 
   for (auto it=_active.begin(); it!=_active.end();) {
     o = *it;
@@ -112,8 +112,8 @@ void entity_store::redraw() {
   }
 }
 
-bool entity_store::collides(basic_object *other) {
-  basic_object *o = NULL;
+bool entity_store::collides(base_object *other) {
+  base_object *o = NULL;
 
   for (auto it=_active.begin(); it!=_active.end();) {
     o = *it;
@@ -133,7 +133,7 @@ bool entity_store::collides(basic_object *other) {
 
 int entity_store::check_collisions(_pool *other) {
   int rv = 0;
-  basic_object *o = NULL;
+  base_object *o = NULL;
 
   for (auto it=other->begin(); it!=other->end();) {
     o = *it;

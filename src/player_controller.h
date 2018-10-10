@@ -4,10 +4,10 @@
 #include <allegro5/allegro.h>
 #include <map>
 
-#include "controller.h"
+#include "base_controller.h"
 #include "point_2d.h"
 
-class player_controller : public controller {
+class player_controller : public base_controller {
   private:
 
     std::map<int, bool> _key_pressed;
@@ -26,7 +26,7 @@ class player_controller : public controller {
     float right();
     bool fire();
 
-    void update(basic_object *) override;
+    void update(base_object *) override;
 
 };//end class player_controller
 

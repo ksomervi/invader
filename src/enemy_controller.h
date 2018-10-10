@@ -6,9 +6,9 @@
 #include <map>
 #include <random>
 
-#include "controller.h"
+#include "base_controller.h"
 
-class enemy_controller : public controller {
+class enemy_controller : public base_controller {
   private:
     int _mv_count;
     std::default_random_engine generator;
@@ -22,7 +22,7 @@ class enemy_controller : public controller {
     void init() override;
 
     point_2d direction() override;
-    void update(basic_object *) override;
+    void update(base_object *) override;
 
 };//end class enemy_controller
 
