@@ -105,6 +105,7 @@ bool level_1::init() {
 
 void level_1::play_level() {
   input->init();
+  hero->controller()->init();
 
   int max_waves = 3;
   int current_wave = 0;
