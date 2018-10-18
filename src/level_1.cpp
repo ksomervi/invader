@@ -74,7 +74,8 @@ bool level_1::init() {
     return false;
   }
 
-  //FIXME: these should be associated with the objects
+  //@todo
+  //@body Collision (and other) sounds should be associated with the objects
   hit_sound = _rm->get_sound("collision");
   if (!hit_sound) {
     cerr << "failed to load sound file" << endl;
