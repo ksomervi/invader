@@ -32,7 +32,7 @@ fighter::fighter() {
 
 fighter::~fighter() {
   if (_mines) {
-    //@todo
+    //@todo Delete allocated mines
     //@body The controller for mines is not deleted. Add code to delete the
     //      controller at the right location
     if (_mine_bm) {

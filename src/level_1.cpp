@@ -74,7 +74,7 @@ bool level_1::init() {
     return false;
   }
 
-  //@todo
+  //@todo Move sounds to associated object
   //@body Collision (and other) sounds should be associated with the objects
   hit_sound = _rm->get_sound("collision");
   if (!hit_sound) {
