@@ -32,8 +32,8 @@ fighter::fighter() {
 
 fighter::~fighter() {
   if (_mines) {
-    //@todo Delete allocated mines
-    //@body The controller for mines is not deleted. Add code to delete the
+    // FIXME: Delete allocated mine_controllers
+    // BODY: The controller for mines is not deleted. Add code to delete the
     //      controller at the right location
     if (_mine_bm) {
       al_destroy_bitmap(_mine_bm);

@@ -1,4 +1,5 @@
 todo:
   autoAssign: true
-  keyword: "@todo"
+  keyword: ['TODO:', 'FIXME:']
+  bodyKeyword: ['BODY:', 'DESCRIPTION:']
 
