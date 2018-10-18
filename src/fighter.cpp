@@ -32,7 +32,9 @@ fighter::fighter() {
 
 fighter::~fighter() {
   if (_mines) {
-    //FIXME: delete controller for mines
+    //@todo
+    //@body The controller for mines is not deleted. Add code to delete the
+    //      controller at the right location
     if (_mine_bm) {
       al_destroy_bitmap(_mine_bm);
       _mine_bm = NULL;
