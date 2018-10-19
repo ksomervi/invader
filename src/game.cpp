@@ -54,8 +54,16 @@ bool game::init() {
 
 
 void game::play() {
+  vector<int> foes = {3, 3, 4};
+  level_configuration config(1, foes, NORMAL);
   level_1 *l = new level_1();
-  l->play(_rm);
+  l->play(_rm, &config);
+
+  foes = {5, 8, 12};
+  config.enemy_waves(foes);
+  config.level(2);
+
+  l->play(_rm, &config);
 
   delete l;
 }

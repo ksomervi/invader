@@ -30,8 +30,9 @@ level_1::level_1() {
 level_1::~level_1() {
 }
 
-bool level_1::play(resource_manager *rm) {
+bool level_1::play(resource_manager *rm, level_configuration *lc) {
   _rm = rm;
+  _cfg = lc;
   display = _rm->get_display();
   title_font = _rm->get_font(TITLE);
   textfont = _rm->get_font();
@@ -43,7 +44,7 @@ bool level_1::play(resource_manager *rm) {
   }
 
   while (hero->health() > 0 and complete() == false and quit() == false) {
-    intro(1, 0.4);
+    intro(_cfg->level(), 0.4);
     play_level();
 
     if (hero->health() == 0) {
@@ -59,6 +60,8 @@ bool level_1::play(resource_manager *rm) {
 
 
 bool level_1::init() {
+  complete(false);
+  hits = 0;
 
   timer = al_create_timer(1.0/FPS);
   if(!timer) {
@@ -109,12 +112,9 @@ void level_1::play_level() {
   input->init();
   hero->controller()->init();
 
-  int max_waves = 3;
-  int current_wave = 0;
-  //int max_foes[] = {32, 42, 60};
-  int max_foes[] = {3, 3, 4};
-  int foes_remaining = max_foes[current_wave];
-
+  size_t current_wave = 0;
+  int foes_remaining = _cfg->enemy_wave(current_wave);
+          
   std::default_random_engine generator;
   std::uniform_int_distribution<int> distribution(20,100);
   int next_foe = 120;
@@ -122,6 +122,9 @@ void level_1::play_level() {
   std::uniform_real_distribution<float> x_distribution(_min_bounds.x(), _max_bounds.x());
 
   bool playing = true;
+
+  cerr << "  " << foes_remaining << " foes in wave " << current_wave
+       << endl;
 
   al_start_timer(timer);
 
@@ -138,7 +141,7 @@ void level_1::play_level() {
           if (_foes->deploy(x_distribution(generator), 0.0)) {
             foes_remaining--;
           }
-          next_foe = distribution(generator) * (1 - current_wave*0.2);
+          next_foe = distribution(generator) * (1.0 - current_wave*0.1);
           cerr << "next foe in " << next_foe << " cycles" << endl;
         }
       }//end if (foes_remaining > 0)
@@ -182,8 +185,10 @@ void level_1::play_level() {
       if (hero->health()) {
         cerr << "Completed wave: " << current_wave << endl;
         current_wave++;
-        if (current_wave < max_waves) {
-          foes_remaining = max_foes[current_wave];
+        if (current_wave < _cfg->enemy_waves().size()) {
+          foes_remaining = _cfg->enemy_wave(current_wave);
+          cerr << "  " << foes_remaining << " foes in wave " << current_wave
+            << endl;
           next_foe = 120;
           playing = true;
         }
@@ -235,7 +240,7 @@ void level_1::show_stats() {
 
   if (quit()) {
     al_draw_textf(title_font, text_color, x_loc, y_loc,
-        ALLEGRO_ALIGN_CENTRE, "Level %d Quit", 1);
+        ALLEGRO_ALIGN_CENTRE, "Level %d Quit", _cfg->level());
 
     y_loc += al_get_font_line_height(title_font);
 
@@ -245,7 +250,7 @@ void level_1::show_stats() {
   }
   else if (complete()) {
     al_draw_textf(title_font, text_color, x_loc, y_loc,
-        ALLEGRO_ALIGN_CENTRE, "Level %d Complete", 1);
+        ALLEGRO_ALIGN_CENTRE, "Level %d Complete", _cfg->level());
 
     y_loc += al_get_font_line_height(title_font);
 

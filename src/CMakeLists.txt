@@ -68,6 +68,7 @@ endif(MINGW)
 
 add_executable(invader
   main.cpp game.cpp base_level.cpp level_1.cpp base_object.cpp fighter.cpp
+  level_configuration.cpp
   entity.cpp
   entity_store.cpp
   resource_manager.cpp

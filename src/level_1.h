@@ -33,7 +33,7 @@ class level_1: protected base_level {
     level_1();
     ~level_1();
 
-    bool play(resource_manager *) override;
+    bool play(resource_manager *, level_configuration *) override;
 
 };//end class level_1
 
