@@ -72,6 +72,7 @@ add_executable(invader
   entity.cpp
   entity_store.cpp
   resource_manager.cpp
+  random_generator.cpp
   enemy.cpp enemy_controller.cpp
   point_2d.cpp
   base_controller.cpp player_controller.cpp game_controller.cpp

@@ -8,7 +8,6 @@
 #include "level_1.h"
 #include "enemy.h"
 
-#include <random>
 #include <iostream>
 using std::cerr;
 using std::endl;
@@ -85,6 +84,7 @@ bool level_1::init() {
     cerr << "failed to load sound file" << endl;
   }
 
+  // FIXME: Move background audio to game startup
   bg_sound = _rm->get_sound("bg_audio");
   if (bg_sound) {
     al_play_sample(bg_sound, 0.8, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
@@ -114,12 +114,13 @@ void level_1::play_level() {
 
   size_t current_wave = 0;
   int foes_remaining = _cfg->enemy_wave(current_wave);
-          
-  std::default_random_engine generator;
-  std::uniform_int_distribution<int> distribution(20,100);
+  random_generator *rg = _rm->get_random_generator();
+  int delay_l = 20;
+  int delay_h = 100;
   int next_foe = 120;
 
-  std::uniform_real_distribution<float> x_distribution(_min_bounds.x(), _max_bounds.x());
+  float x_min = _min_bounds.x();
+  float x_max = _max_bounds.x();
 
   bool playing = true;
 
@@ -138,10 +139,10 @@ void level_1::play_level() {
           next_foe--;
         }
         else {
-          if (_foes->deploy(x_distribution(generator), 0.0)) {
+          if (_foes->deploy(rg->random_float(x_min, x_max), 0.0)) {
             foes_remaining--;
           }
-          next_foe = distribution(generator) * (1.0 - current_wave*0.1);
+          next_foe = rg->random_int(delay_l, delay_h) * (1.0 - current_wave*0.1);
           cerr << "next foe in " << next_foe << " cycles" << endl;
         }
       }//end if (foes_remaining > 0)
