@@ -7,9 +7,11 @@
 #include "enemy_controller.h"
 
 enemy_controller::enemy_controller() : _mv_count(0) {
+  _rg = new random_generator();
 }
 
 enemy_controller::~enemy_controller() {
+  delete _rg;
 }
 
 void enemy_controller::init() {
@@ -22,8 +24,7 @@ bool enemy_controller::handle_event(ALLEGRO_EVENT &ev) {
 
 point_2d enemy_controller::direction() {
   if (!_mv_count) {
-    std::uniform_int_distribution<int> distribution(40,120);
-    _mv_count = distribution(generator);
+    _mv_count = _rg->random_int(40,120);
 
     if (_dir.x() < 0.0) {
       _dir.x(1.0);

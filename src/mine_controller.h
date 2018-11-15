@@ -7,12 +7,13 @@
 #include <random>
 
 #include "base_controller.h"
+#include "random_generator.h"
 
 class mine_controller : public base_controller {
   private:
     int _mv_count;
     bool _x_side;
-    std::default_random_engine generator;
+    random_generator *_rg;
 
     bool handle_event(ALLEGRO_EVENT &) override;
 

@@ -8,9 +8,11 @@
 
 mine_controller::mine_controller() : _mv_count(0) {
   _x_side = false;
+  _rg = new random_generator();
 }
 
 mine_controller::~mine_controller() {
+  delete _rg;
 }
 
 void mine_controller::init() {
@@ -23,8 +25,7 @@ bool mine_controller::handle_event(ALLEGRO_EVENT &ev) {
 
 point_2d mine_controller::direction() {
   if (!_mv_count) {
-    std::uniform_int_distribution<int> distribution(10,30);
-    _mv_count = distribution(generator);
+    _mv_count = _rg->random_int(10,30);
 
     if (_x_side) {
       if (_dir.x() < 0.0) {
