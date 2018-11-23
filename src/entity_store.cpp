@@ -68,11 +68,11 @@ int entity_store::deployed() {
   return _next_id;
 }
 
-bool entity_store::deploy(const float &x, const float &y) {
+base_object* entity_store::deploy(const float &x, const float &y) {
   return deploy(point_2d(x, y));
 }
 
-bool entity_store::deploy(const point_2d &p) {
+base_object* entity_store::deploy(const point_2d &p) {
   for (auto &f: _store) {
     if (f->active() == false) {
       f->move_to(p);
@@ -81,12 +81,12 @@ bool entity_store::deploy(const point_2d &p) {
       cerr << "foe[" << _next_id << "] starting at " << p.x() << endl;
       _active.push_back(f);
       cerr << "active enemy: " << _active.size() << endl;
-      return true;
+      return f;
     }
   }
 
   cerr << "all foes active" << endl;
-  return false;
+  return nullptr;
 }
 
 void entity_store::update() {

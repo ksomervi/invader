@@ -9,6 +9,7 @@
 using std::cerr;
 using std::endl;
 
+#include "mine.h"
 #include "mine_controller.h"
 
 fighter::fighter() {
@@ -307,7 +308,7 @@ bool fighter::ready_weapons(base_object *proto, const int &max) {
 
   base_object *m = NULL;
   for (int i=0; i<max; i++) {
-    m = new entity();
+    m = new mine();
     m->bitmap(proto->bitmap());
     m->controller(proto->controller());
     _mines->add(m);
@@ -336,9 +337,12 @@ bool fighter::ready_weapons(base_object *proto, const int &max) {
 
 bool fighter::fire_weapon() {
   if (_fire_delay == 0) {
-    if (_active_wpn->deploy(_loc + point_2d((w()-6)/2, h()/2))) {
+    base_object * b = _active_wpn->deploy(_loc + point_2d((w()-6)/2, h()/2));
+    //if (_active_wpn->deploy(_loc + point_2d((w()-6)/2, h()/2))) {
+    if (b) {
       al_play_sample(_deploy_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
       if (_active_wpn == _mines) {
+        ((mine*)b)->age(300); //Limit how long a mine is active
         _fire_delay = _mine_delay;
       }
       else {

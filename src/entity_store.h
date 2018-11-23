@@ -25,8 +25,8 @@ class entity_store {
     void add(base_object*);
     int deployed();
     void clear_active();
-    bool deploy(const float &, const float &);
-    bool deploy(const point_2d&);
+    base_object* deploy(const float &, const float &);
+    base_object* deploy(const point_2d&);
 
     void update();
     bool collides(base_object *);
