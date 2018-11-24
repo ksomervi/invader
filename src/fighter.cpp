@@ -342,7 +342,7 @@ bool fighter::fire_weapon() {
     if (b) {
       al_play_sample(_deploy_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
       if (_active_wpn == _mines) {
-        ((mine*)b)->age(300); //Limit how long a mine is active
+        dynamic_cast<mine*>(b)->age(300); //Limit how long a mine is active
         _fire_delay = _mine_delay;
       }
       else {
