@@ -54,16 +54,31 @@ bool game::init() {
 
 
 void game::play() {
-  vector<int> foes = {3, 3, 4};
-  level_configuration config(1, foes, NORMAL);
+  int max_levels = atoi(_rm->option(NULL, "max_levels"));
+  _log->note("max levels: " + std::to_string(max_levels));
+  vector<int> init_foes = {3, 3, 4};
+  vector<int> foes;
   level_1 *l = new level_1();
-  l->play(_rm, &config);
+  level_configuration config;
 
-  foes = {5, 8, 12};
-  config.enemy_waves(foes);
-  config.level(2);
+  int final_wave = 0;
+  int wave = 0;
 
-  l->play(_rm, &config);
+  for (int level=1; level<=max_levels; level++) {
+    foes.clear();
+    final_wave = 0;
+    for (auto &f: init_foes) {
+      wave = level * f;
+      foes.push_back(wave);
+      final_wave += wave;
+    }
+    init_foes.push_back(wave);
+    foes.push_back(final_wave);
+
+    config.enemy_waves(foes);
+    config.level(level);
+    l->play(_rm, &config);
+  }//end for (int level)
 
   delete l;
 }
