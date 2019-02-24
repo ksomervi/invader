@@ -1,6 +1,7 @@
 
 #include "resource_manager.h"
 
+// TODO: Change all the cerr statements to use the logger
 #include<iostream>
 using std::cerr;
 using std::endl;
@@ -70,7 +71,7 @@ bool resource_manager::_init_audio() {
     return false;
   }
 
-  if (!al_reserve_samples(4)) {
+  if (!al_reserve_samples(8)) {
     _log->error("failed to reserve samples!");
     return false;
   }

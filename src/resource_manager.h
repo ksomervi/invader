@@ -49,7 +49,7 @@ class resource_manager {
 
     random_generator* get_random_generator();
 
-    bool init();
+    //bool init();
 
 };//end class resource_manager
 
