@@ -31,6 +31,7 @@ class resource_manager {
     fighter *_player;
     static resource_manager &_rm;
 
+    bool _init_display();
     bool _init_audio();
     bool _init_fonts();
 

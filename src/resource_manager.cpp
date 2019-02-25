@@ -40,9 +40,9 @@ bool resource_manager::init_resources(ALLEGRO_CONFIG *ac) {
     _log->error("no config provided to resource manager!");
     return false;
   }
-  _display = al_create_display(SCREEN_W, SCREEN_H);
-  if(!_display) {
-    _log->error("failed to create display!");
+
+  if(!_init_display()) {
+    _log->error("failed to initialize display!");
     return false;
   }
 
@@ -58,6 +58,22 @@ bool resource_manager::init_resources(ALLEGRO_CONFIG *ac) {
 
   return true;
 }//end resource_manager::init()
+
+bool resource_manager::_init_display() {
+  _display = al_create_display(SCREEN_W, SCREEN_H);
+  if(!_display) {
+    return false;
+  }
+
+  const char *path = option("DISPLAY", "icon");
+  if (path) {
+    ALLEGRO_BITMAP *bm = al_load_bitmap(path);
+    al_set_display_icon(_display, bm);
+  }
+
+  al_set_window_title(_display, "Invader!");
+  return true;
+}//end resource_manager::_init_display()
 
 bool resource_manager::_init_audio() {
 
@@ -132,6 +148,9 @@ ALLEGRO_FONT *resource_manager::get_font(fonttype f) {
 
 
 const char* resource_manager::option(const char* section, const char* key) {
+  //FIXME: returns null when key not found
+  //DESCRIPTION: Need to find a graceful way to manage when config options are
+  //not found in the config file.
   return al_get_config_value(_cfg, section, key);
 }//end resource_manager::option
 
