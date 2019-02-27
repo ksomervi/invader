@@ -9,6 +9,7 @@ entity_store::entity_store() {
   _next_id = 0;
   _store.clear();
   _active.clear();
+  _log = nullptr;
 }
 
 /*
@@ -42,6 +43,10 @@ class entity_store::entity_store(int sz) {
 */
 
 entity_store::~entity_store() {
+}
+
+void entity_store::set_logger(logger *l) {
+  _log = l;
 }
 
 _pool& entity_store::get_active() {
@@ -78,19 +83,26 @@ base_object* entity_store::deploy(const point_2d &p) {
       f->move_to(p);
       f->id(++_next_id);
       f->active(true);
-      cerr << "foe[" << _next_id << "] starting at " << p.x() << endl;
+      if (_log) {
+        _log->debug("foe[" + std::to_string(_next_id) + "] starting at " 
+            + std::to_string(p.x()));
+      }
       _active.push_back(f);
-      cerr << "active enemy: " << _active.size() << endl;
+      if (_log) {
+        _log->debug("active enemy: " + std::to_string(_active.size()));
+      }
       return f;
     }
   }
 
-  cerr << "all foes active" << endl;
+  if (_log) {
+    _log->debug("all foes active");
+  }
   return nullptr;
 }
 
 void entity_store::update() {
-  base_object *o = NULL;
+  base_object *o = nullptr;
 
   for (auto it=_active.begin(); it!=_active.end();) {
     o = *it;
@@ -100,7 +112,6 @@ void entity_store::update() {
       it++;
     }
     else {
-      cerr << " enemy escaped: " << o->id() << endl;
       it = _active.erase(it);
     }
   }
@@ -113,13 +124,13 @@ void entity_store::redraw() {
 }
 
 bool entity_store::collides(base_object *other) {
-  base_object *o = NULL;
+  base_object *o = nullptr;
 
   for (auto it=_active.begin(); it!=_active.end();) {
     o = *it;
 
     if (o->collides(other)) {
-      cerr << "collided with enemy: " << o->id() << endl;
+      _log->debug("collided with enemy: " + std::to_string(o->id()));
       o->active(false);
       it = _active.erase(it);
       return true;
@@ -133,7 +144,7 @@ bool entity_store::collides(base_object *other) {
 
 int entity_store::check_collisions(_pool *other) {
   int rv = 0;
-  base_object *o = NULL;
+  base_object *o = nullptr;
 
   for (auto it=other->begin(); it!=other->end();) {
     o = *it;

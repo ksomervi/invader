@@ -8,10 +8,6 @@
 #include "level_1.h"
 #include "enemy.h"
 
-#include <iostream>
-using std::cerr;
-using std::endl;
-
 #include <string>
 using std::string;
 
@@ -32,6 +28,7 @@ level_1::~level_1() {
 bool level_1::play(resource_manager *rm, level_configuration *lc) {
   _rm = rm;
   _cfg = lc;
+  _log = _rm->get_logger();
   display = _rm->get_display();
   title_font = _rm->get_font(TITLE);
   textfont = _rm->get_font();
@@ -64,7 +61,7 @@ bool level_1::init() {
 
   timer = al_create_timer(1.0/FPS);
   if(!timer) {
-    cerr << "failed to create timer!" << endl;
+    _log->error("failed to create timer!");
     return false;
   }
 
@@ -72,7 +69,7 @@ bool level_1::init() {
   hero->bound(_min_bounds, _max_bounds);
 
   if (!init_foes(16)) {
-    cerr << "failed to create foes!" << endl;
+    _log->error("failed to create foes!");
     return false;
   }
 
@@ -81,7 +78,7 @@ bool level_1::init() {
   // objects
   hit_sound = _rm->get_sound("collision");
   if (!hit_sound) {
-    cerr << "failed to load sound file" << endl;
+    _log->error("failed to load sound file");
   }
 
   // FIXME: Move background audio to game startup
@@ -92,7 +89,7 @@ bool level_1::init() {
 
   event_queue = al_create_event_queue();
   if(!event_queue) {
-    cerr << "failed to create event_queue!" << endl;
+    _log->error("failed to create event_queue!");
     return false;
   }
 
@@ -124,8 +121,8 @@ void level_1::play_level() {
 
   bool playing = true;
 
-  cerr << "  " << foes_remaining << " foes in wave " << current_wave
-       << endl;
+  _log->debug(" - " + std::to_string(foes_remaining) + " foes in wave " 
+      + std::to_string(current_wave));
 
   al_start_timer(timer);
 
@@ -143,7 +140,7 @@ void level_1::play_level() {
             foes_remaining--;
           }
           next_foe = rg->random_int(delay_l, delay_h) * (1.0 - current_wave*0.1);
-          cerr << "next foe in " << next_foe << " cycles" << endl;
+          _log->debug("next foe in " + std::to_string(next_foe) + " cycles");
         }
       }//end if (foes_remaining > 0)
 
@@ -174,7 +171,7 @@ void level_1::play_level() {
       }//end else if (input->pause_event())
     }
     else if (!hero->handle_event(ev)) {
-      cerr << "WARNING: unhandled event: " << ev.type << endl;
+      _log->error("unhandled event: " + std::to_string(ev.type));
     }//end else if (!hero->handle_event(ev))
 
     if (hero->health() == 0) {
@@ -184,12 +181,12 @@ void level_1::play_level() {
     if (foes_remaining == 0 and _foes->get_active().empty()) {
       playing = false;
       if (hero->health()) {
-        cerr << "Completed wave: " << current_wave << endl;
+        _log->debug("Completed wave: " + std::to_string(current_wave));
         current_wave++;
         if (current_wave < _cfg->enemy_waves().size()) {
           foes_remaining = _cfg->enemy_wave(current_wave);
-          cerr << "  " << foes_remaining << " foes in wave " << current_wave
-            << endl;
+          _log->debug(std::to_string(foes_remaining) + " foes in wave " 
+              + std::to_string(current_wave));
           next_foe = 120;
           playing = true;
         }
@@ -205,7 +202,7 @@ void level_1::play_level() {
   al_stop_timer(timer);
   al_rest(1.0);
   if (al_is_event_queue_empty(event_queue) == false) {
-    cerr << "pending event ... flushing" << endl;
+    _log->debug("pending event ... flushing");
     al_flush_event_queue(event_queue);
   }
 
@@ -218,10 +215,10 @@ void level_1::show_stats() {
   if (total_foes) {
     kill_eff = hits*100/total_foes;
   }
-  cerr << "So how did you do?" << endl;
-  cerr << "  Total foes: " << total_foes << endl;
-  cerr << "  Total hits: " << hits << " (eff: "
-    << kill_eff << "%)" << endl;
+  _log->note("So how did you do?");
+  _log->note("  Total foes: " + std::to_string(total_foes));
+  _log->note("  Total hits: " + std::to_string(hits) + " (eff: "
+    + std::to_string(kill_eff) + "%)");
 
   ALLEGRO_COLOR box_color = WHITE;
   ALLEGRO_COLOR text_color = WHITE;
@@ -317,7 +314,7 @@ void level_1::show_stats() {
 }//end level_1::show_stats()
 
 void level_1::end_level() {
-  cerr << "ending level..." << endl;
+  _log->debug("ending level...");
 
   al_stop_samples();
 
@@ -330,25 +327,25 @@ void level_1::end_level() {
 
   if (foe_bm) {
     al_destroy_bitmap(foe_bm);
-    foe_bm = NULL;
+    foe_bm = nullptr;
   }
   for (auto &f: *_foes) {
     if (f) {
       f->bitmap(NULL);
       delete f;
-      f = NULL;
+      f = nullptr;
     }
   }
 
   delete _foes;
 
   if (timer) {
-    cerr << "   ... destroying timer" << endl;
+    _log->debug("   ... destroying timer");
     al_destroy_timer(timer);
   }
 
   if (event_queue) {
-    cerr << "   ... destroying event_queue" << endl;
+    _log->debug("   ... destroying event_queue");
     al_destroy_event_queue(event_queue);
   }
 
@@ -358,16 +355,17 @@ void level_1::end_level() {
 }//end level_1::end_level()
 
 bool level_1::init_foes(int max) {
-  cerr << "Initializing foes..." << endl;
+  _log->debug("Initializing foes...");
 
   point_2d init_vel(0.0, 1.0);
 
   _foes = new armada(); //entity_store();
+  _foes->set_logger(_log);
 
   foe_bm = _rm->get_sprite("creeper");
 
   if (!foe_bm) {
-    cerr << "failed to load bitmap for foe" << endl;
+    _log->error("failed to load bitmap for foe");
     foe_bm = al_create_bitmap(SPRITE_SIZE, SPRITE_SIZE);
 
     al_set_target_bitmap(foe_bm);
@@ -375,17 +373,15 @@ bool level_1::init_foes(int max) {
     al_set_target_backbuffer(display);
   }
 
-  enemy *f = NULL;
+  enemy *f = nullptr;
   for (int i=0; i<max; i++) {
-    cerr << ".";
     f = new enemy();
     f->bitmap(foe_bm);
     f->velocity(init_vel);
     f->bound(point_2d(), _max_bounds);
     _foes->add(f);
   }
-  cerr << endl;
-  cerr << "Active foes: " << _foes->get_active().size() << endl;
+  _log->debug("Active foes: " + std::to_string(_foes->get_active().size()));
   return true;
 }//end level_1::init_foes()
 
@@ -396,7 +392,6 @@ void level_1::check_collisions() {
 
   if (mine_hits > 0) {
     hits += mine_hits;
-    cerr << "BOOM" << endl;
     al_play_sample(hit_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE,
           NULL);
   }
@@ -404,7 +399,7 @@ void level_1::check_collisions() {
   if (_foes->collides(hero)) {
     hits++;
     al_play_sample(hit_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-    cerr << "hit: " << hits << endl;
+    _log->debug("hit: " + std::to_string(hits));
     hero->take_hit(20);
   }
 }//end level_1::check_collisions()

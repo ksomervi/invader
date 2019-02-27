@@ -8,7 +8,7 @@
 
 #include "base_level.h"
 
-class level_1: protected base_level {
+class level_1: public base_level {
   private:
     ALLEGRO_BITMAP *mine_bm = NULL;
     ALLEGRO_BITMAP *foe_bm = NULL;

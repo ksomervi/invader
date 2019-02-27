@@ -63,8 +63,10 @@ void game::play() {
 
   int final_wave = 0;
   int wave = 0;
+  int level = 1;
+  bool playing = true;
 
-  for (int level=1; level<=max_levels; level++) {
+  while (playing and (level<=max_levels)) {
     foes.clear();
     final_wave = 0;
     for (auto &f: init_foes) {
@@ -77,8 +79,15 @@ void game::play() {
 
     config.enemy_waves(foes);
     config.level(level);
-    l->play(_rm, &config);
-  }//end for (int level)
+
+    if (l->play(_rm, &config)){
+      // Level completed
+      level++;
+    }
+    else if (l->quit()) {
+      playing = false;
+    }
+  }//end while (playing and (level<=max_levels))
 
   delete l;
 }

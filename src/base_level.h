@@ -15,9 +15,9 @@ class base_level {
   private:
     bool _quit;
     bool _complete;
-    static logger *_log;
 
   protected:
+    logger *_log;
     resource_manager *_rm;
     level_configuration * _cfg;
     ALLEGRO_DISPLAY *display;

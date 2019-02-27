@@ -28,9 +28,6 @@ base_controller* base_object::controller() {
 }
 
 void base_object::bound(const point_2d &min, const point_2d &max) {
-  std::cerr << " bound: (" << min.x() << ", " << min.y()
-    << ") - ("<< max.x() << ", " << max.y() << ")" << std::endl;
-
   _min_bounds = min;
   _max_bounds = max;
 }

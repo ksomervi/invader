@@ -10,18 +10,19 @@ using std::cerr;
 using std::endl;
 
 base_level::base_level() {
-  _rm = NULL;
-  display = NULL;
-  event_queue = NULL;
-  timer = NULL;
+  _rm = nullptr;
+  _log = nullptr;
+  display = nullptr;
+  event_queue = nullptr;
+  timer = nullptr;
 
-  hero = NULL;
-  _foes = NULL;
+  hero = nullptr;
+  _foes = nullptr;
 
   hits = 0;
 
-  title_font = NULL;
-  textfont = NULL;
+  title_font = nullptr;
+  textfont = nullptr;
 
   _complete = false;
   _quit = false;
@@ -81,7 +82,7 @@ void base_level::intro(int level, float delay) {
   }
   cerr << endl;
   if (al_is_event_queue_empty(event_queue) == false) {
-    cerr << "pending event ... flushing" << endl;
+    _log->debug("pending event ... flushing");
     al_flush_event_queue(event_queue);
   }
 

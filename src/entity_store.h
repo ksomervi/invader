@@ -6,6 +6,7 @@
 #include <random>
 
 #include "base_object.h"
+#include "logger.h"
 
 using _pool = std::deque< base_object* >;
 
@@ -14,10 +15,13 @@ class entity_store {
     _pool _store;
     _pool _active;
     int _next_id;
+    logger *_log;
 
   public:
     entity_store();
     ~entity_store();
+
+    void set_logger(logger *);
 
     _pool& get_active();
     int count();
