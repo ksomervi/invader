@@ -55,6 +55,7 @@ bool game::init() {
 
 void game::play() {
   int max_levels = atoi(_rm->option(NULL, "max_levels"));
+  fighter *f = _rm->get_player();
   _log->note("max levels: " + std::to_string(max_levels));
   vector<int> init_foes = {3, 3, 4};
   vector<int> foes;
@@ -84,12 +85,11 @@ void game::play() {
       // Level completed
       level++;
       // Increase players max_health
-      fighter *f =  _rm->get_player();
       int max_health = f->max_health();
       f->max_health(max_health+10);
       f->add_health(10);
     }
-    else if (l->quit()) {
+    else if (l->quit() || (f->lives() == 0)) {
       playing = false;
     }
   }//end while (playing and (level<=max_levels))
