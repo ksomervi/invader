@@ -8,10 +8,6 @@
 #include "weapon.h"
 #include "entity.h"
 
-#include<iostream>
-using std::cerr;
-using std::endl;
-
 weapon::weapon() {
   _cache = new entity_store();
   //_bm = nullptr;
