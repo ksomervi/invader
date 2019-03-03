@@ -83,6 +83,11 @@ void game::play() {
     if (l->play(_rm, &config)){
       // Level completed
       level++;
+      // Increase players max_health
+      fighter *f =  _rm->get_player();
+      int max_health = f->max_health();
+      f->max_health(max_health+10);
+      f->add_health(10);
     }
     else if (l->quit()) {
       playing = false;

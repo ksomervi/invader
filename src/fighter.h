@@ -14,7 +14,6 @@ class fighter;
 
 class fighter: public base_object {
   private:
-    //using weapons = entity_store;
     enum move_state { STILL, LEFT, RIGHT };
     move_state _m_st;
     float _rot;
@@ -31,7 +30,6 @@ class fighter: public base_object {
     weapon *_active_wpn;
     ALLEGRO_BITMAP *_blaster_bm;
     ALLEGRO_BITMAP *_mine_bm;
-    int _fire_delay;
     int _sel_delay;
 
     logger *_log;
@@ -60,6 +58,7 @@ class fighter: public base_object {
 
     int health();
     int max_health();
+    void max_health(const int&);
     void add_health(int);
     void take_hit(int);
     float percent_health();

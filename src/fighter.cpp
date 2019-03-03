@@ -9,7 +9,6 @@
 using std::cerr;
 using std::endl;
 
-#include "mine.h"
 #include "mine_controller.h"
 
 fighter::fighter() {
@@ -22,7 +21,6 @@ fighter::fighter() {
   _mine_bm = NULL;
   _blaster = NULL;
   _blaster_bm = NULL;
-  _fire_delay = 0;
   _sel_delay = 0;
   _m_st = STILL;
   _rot = 0.0;
@@ -91,12 +89,16 @@ int fighter::max_health() {
   return _max_health;
 }
 
+void fighter::max_health(const int &mh) {
+  _max_health = mh;
+}
+
 void fighter::add_health(int h) {
   _health += h;
 
   if (_health < 0) {
     _health = 0;
-    std::cout << "player died! restart level" << std::endl;
+    _log->note("player died! restart level");
   }
   else if (_health < _max_health) {
     _healing = true;
@@ -223,9 +225,6 @@ void fighter::update() {
     }
   }
 
-  if (_fire_delay) {
-    _fire_delay--;
-  }
   if (_sel_delay) {
     _sel_delay--;
   }
@@ -236,7 +235,7 @@ bool fighter::init(resource_manager *rm) {
   ALLEGRO_BITMAP *bm = rm->get_sprite("hero");
   if (!bm) {
     if (!create_bitmap(SPRITE_SIZE, SPRITE_SIZE)) {
-      cerr << "failed to create hero bitmap!" << endl;
+      _log->error("failed to create hero bitmap!");
       return false;
     }
     ALLEGRO_STATE state;
@@ -333,11 +332,11 @@ void fighter::swap_weapons() {
     _sel_delay = 20;
     if (_active_wpn != _mines) {
       _active_wpn = _mines;
-      cerr << "mines active!" << endl;
+      _log->debug("mines active!");
     }
     else {
       _active_wpn = _blaster;
-      cerr << "blaster active!" << endl;
+      _log->debug("blaster active!");
     }
   }
 }//end fighter::next_weapon()
