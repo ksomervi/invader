@@ -160,6 +160,10 @@ int entity_store::check_collisions(_pool *other) {
   return rv;
 }
 
+bool entity_store::empty() {
+  return _store.empty();
+}
+
 _pool::iterator entity_store::begin() {
   return _store.begin();
 }

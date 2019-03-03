@@ -26,9 +26,11 @@ class base_object {
 
   public:
     base_object();
+    base_object(const base_object&);
 
     virtual ~base_object() = 0;
 
+    virtual base_object *clone() = 0;
     void controller(base_controller*);
     base_controller* controller();
 

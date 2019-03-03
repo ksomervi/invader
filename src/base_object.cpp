@@ -7,13 +7,21 @@
 #include "base_object.h"
 
 #include <cmath>
-#include <iostream>
-using std::cout;
-using std::endl;
 
 base_object::base_object() : _loc(), _vel() {
-  _bm = NULL;
+  _id = 0;
+  _bm = nullptr;
   _active = false;
+  _ctrl = nullptr;
+}//end base_object
+
+base_object::base_object(const base_object &other) : _loc(other._loc), _vel(other._vel) {
+  _id = other._id;
+  _bm = other._bm;
+  _active = other._active;
+  _ctrl = other._ctrl;
+  _min_bounds = other._min_bounds;
+  _max_bounds = other._max_bounds;
 }//end base_object
 
 base_object::~base_object() {

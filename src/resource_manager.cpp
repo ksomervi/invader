@@ -132,6 +132,7 @@ ALLEGRO_DISPLAY *resource_manager::get_display() {
 fighter* resource_manager::get_player() {
   if (!_player) {
     _player = new fighter();
+    _player->set_logger(_log);
   }
   return _player;
 }

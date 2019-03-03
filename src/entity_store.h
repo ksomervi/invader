@@ -28,6 +28,7 @@ class entity_store {
 
     void add(base_object*);
     int deployed();
+    bool empty();
     void clear_active();
     base_object* deploy(const float &, const float &);
     base_object* deploy(const point_2d&);

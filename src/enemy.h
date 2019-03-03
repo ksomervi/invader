@@ -9,8 +9,10 @@ class enemy : public base_object {
 
   public:
     enemy();
+    enemy(const enemy&);
     ~enemy();
 
+    base_object* clone() override;
     void update() override;
 
 }; //end class enemy

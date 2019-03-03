@@ -46,7 +46,7 @@ void player_controller::update(base_object *o) {
   }
 
   if (_key_pressed[ALLEGRO_KEY_C]) {
-    ((fighter*)o)->next_weapon();
+    ((fighter*)o)->swap_weapons();
   }
 }//end player_controller::update(base_object *o)
 

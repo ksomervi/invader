@@ -9,8 +9,10 @@ class mine: public base_object {
 
   public:
     mine();
+    mine(const mine&);
     ~mine();
 
+    base_object *clone() override;
     void update() override;
 
     int age();
