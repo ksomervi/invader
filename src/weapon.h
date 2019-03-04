@@ -36,7 +36,6 @@ class weapon {
     _pool& get_active();
     void range(const int&);
     int range();
-    bool ready();
 
     void redraw();
 
