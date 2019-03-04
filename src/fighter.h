@@ -27,7 +27,6 @@ class fighter: public base_object {
 
     weapon *_mines;
     weapon *_blaster;
-    weapon *_active_wpn;
     ALLEGRO_BITMAP *_blaster_bm;
     ALLEGRO_BITMAP *_mine_bm;
     int _sel_delay;
@@ -48,8 +47,9 @@ class fighter: public base_object {
     void lives(int);
     void add_lives(int);
 
+    enum weapon_select {primary, secondary};
     bool ready_weapons(resource_manager *);
-    bool fire_weapon();
+    bool fire_weapon(const weapon_select &w=primary);
     void swap_weapons();
     void clear_weapons();
     int max_weapons();
@@ -69,6 +69,9 @@ class fighter: public base_object {
     void move(const point_2d&);
 
     void set_logger(logger *);
+
+  private:
+    std::map<weapon_select, weapon*> _arsenal;
 
 };//end class fighter
 #endif //!defined(FIGHTER_H)

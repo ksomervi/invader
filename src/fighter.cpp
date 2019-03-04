@@ -300,7 +300,6 @@ bool fighter::ready_weapons(resource_manager *rm) {
   _mines->sound(_deploy_sound);
   //TODO: mine range should be config option
   _mines->range(300);
-  _active_wpn = _mines;
 
   _blaster = new weapon();
   if (!_blaster_bm) {
@@ -323,24 +322,22 @@ bool fighter::ready_weapons(resource_manager *rm) {
 
   delete proto;
 
+  _arsenal[primary] = _blaster;
+  _arsenal[secondary] = _mines;
+
   return true;
 }//end fighter::ready_weapons()
 
-bool fighter::fire_weapon() {
-  return _active_wpn->fire(_loc + point_2d((w()-6)/2, h()/2));
+bool fighter::fire_weapon(const weapon_select &ws) {
+  return _arsenal[ws]->fire(_loc + point_2d((w()-6)/2, h()/2));
 }//end fighter::fire_weapon()
 
 void fighter::swap_weapons() {
   if (_sel_delay == 0) {
     _sel_delay = 20;
-    if (_active_wpn != _mines) {
-      _active_wpn = _mines;
-      _log->debug("mines active!");
-    }
-    else {
-      _active_wpn = _blaster;
-      _log->debug("blaster active!");
-    }
+    weapon *tmp = _arsenal[primary];
+    _arsenal[primary] = _arsenal[secondary];
+    _arsenal[secondary] = tmp;
   }
 }//end fighter::next_weapon()
 
