@@ -56,6 +56,7 @@ class fighter: public base_object {
     _pool& get_deployed_mines();
     _pool& get_deployed_blasts();
 
+    bool is_alive();
     int health();
     int max_health();
     void max_health(const int&);

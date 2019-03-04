@@ -39,11 +39,11 @@ bool level_1::play(resource_manager *rm, level_configuration *lc) {
     return false;
   }
 
-  while (hero->health() > 0 and complete() == false and quit() == false) {
+  while (hero->is_alive() and complete() == false and quit() == false) {
     intro(_cfg->level(), 0.4);
     play_level();
 
-    if (hero->health() == 0) {
+    if (hero->is_alive() == false) {
       hero->add_lives(-1);
     }
 
@@ -146,7 +146,7 @@ void level_1::play_level() {
 
       _foes->update();
 
-      if (hero->health()) {
+      if (hero->is_alive()) {
         hero->update();
         check_collisions();
       }
@@ -174,13 +174,13 @@ void level_1::play_level() {
       _log->error("unhandled event: " + std::to_string(ev.type));
     }//end else if (!hero->handle_event(ev))
 
-    if (hero->health() == 0) {
+    if (hero->is_alive() == false) {
       foes_remaining = 0;
     }
 
     if (foes_remaining == 0 and _foes->get_active().empty()) {
       playing = false;
-      if (hero->health()) {
+      if (hero->is_alive()) {
         _log->debug("Completed wave: " + std::to_string(current_wave));
         current_wave++;
         if (current_wave < _cfg->enemy_waves().size()) {

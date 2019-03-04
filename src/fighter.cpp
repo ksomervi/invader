@@ -80,6 +80,9 @@ void fighter::add_lives(int l) {
   _lives += l;
 }
 
+bool fighter::is_alive() {
+  return (_health > 0);
+}
 
 int fighter::health() {
   return _health;
