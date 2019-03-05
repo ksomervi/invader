@@ -46,7 +46,9 @@ class resource_manager {
     ALLEGRO_FONT *get_font(fonttype=NONE);
     fighter* get_player();
     ALLEGRO_SAMPLE* get_sound(const char*);
+    ALLEGRO_SAMPLE* get_sound(const char*, const char*);
     ALLEGRO_BITMAP* get_sprite(const char*);
+    ALLEGRO_BITMAP* get_sprite(const char*, const char*);
 
     random_generator* get_random_generator();
 

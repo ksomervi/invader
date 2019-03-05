@@ -4,8 +4,11 @@
  * \date 2018-07-29
  */
 
+#include <cstdio>
+
 #include "fighter.h"
-#include<iostream>
+
+#include <iostream>
 using std::cerr;
 using std::endl;
 
@@ -17,10 +20,10 @@ fighter::fighter() {
   _health = _max_health;
   _healing_time = 0;
   _healing = false;
-  _mines = NULL;
-  _mine_bm = NULL;
-  _blaster = NULL;
-  _blaster_bm = NULL;
+  _mines = nullptr;
+  _mine_bm = nullptr;
+  _blaster = nullptr;
+  _blaster_bm = nullptr;
   _sel_delay = 0;
   _m_st = STILL;
   _rot = 0.0;
@@ -35,7 +38,7 @@ fighter::~fighter() {
     //      controller at the right location
     if (_mine_bm) {
       al_destroy_bitmap(_mine_bm);
-      _mine_bm = NULL;
+      _mine_bm = nullptr;
     }
     //mines have a shared controller
     delete _mines;
@@ -44,7 +47,7 @@ fighter::~fighter() {
   if (_blaster) {
     if (_blaster_bm) {
       al_destroy_bitmap(_blaster_bm);
-      _blaster_bm = NULL;
+      _blaster_bm = nullptr;
     }
     delete _blaster;
   }
@@ -261,12 +264,14 @@ bool fighter::init(resource_manager *rm) {
   return true;
 }//end fighter::init()
 
+// TODO: refactor to function that initializes a single weapon
 bool fighter::ready_weapons(resource_manager *rm) {
 
   _mines = new weapon();
 
   entity *proto = new entity();
-  proto->bitmap(rm->get_sprite("mine"));
+  const char *label = rm->option("WEAPON 1", "label");
+  proto->bitmap(rm->get_sprite(label));
   proto->controller(new mine_controller());
 
   if (!proto->bitmap()) {
@@ -290,18 +295,33 @@ bool fighter::ready_weapons(resource_manager *rm) {
     al_restore_state(&state);
   }
 
-  //TODO: mine delay and count should be a configuration option
-  _mines->init(proto, 5);
-  _mines->delay(_mine_delay);
-  _deploy_sound = rm->get_sound("mine");
+  const char *opt = rm->option("WEAPON 1", "count");
+  int max_count = 5;
+  if (opt) {
+    max_count = atoi(opt);
+  }
+  _mines->init(proto, max_count);
+
+  int delay = _mine_delay;
+  opt = rm->option("WEAPON 1", "delay");
+  if (opt) {
+    _log->debug(string("setting ") + label + " delay: " + opt);
+    delay = atoi(opt);
+  }
+  _mines->delay(delay);
+  _deploy_sound = rm->get_sound(label);
   if (!_deploy_sound) {
-    _log->error("failed to load sound file");
+    _log->error("failed to load sound file for " + string(label));
   }
   _mines->sound(_deploy_sound);
-  //TODO: mine range should be config option
-  _mines->range(300);
+  opt = rm->option("WEAPON 1", "range");
+  if (opt) {
+    _mines->range(atoi(opt));
+  }
 
+  label = rm->option("WEAPON 0", "label");
   _blaster = new weapon();
+  _blaster_bm = rm->get_sprite(label);
   if (!_blaster_bm) {
     _blaster_bm = al_create_bitmap(4, 5);
     ALLEGRO_STATE state;
@@ -315,9 +335,18 @@ bool fighter::ready_weapons(resource_manager *rm) {
   proto->controller(nullptr);
   proto->velocity(point_2d(0.0, -8.0));
 
-  //TODO: blaster delay and count should be a configuration option
-  _blaster->init(proto, 20);
-  _blaster->delay(_blaster_delay);
+  max_count = 20;
+  if (opt) {
+    max_count = atoi(opt);
+  }
+  _blaster->init(proto, max_count);
+  delay = _blaster_delay;
+  opt = rm->option("WEAPON 0", "delay");
+  if (opt) {
+    _log->debug(string("setting ") + label + " delay: " + opt);
+    delay = atoi(opt);
+  }
+  _blaster->delay(delay);
   _blaster->sound(_deploy_sound);
 
   delete proto;

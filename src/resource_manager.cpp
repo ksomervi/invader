@@ -5,14 +5,14 @@
 using std::stringstream;
 
 resource_manager::resource_manager() {
-  _cfg = NULL;
-  _display = NULL;
-  _title_font = NULL;
-  _textfont = NULL;
+  _cfg = nullptr;
+  _display = nullptr;
+  _title_font = nullptr;
+  _textfont = nullptr;
 
   _rand_gen = new random_generator();
 
-  _player = NULL;
+  _player = nullptr;
 
   _log = new logger(logger::NOTE);
 
@@ -153,17 +153,14 @@ ALLEGRO_FONT *resource_manager::get_font(fonttype f) {
 
 
 const char* resource_manager::option(const char* section, const char* key) {
-  //FIXME: returns null when key not found
-  //DESCRIPTION: Need to find a graceful way to manage when config options are
-  //not found in the config file.
   return al_get_config_value(_cfg, section, key);
 }//end resource_manager::option
 
 
 ALLEGRO_SAMPLE* resource_manager::get_sound(const char* option_key) {
-  string path = option("MEDIA", option_key);
+  string path = option("AUDIO", option_key);
   stringstream ss;
-  ss << "Loading sound: MEDIA::" << option_key << ":" << path;
+  ss << "Loading sound: AUDIO::" << option_key << ":" << path;
   _log->note(ss.str());
   ALLEGRO_SAMPLE *s = al_load_sample(path.c_str());
   return s;
@@ -171,11 +168,18 @@ ALLEGRO_SAMPLE* resource_manager::get_sound(const char* option_key) {
 
 
 ALLEGRO_BITMAP* resource_manager::get_sprite(const char* option_key) {
-  string path = option("SPRITES", option_key);
-  stringstream ss;
-  ss << "Loading bitmap: SPRITES::" << option_key << ":" << path;
-  _log->note(ss.str());
-  ALLEGRO_BITMAP *bm = al_load_bitmap(path.c_str());
+  return get_sprite("SPRITES", option_key);
+}//end resource_manager::get_sprite()
+
+ALLEGRO_BITMAP* resource_manager::get_sprite(const char* section, const char* option_key) {
+  const char *path = option(section, option_key);
+  ALLEGRO_BITMAP *bm = nullptr;
+  if (path) {
+    stringstream ss;
+    ss << "Loading bitmap: " << section << "::" << option_key << ":" << path;
+    _log->note(ss.str());
+    bm = al_load_bitmap(path);
+  }
   return bm;
 }//end resource_manager::get_sprite()
 

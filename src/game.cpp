@@ -54,7 +54,7 @@ bool game::init() {
 
 
 void game::play() {
-  int max_levels = atoi(_rm->option(NULL, "max_levels"));
+  int max_levels = atoi(_rm->option("GAME", "max_levels"));
   fighter *f = _rm->get_player();
   _log->note("max levels: " + std::to_string(max_levels));
   vector<int> init_foes = {3, 3, 4};
