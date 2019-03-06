@@ -16,7 +16,7 @@ directory. This will create an invader executable in the bin directory.
 
     mkdir build
     cd build
-    cmake ../CMakeLists.txt
+    cmake ..
     make
 
 Build has been tested on Linux and Windows using MingW.
