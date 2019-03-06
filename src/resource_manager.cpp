@@ -24,6 +24,7 @@ resource_manager::~resource_manager() {
     delete _player;
   }
 
+  delete _rand_gen;
   delete _log;
 }
 

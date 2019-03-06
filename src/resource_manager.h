@@ -14,7 +14,6 @@ class resource_manager;
 #include "logger.h"
 #include "fighter.h"
 #include "random_generator.h"
-//#include "resource.h"
 
 enum fonttype { NONE, TITLE, TEXT, SMALL };
 
