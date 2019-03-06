@@ -1,8 +1,6 @@
 #ifndef BASE_LEVEL_H
 #define BASE_LEVEL_H
 
-//#include <vector>
-#include "game.h"
 #include "game_controller.h"
 #include "fighter.h"
 #include "entity_store.h"
