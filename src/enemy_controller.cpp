@@ -39,8 +39,23 @@ point_2d enemy_controller::direction() {
 }//end enemy_controller::direction()
 
 void enemy_controller::update(base_object *o) {
-  _dir = o->velocity();
 
-  o->velocity(direction());
+  if(o->y() > o->max_bounds().y()) {
+    //Deactivate foe when it moves off screen
+    o->active(false);
+  }
+  else {
+    _dir = o->velocity();
+    if (o->x() > o->max_bounds().x()) {
+      o->x(o->max_bounds().x());
+      _dir.x(-_dir.x());
+    }
+    else if (o->x() < o->min_bounds().x()) {
+      o->x(o->min_bounds().x());
+      _dir.x(-_dir.x());
+    }
+
+    o->velocity(direction());
+  }
 }//end enemy_controller::update(base_object *)
 

@@ -39,12 +39,19 @@ class base_object {
     void redraw(const float& =0.0);
     void draw(const point_2d&);
     void bound(const point_2d&, const point_2d&);
+    void min_bounds(const point_2d&);
+    point_2d min_bounds();
+    void max_bounds(const point_2d&);
+    point_2d max_bounds();
+
     float w();
     float h();
     float x();
     float y();
     void x(float);
     void y(float);
+    float cx();
+    float cy();
 
     bool active();
     void active(bool);

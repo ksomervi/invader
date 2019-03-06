@@ -40,6 +40,22 @@ void base_object::bound(const point_2d &min, const point_2d &max) {
   _max_bounds = max;
 }
 
+void base_object::min_bounds(const point_2d &min) {
+  _min_bounds = min;
+}
+
+point_2d base_object::min_bounds() {
+  return _min_bounds;
+}
+
+void base_object::max_bounds(const point_2d &max) {
+  _max_bounds = max;
+}
+
+point_2d base_object::max_bounds() {
+  return _max_bounds;
+}
+
 float base_object::x() {
   return _loc.x();
 }
@@ -70,14 +86,22 @@ void base_object::y(float v) {
   _loc.y(v);
 }
 
+float base_object::cx() {
+  return _loc.x() + (w()/2);
+}
+
+float base_object::cy() {
+  return _loc.y() + (h()/2);
+}
+
 void base_object::redraw(const float &rotation) {
-  float cx = w()/2;
-  float cy = h()/2;
+  float c_x = w()/2;
+  float c_y = h()/2;
 
-  float dx = _loc.x() + cx;
-  float dy = _loc.y() + cy;
+  float dx = _loc.x() + c_x;
+  float dy = _loc.y() + c_y;
 
-  al_draw_rotated_bitmap(_bm, cx, cy, dx, dy, rotation, 0);
+  al_draw_rotated_bitmap(_bm, c_x, c_y, dx, dy, rotation, 0);
 }
 
 void base_object::draw(const point_2d &p) {

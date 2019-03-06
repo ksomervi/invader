@@ -34,16 +34,16 @@ bool game::init() {
     return false;
   }
 
-  if (!_rm->init_resources(load_options(CONFIG_FILE))) {
-    _log->error("failed to initialize resource_manager!");
-    return false;
-  }
-
   al_init_image_addon();
   al_init_primitives_addon();
 
   if(!al_install_keyboard()) {
     _log->error("failed to initialize the keyboard!");
+    return false;
+  }
+
+  if (!_rm->init_resources(load_options(CONFIG_FILE))) {
+    _log->error("failed to initialize resource_manager!");
     return false;
   }
 

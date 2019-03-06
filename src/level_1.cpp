@@ -6,7 +6,12 @@
 
 #include <allegro5/allegro.h>
 #include "level_1.h"
-#include "enemy.h"
+//#include "enemy.h"
+#include "enemy_controller.h"
+
+#include <iostream>
+using std::cerr;
+using std::endl;
 
 #include <string>
 using std::string;
@@ -356,6 +361,7 @@ void level_1::end_level() {
 
 bool level_1::init_foes(int max) {
   _log->debug("Initializing foes...");
+  cerr.flush();
 
   point_2d init_vel(0.0, 1.0);
 
@@ -373,9 +379,10 @@ bool level_1::init_foes(int max) {
     al_set_target_backbuffer(display);
   }
 
-  enemy *f = nullptr;
+  entity *f = nullptr;
   for (int i=0; i<max; i++) {
-    f = new enemy();
+    f = new entity();
+    f->controller(new enemy_controller());
     f->bitmap(foe_bm);
     f->velocity(init_vel);
     f->bound(point_2d(), _max_bounds);
