@@ -33,15 +33,15 @@ base_level::~base_level() {
 };//end base_level::~base_level()
 
 void base_level::intro(int level, float delay) {
-  float textbox_h = al_get_font_line_height(title_font) +
-    4 * al_get_font_line_height(textfont);
+  float textbox_h = 4 * al_get_font_line_height(title_font);
+                    //+ 0.5 * TITLE_Y; //al_get_font_line_height(title_font);
   float textbox_w = 0.8 * SCREEN_W;
 
   ALLEGRO_COLOR text_color = WHITE;
   ALLEGRO_BITMAP *textbox = al_create_bitmap(textbox_w, textbox_h);
   float x_base = al_get_bitmap_width(textbox)/2;
   float x_loc = x_base;
-  float y_loc = TITLE_Y;
+  float y_loc = al_get_font_line_height(title_font);
 
   int wait_delay = 3;
 
@@ -56,7 +56,7 @@ void base_level::intro(int level, float delay) {
         al_get_bitmap_height(textbox), 10, 10, text_color, 4);
 
     x_loc = x_base;
-    y_loc = TITLE_Y;
+    y_loc = al_get_font_line_height(title_font) / 2.0;
     al_draw_text(title_font, text_color, x_loc, y_loc,
         ALLEGRO_ALIGN_CENTRE, GAME_TITLE);
 
