@@ -17,14 +17,6 @@ using std::endl;
 using std::string;
 
 level_1::level_1() {
-  // Playable region
-  float x_min = 4.0;
-  float x_max = SCREEN_W - SPRITE_SIZE - x_min;
-  float y_min = 0.25 * SCREEN_H;
-  float y_max = SCREEN_H - SPRITE_SIZE;
-
-  _min_bounds = point_2d(x_min, y_min);
-  _max_bounds = point_2d(x_max, y_max);
 }
 
 level_1::~level_1() {
@@ -69,6 +61,18 @@ bool level_1::init() {
     _log->error("failed to create timer!");
     return false;
   }
+
+  int screen_w = al_get_display_width(display);
+  int screen_h = al_get_display_height(display);
+
+  // Playable region
+  float x_min = 4.0;
+  float x_max = screen_w - SPRITE_SIZE - x_min;
+  float y_min = 0.25 * screen_h;
+  float y_max = screen_h - SPRITE_SIZE;
+
+  _min_bounds = point_2d(x_min, y_min);
+  _max_bounds = point_2d(x_max, y_max);
 
   hero->init(_rm);
   hero->bound(_min_bounds, _max_bounds);
@@ -217,6 +221,8 @@ void level_1::play_level() {
 
 
 void level_1::show_stats() {
+  int screen_w = al_get_display_width(display);
+
   int kill_eff = 0;
   int total_foes = _foes->deployed();
   if (total_foes) {
@@ -232,7 +238,7 @@ void level_1::show_stats() {
 
   float textbox_h = al_get_font_line_height(title_font) +
     4 * al_get_font_line_height(textfont);
-  float textbox_w = 0.8 * SCREEN_W;
+  float textbox_w = 0.8 * screen_w;
 
   ALLEGRO_BITMAP *textbox = al_create_bitmap(textbox_w, textbox_h);
   al_set_target_bitmap(textbox);
@@ -287,10 +293,10 @@ void level_1::show_stats() {
 
   al_set_target_backbuffer(display);
   al_clear_to_color(al_map_rgb(0, 0, 0));
-  x_loc = (SCREEN_W - textbox_w) / 2;
+  x_loc = (screen_w - textbox_w) / 2;
   y_loc = 100;
   al_draw_bitmap(textbox, x_loc, y_loc, 0);
-  x_loc = SCREEN_W / 2;
+  x_loc = screen_w / 2;
   y_loc += textbox_h;
   al_draw_text(textfont, text_color, x_loc, y_loc,
       ALLEGRO_ALIGN_CENTRE, "Any key to continue...");

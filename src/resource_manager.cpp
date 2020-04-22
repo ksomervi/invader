@@ -59,10 +59,16 @@ bool resource_manager::init_resources(ALLEGRO_CONFIG *ac) {
 }//end resource_manager::init()
 
 bool resource_manager::_init_display() {
-  _display = al_create_display(SCREEN_W, SCREEN_H);
+  int width = atoi(option("DISPLAY", "width"));
+  int height = atoi(option("DISPLAY", "height"));
+  _display = al_create_display(width, height);
   if(!_display) {
     return false;
   }
+
+  stringstream ss;
+  ss << "Created display: " << width << "x" << height;
+  _log->note(ss.str());
 
   const char *path = option("DISPLAY", "icon");
   if (path) {

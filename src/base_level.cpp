@@ -35,9 +35,9 @@ base_level::~base_level() {
 };//end base_level::~base_level()
 
 void base_level::intro(int level, float delay) {
+  int screen_w = al_get_display_width(display);
   float textbox_h = 4 * al_get_font_line_height(title_font);
-                    //+ 0.5 * TITLE_Y; //al_get_font_line_height(title_font);
-  float textbox_w = 0.8 * SCREEN_W;
+  float textbox_w = 0.8 * screen_w;
 
   ALLEGRO_COLOR text_color = WHITE;
   ALLEGRO_BITMAP *textbox = al_create_bitmap(textbox_w, textbox_h);
@@ -72,7 +72,7 @@ void base_level::intro(int level, float delay) {
 
     al_set_target_backbuffer(display);
     al_clear_to_color(al_map_rgb(0, 0, 0));
-    x_loc = (SCREEN_W - textbox_w) / 2;
+    x_loc = (screen_w - textbox_w) / 2;
     y_loc = 100;
     al_draw_bitmap(textbox, x_loc, y_loc, 0);
 

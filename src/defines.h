@@ -7,10 +7,6 @@
 
 #define SPRITE_SIZE 36
 
-//TODO: Make the screen dimensions configuration option
-#define SCREEN_W  640
-#define SCREEN_H  480
-
 #define RESOURCE_PATH  "resources/"
 #define CONFIG_FILE  "resources/invader.cfg"
 
