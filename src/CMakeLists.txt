@@ -79,6 +79,7 @@ add_executable(invader
   base_controller.cpp player_controller.cpp game_controller.cpp
   mine_controller.cpp
   logger.cpp
+  overlay.cpp
   )
 
 target_link_libraries(invader ${INVADER_LIBS})

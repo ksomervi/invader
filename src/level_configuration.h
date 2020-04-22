@@ -3,6 +3,8 @@
  * \author Kevin Somervill < kevin @ somervill dot org >
  * \date 2018-10-18
  */
+#ifndef LEVEL_CONFIGURATION_H
+#define LEVEL_CONFIGURATION_H 13
 
 #include <vector>
 using std::vector;
@@ -29,4 +31,4 @@ class level_configuration {
 
 };//end level_configuration
 
-
+#endif //!defined(LEVEL_CONFIGURATION_H)

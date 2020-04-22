@@ -10,7 +10,7 @@
 
 class level_1: public base_level {
   private:
-    ALLEGRO_BITMAP *mine_bm = NULL;
+    ALLEGRO_BITMAP *mine_bm = nullptr;
     ALLEGRO_BITMAP *foe_bm = NULL;
     ALLEGRO_SAMPLE *hit_sound = NULL;
     ALLEGRO_SAMPLE *bg_sound = NULL;
@@ -26,7 +26,7 @@ class level_1: public base_level {
     void show_stats();
     void check_collisions();
     void redraw();
-    void update_score();
+    //void update_score();
     bool init_foes(int);
 
   public:

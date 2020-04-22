@@ -7,6 +7,8 @@
 #include "level_configuration.h"
 using armada = entity_store;
 
+#include "overlay.h"
+
 //enum Difficulty { EASY, NORMAL, HARD };
 
 class base_level {
@@ -23,6 +25,8 @@ class base_level {
     ALLEGRO_TIMER *timer;
     ALLEGRO_FONT *title_font;
     ALLEGRO_FONT *textfont;
+
+    overlay *_overlay;
 
     game_controller *input;
 

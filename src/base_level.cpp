@@ -16,6 +16,8 @@ base_level::base_level() {
   event_queue = nullptr;
   timer = nullptr;
 
+  _overlay = nullptr;
+
   hero = nullptr;
   _foes = nullptr;
 

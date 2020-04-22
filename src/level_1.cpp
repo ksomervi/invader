@@ -106,6 +106,8 @@ bool level_1::init() {
 
   al_flip_display();
 
+  _overlay = new overlay(_rm);
+
   return true;
 }//end level_1::init()
 
@@ -323,6 +325,9 @@ void level_1::end_level() {
 
   al_stop_samples();
 
+  delete _overlay;
+  _overlay = nullptr;
+
   if (hero) {
     //Cleanup the bitmap we allocated
     ALLEGRO_BITMAP *bm = hero->bitmap();
@@ -413,31 +418,25 @@ void level_1::check_collisions() {
 
 
 void level_1::redraw() {
-  al_clear_to_color(al_map_rgb(0,0,0));
+  al_clear_to_color(BLACK);
 
   _foes->redraw();
 
   hero->redraw();
 
-  update_score();
+  //update_score();
+  _overlay->redraw(_foes->deployed(), hits, hero);
 
   al_flip_display();
 }//end level_1::redraw()
 
-
 /*
-void level_1::draw_text(const char *s, float x, float y, flag) {
-  al_draw_text(textfont, al_map_rgb(255,255,255), x, y, flag, s);
-}
-*/
-
-
 void level_1::update_score() {
   float x_base = al_get_display_width(display) - 220;
   float x_loc = x_base;
   float y_loc = TITLE_Y;
 
-  ALLEGRO_COLOR text_color = WHITE;
+  ALLEGRO_COLOR text_color = al_premul_rgba(255, 255, 255, 107);
 
   int kill_eff = 0;
   float y_step = al_get_font_line_height(textfont);
@@ -451,22 +450,22 @@ void level_1::update_score() {
       al_get_display_width(display)/2, TITLE_Y, ALLEGRO_ALIGN_RIGHT,
       GAME_TITLE);
 
-  al_draw_text(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+  al_draw_text(textfont, text_color, x_loc, y_loc,
       ALLEGRO_ALIGN_LEFT, "Lives:");
 
   x_loc += 100;
-  al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+  al_draw_textf(textfont, text_color, x_loc, y_loc,
       ALLEGRO_ALIGN_RIGHT, "%d", hero->lives());
 
   x_loc = x_base;
   y_loc += y_step;
-  al_draw_text(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+  al_draw_text(textfont, text_color, x_loc, y_loc,
       ALLEGRO_ALIGN_LEFT, "Health:");
 
   x_loc += 100;
   float h_bar_len = 100;
   float h_bar_fill = h_bar_len * hero->percent_health();
-  ALLEGRO_COLOR fill_color = GREEN;
+  ALLEGRO_COLOR fill_color = al_premul_rgba(153, 204, 0, 107);
   if (hero->percent_health() < 0.4) {
     fill_color = RED;
   }
@@ -476,33 +475,32 @@ void level_1::update_score() {
   }
 
   al_draw_rounded_rectangle(x_loc, y_loc, x_loc+h_bar_len, y_loc+y_step,
-      5, 5, al_map_rgb(255, 255, 255), 4);
+      5, 5, text_color, 4);
 
-  al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc+h_bar_len/2.0, y_loc,
+  al_draw_textf(textfont, text_color, x_loc+h_bar_len/2.0, y_loc,
       ALLEGRO_ALIGN_CENTRE, "%d", hero->max_health());
 
   x_loc -= 100;
   x_loc = x_base;
   y_loc += y_step;
-  al_draw_text(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+  al_draw_text(textfont, text_color, x_loc, y_loc,
       ALLEGRO_ALIGN_LEFT, "Kills:");
 
   x_loc += 100;
-  al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+  al_draw_textf(textfont, text_color, x_loc, y_loc,
       ALLEGRO_ALIGN_RIGHT, "%d", hits);
 
   x_loc += 14;
-  al_draw_text(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+  al_draw_text(textfont, text_color, x_loc, y_loc,
       ALLEGRO_ALIGN_CENTRE, ":");
 
   x_loc += 14;
-  al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+  al_draw_textf(textfont, text_color, x_loc, y_loc,
       ALLEGRO_ALIGN_LEFT, "%d%%", kill_eff);
 
   x_loc = x_base;
   y_loc += y_step;
-  al_draw_text(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
-      ALLEGRO_ALIGN_LEFT, "Mines:");
+  al_draw_text(textfont, text_color, x_loc, y_loc, ALLEGRO_ALIGN_LEFT, "Mines:");
 
   x_loc += 100;
   int ready = hero->get_deployed_mines().size();
@@ -510,12 +508,13 @@ void level_1::update_score() {
       ALLEGRO_ALIGN_RIGHT, "%d", ready);
 
   x_loc += 14;
-  al_draw_text(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+  al_draw_text(textfont, text_color, x_loc, y_loc,
       ALLEGRO_ALIGN_CENTRE, ":");
 
   x_loc += 14;
-  al_draw_textf(textfont, al_map_rgb(255,255,255), x_loc, y_loc,
+  al_draw_textf(textfont, text_color, x_loc, y_loc,
       ALLEGRO_ALIGN_LEFT, "%d", hero->max_weapons());
 
 }//end level_1::update_score()
+*/
 
