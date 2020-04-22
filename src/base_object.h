@@ -1,25 +1,23 @@
-#ifndef BASIC_OBJECT_H
-#define BASIC_OBJECT_H
+#ifndef BASE_OBJECT_H
+#define BASE_OBJECT_H
 
 #include <allegro5/allegro.h>
 
 #include "defines.h"
 
-class basic_object;
+class base_object;
 
-#include "controller.h"
+#include "base_controller.h"
 #include "point_2d.h"
 
-class basic_object {
+class base_object {
   private:
-    float _w;
-    float _h;
     int _id;
 
     ALLEGRO_BITMAP *_bm;
 
   protected:
-    controller * _ctrl;
+    base_controller * _ctrl;
     point_2d _loc;
     point_2d _vel;
     bool _active;
@@ -27,20 +25,33 @@ class basic_object {
     point_2d _max_bounds;
 
   public:
-    basic_object();
+    base_object();
+    base_object(const base_object&);
 
-    virtual ~basic_object() = 0;
+    virtual ~base_object() = 0;
+
+    virtual base_object *clone() = 0;
+    void controller(base_controller*);
+    base_controller* controller();
+
     virtual void update() = 0;
 
     void redraw(const float& =0.0);
     void draw(const point_2d&);
     void bound(const point_2d&, const point_2d&);
+    void min_bounds(const point_2d&);
+    point_2d min_bounds();
+    void max_bounds(const point_2d&);
+    point_2d max_bounds();
+
     float w();
     float h();
     float x();
     float y();
     void x(float);
     void y(float);
+    float cx();
+    float cy();
 
     bool active();
     void active(bool);
@@ -51,7 +62,7 @@ class basic_object {
     bool create_bitmap(const char*);
 
     //Perhaps this should be a friend of the class?
-    bool collides(basic_object*);
+    bool collides(base_object*);
 
     void location(const point_2d&);
     point_2d location();
@@ -72,6 +83,6 @@ class basic_object {
     void id(const int&);
     int id();
 
-};//end class basic_object
+};//end class base_object
 
-#endif
+#endif //!defined(BASE_OBJECT_H)

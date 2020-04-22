@@ -6,14 +6,14 @@
 
 class fighter;
 #include "entity.h"
-#include "basic_object.h"
-#include "player_controller.h"
 #include "entity_store.h"
+#include "logger.h"
+#include "player_controller.h"
 #include "resource_manager.h"
+#include "weapon.h"
 
-class fighter: public basic_object {
+class fighter: public base_object {
   private:
-    using weapons = entity_store;
     enum move_state { STILL, LEFT, RIGHT };
     move_state _m_st;
     float _rot;
@@ -25,9 +25,17 @@ class fighter: public basic_object {
     int _healing_time;
     bool _healing;
 
-    weapons *_mines;
+    weapon *_mines;
+    weapon *_blaster;
+    ALLEGRO_BITMAP *_blaster_bm;
     ALLEGRO_BITMAP *_mine_bm;
-    int _fire_delay;
+    int _sel_delay;
+
+    logger *_log;
+
+    const int _mine_delay = 30;
+    const int _blaster_delay = 10;
+    base_object *clone() override {return nullptr;};
 
   public:
     fighter();
@@ -39,14 +47,19 @@ class fighter: public basic_object {
     void lives(int);
     void add_lives(int);
 
-    bool ready_weapons(basic_object*, const int&);
-    bool fire_weapon();
+    enum weapon_select {primary, secondary};
+    bool ready_weapons(resource_manager *);
+    bool fire_weapon(const weapon_select &w=primary);
+    void swap_weapons();
     void clear_weapons();
     int max_weapons();
     _pool& get_deployed_mines();
+    _pool& get_deployed_blasts();
 
+    bool is_alive();
     int health();
     int max_health();
+    void max_health(const int&);
     void add_health(int);
     void take_hit(int);
     float percent_health();
@@ -54,6 +67,11 @@ class fighter: public basic_object {
     bool handle_event(ALLEGRO_EVENT &);
     void update() override;
     void move(const point_2d&);
+
+    void set_logger(logger *);
+
+  private:
+    std::map<weapon_select, weapon*> _arsenal;
 
 };//end class fighter
 #endif //!defined(FIGHTER_H)

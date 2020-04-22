@@ -14,10 +14,14 @@ game::game() {
 
   _rm = new resource_manager();
   _log = _rm->get_logger();
+  _cfg = nullptr;
 
 }//end game::game()
 
 game::~game() {
+  if (_cfg) {
+    al_destroy_config(_cfg);
+  }
   delete _rm;
 }
 
@@ -54,8 +58,45 @@ bool game::init() {
 
 
 void game::play() {
+  int max_levels = atoi(_rm->option("GAME", "max_levels"));
+  fighter *hero = _rm->get_player();
+  _log->note("max levels: " + std::to_string(max_levels));
+  vector<int> init_foes = {3, 3, 4};
+  vector<int> foes;
   level_1 *l = new level_1();
-  l->play(_rm);
+  level_configuration config;
+
+  int final_wave = 0;
+  int wave = 0;
+  int level = 1;
+  bool playing = true;
+
+  while (playing and (level<=max_levels)) {
+    foes.clear();
+    final_wave = 0;
+    for (auto &f: init_foes) {
+      wave = level * f;
+      foes.push_back(wave);
+      final_wave += wave;
+    }
+    init_foes.push_back(wave);
+    foes.push_back(final_wave);
+
+    config.enemy_waves(foes);
+    config.level(level);
+
+    if (l->play(_rm, &config)) {
+      // Level completed
+      level++;
+      // Increase players max_health
+      int max_health = hero->max_health();
+      hero->max_health(max_health+10);
+      hero->add_health(10);
+    }
+    else if (l->quit() || (hero->lives() == 0)) {
+      playing = false;
+    }
+  }//end while (playing and (level<=max_levels))
 
   delete l;
 }

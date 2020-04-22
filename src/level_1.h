@@ -8,12 +8,12 @@
 
 #include "base_level.h"
 
-class level_1: protected base_level {
+class level_1: public base_level {
   private:
-    ALLEGRO_BITMAP *mine_bm = NULL;
+    ALLEGRO_BITMAP *mine_bm = nullptr;
     ALLEGRO_BITMAP *foe_bm = NULL;
     ALLEGRO_SAMPLE *hit_sound = NULL;
-    ALLEGRO_SAMPLE *deploy_sound = NULL;
+    ALLEGRO_SAMPLE *bg_sound = NULL;
 
     point_2d _min_bounds;
     point_2d _max_bounds;
@@ -26,14 +26,14 @@ class level_1: protected base_level {
     void show_stats();
     void check_collisions();
     void redraw();
-    void update_score();
+    //void update_score();
     bool init_foes(int);
 
   public:
     level_1();
     ~level_1();
 
-    bool play(resource_manager *) override;
+    bool play(resource_manager *, level_configuration *) override;
 
 };//end class level_1
 

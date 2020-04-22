@@ -1,30 +1,32 @@
-#ifndef ENEMY_CONTROLLER_H
-#define ENEMY_CONTROLLER_H
+#ifndef MINE_CONTROLLER_H
+#define MINE_CONTROLLER_H
 
 #include <allegro5/allegro.h>
 
 #include <map>
+#include <random>
 
 #include "base_controller.h"
 #include "random_generator.h"
 
-class enemy_controller : public base_controller {
+class mine_controller : public base_controller {
   private:
     int _mv_count;
+    bool _x_side;
     random_generator *_rg;
 
     bool handle_event(ALLEGRO_EVENT &) override;
 
   public:
-    enemy_controller();
-    ~enemy_controller();
+    mine_controller();
+    ~mine_controller();
 
     void init() override;
 
     point_2d direction() override;
     void update(base_object *) override;
 
-};//end class enemy_controller
+};//end class mine_controller
 
-#endif //!defined(ENEMY_CONTROLLER_H)
+#endif //!defined(MINE_CONTROLLER_H)
 

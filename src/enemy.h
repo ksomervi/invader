@@ -1,16 +1,18 @@
 #ifndef ENEMY_H
 #define ENEMY_H
 
-#include "basic_object.h"
+#include "base_object.h"
 #include "enemy_controller.h"
 
-class enemy : public basic_object {
+class enemy : public base_object {
   private:
 
   public:
     enemy();
+    enemy(const enemy&);
     ~enemy();
 
+    base_object* clone() override;
     void update() override;
 
 }; //end class enemy

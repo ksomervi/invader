@@ -4,10 +4,15 @@
  * \date 2018-07-29
  */
 
+#include <cstdio>
+
 #include "fighter.h"
-#include<iostream>
+
+#include <iostream>
 using std::cerr;
 using std::endl;
+
+#include "mine_controller.h"
 
 fighter::fighter() {
   _lives = DEFAULT_LIVES;
@@ -15,33 +20,43 @@ fighter::fighter() {
   _health = _max_health;
   _healing_time = 0;
   _healing = false;
-  _mines = NULL;
-  _mine_bm = NULL;
-  _fire_delay = 0;
+  _mines = nullptr;
+  _mine_bm = nullptr;
+  _blaster = nullptr;
+  _blaster_bm = nullptr;
+  _sel_delay = 0;
   _m_st = STILL;
   _rot = 0.0;
-  _deploy_sound = NULL;
 
   _ctrl = new player_controller();
 };
 
 fighter::~fighter() {
   if (_mines) {
+    // FIXME: Delete allocated mine_controller
+    // BODY: The controller for mines is not deleted. Add code to delete the
+    //      controller at the right location
     if (_mine_bm) {
       al_destroy_bitmap(_mine_bm);
-      _mine_bm = NULL;
+      _mine_bm = nullptr;
     }
-    for (auto &m: *_mines) {
-      if (m) {
-        m->bitmap(NULL);
-        delete m;
-      }
-    }
-
+    //mines have a shared controller
     delete _mines;
   }
 
+  if (_blaster) {
+    if (_blaster_bm) {
+      al_destroy_bitmap(_blaster_bm);
+      _blaster_bm = nullptr;
+    }
+    delete _blaster;
+  }
+
   delete _ctrl;
+
+  if (_deploy_sound) {
+    al_destroy_sample(_deploy_sound);
+  }
 }
 
 bool fighter::handle_event(ALLEGRO_EVENT &ev) {
@@ -68,6 +83,9 @@ void fighter::add_lives(int l) {
   _lives += l;
 }
 
+bool fighter::is_alive() {
+  return (_health > 0);
+}
 
 int fighter::health() {
   return _health;
@@ -77,12 +95,16 @@ int fighter::max_health() {
   return _max_health;
 }
 
+void fighter::max_health(const int &mh) {
+  _max_health = mh;
+}
+
 void fighter::add_health(int h) {
   _health += h;
 
   if (_health < 0) {
     _health = 0;
-    std::cout << "player died! restart level" << std::endl;
+    _log->note("player died! restart level");
   }
   else if (_health < _max_health) {
     _healing = true;
@@ -96,10 +118,13 @@ void fighter::add_health(int h) {
   }
 }//end fighter::add_health()
 
+void fighter::set_logger(logger *l) {
+  _log = l;
+}//end set_logger(logger*)
 
 void fighter::take_hit(int damage) {
   add_health(-1*damage);
-  cerr << "hit: " << _health << endl;
+  _log->debug("hit: " + std::to_string(_health));
 }
 
 
@@ -125,8 +150,6 @@ void fighter::move(const point_2d &offset) {
   location(next_loc);
 }//end
 
-//void fighter::update(controller *c) { }
-
 void fighter::update() {
   float max_vx = 5.0;
   float max_vy = 5.0;
@@ -134,17 +157,14 @@ void fighter::update() {
   float v_inc = 0.5;
   point_2d g(0.0, 1.0);
 
-  _ctrl->update(this);
+  _mines->update();
+  _blaster->update();
 
-  /*
-  if (_ctrl->fire() && fire_weapon()) {
-    ;
-  }
-  */
+  _ctrl->update(this);
 
   point_2d m = _ctrl->direction();
 
-  _vel.x(_vel.x()+m.x());
+  _vel += m;
 
   if (m.x() < -0.1) {
     if (_rot > -0.75) {
@@ -181,7 +201,6 @@ void fighter::update() {
     _m_st = STILL;
   }
 
-  _vel.y(_vel.y()+m.y());
   if (m.y() < -0.1) {
     if (_vel.y() < -max_vy) {
       _vel.y(-max_vy);
@@ -212,8 +231,8 @@ void fighter::update() {
     }
   }
 
-  if (_fire_delay) {
-    _fire_delay--;
+  if (_sel_delay) {
+    _sel_delay--;
   }
 
 }//end fighter::update()
@@ -222,7 +241,7 @@ bool fighter::init(resource_manager *rm) {
   ALLEGRO_BITMAP *bm = rm->get_sprite("hero");
   if (!bm) {
     if (!create_bitmap(SPRITE_SIZE, SPRITE_SIZE)) {
-      cerr << "failed to create hero bitmap!" << endl;
+      _log->error("failed to create hero bitmap!");
       return false;
     }
     ALLEGRO_STATE state;
@@ -236,18 +255,8 @@ bool fighter::init(resource_manager *rm) {
     bitmap(bm);
   }
 
-  entity proto;
-  proto.bitmap(rm->get_sprite("mine"));
-
-  if (! ready_weapons(&proto, 5)) {
+  if (! ready_weapons(rm)) {
     return false;
-  }
-
-  proto.bitmap(NULL);
-
-  _deploy_sound = rm->get_sound("mine");
-  if (!_deploy_sound) {
-    cerr << "failed to load sound file" << endl;
   }
 
   _ctrl->init();
@@ -255,8 +264,15 @@ bool fighter::init(resource_manager *rm) {
   return true;
 }//end fighter::init()
 
-bool fighter::ready_weapons(basic_object *proto, const int &max) {
-  _mines = new weapons();
+// TODO: refactor to function that initializes a single weapon
+bool fighter::ready_weapons(resource_manager *rm) {
+
+  _mines = new weapon();
+
+  entity *proto = new entity();
+  const char *label = rm->option("WEAPON 1", "label");
+  proto->bitmap(rm->get_sprite(label));
+  proto->controller(new mine_controller());
 
   if (!proto->bitmap()) {
     ALLEGRO_STATE state;
@@ -279,26 +295,80 @@ bool fighter::ready_weapons(basic_object *proto, const int &max) {
     al_restore_state(&state);
   }
 
-  basic_object *m = NULL;
-  for (int i=0; i<max; i++) {
-    m = new entity();
-    m->bitmap(proto->bitmap());
-    _mines->add(m);
+  const char *opt = rm->option("WEAPON 1", "count");
+  int max_count = 5;
+  if (opt) {
+    max_count = atoi(opt);
   }
+  _mines->init(proto, max_count);
+
+  int delay = _mine_delay;
+  opt = rm->option("WEAPON 1", "delay");
+  if (opt) {
+    _log->debug(string("setting ") + label + " delay: " + opt);
+    delay = atoi(opt);
+  }
+  _mines->delay(delay);
+  _deploy_sound = rm->get_sound(label);
+  if (!_deploy_sound) {
+    _log->error("failed to load sound file for " + string(label));
+  }
+  _mines->sound(_deploy_sound);
+  opt = rm->option("WEAPON 1", "range");
+  if (opt) {
+    _mines->range(atoi(opt));
+  }
+
+  label = rm->option("WEAPON 0", "label");
+  _blaster = new weapon();
+  _blaster_bm = rm->get_sprite(label);
+  if (!_blaster_bm) {
+    _blaster_bm = al_create_bitmap(4, 5);
+    ALLEGRO_STATE state;
+    al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
+    al_set_target_bitmap(_blaster_bm);
+    al_clear_to_color(LIGHT_BLUE);
+    al_restore_state(&state);
+  }
+
+  proto->bitmap(_blaster_bm);
+  proto->controller(nullptr);
+  proto->velocity(point_2d(0.0, -8.0));
+
+  max_count = 20;
+  if (opt) {
+    max_count = atoi(opt);
+  }
+  _blaster->init(proto, max_count);
+  delay = _blaster_delay;
+  opt = rm->option("WEAPON 0", "delay");
+  if (opt) {
+    _log->debug(string("setting ") + label + " delay: " + opt);
+    delay = atoi(opt);
+  }
+  _blaster->delay(delay);
+  _blaster->sound(_deploy_sound);
+
+  delete proto;
+
+  _arsenal[primary] = _blaster;
+  _arsenal[secondary] = _mines;
 
   return true;
 }//end fighter::ready_weapons()
 
-bool fighter::fire_weapon() {
-  if (_fire_delay == 0) {
-    if (_mines->deploy(_loc)) {
-      al_play_sample(_deploy_sound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-      _fire_delay = 30;
-      return true;
-    }
-  }
-  return false;
+bool fighter::fire_weapon(const weapon_select &ws) {
+  return _arsenal[ws]->fire(_loc + point_2d((w()-6)/2, h()/2));
 }//end fighter::fire_weapon()
+
+void fighter::swap_weapons() {
+  if (_sel_delay == 0) {
+    _sel_delay = 20;
+    weapon *tmp = _arsenal[primary];
+    _arsenal[primary] = _arsenal[secondary];
+    _arsenal[secondary] = tmp;
+  }
+}//end fighter::next_weapon()
 
 
 void fighter::clear_weapons() {
@@ -314,13 +384,18 @@ _pool& fighter::get_deployed_mines() {
   return _mines->get_active();
 }
 
+_pool& fighter::get_deployed_blasts() {
+  return _blaster->get_active();
+}
+
 void fighter::redraw() {
   _mines->redraw();
+  _blaster->redraw();
 
   if (_health == 0) {
     return;
   }
 
-  basic_object::redraw(_rot);
+  base_object::redraw(_rot);
 }
 

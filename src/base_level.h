@@ -1,28 +1,32 @@
 #ifndef BASE_LEVEL_H
 #define BASE_LEVEL_H
 
-#include "game.h"
 #include "game_controller.h"
 #include "fighter.h"
-#include <vector>
 #include "entity_store.h"
+#include "level_configuration.h"
 using armada = entity_store;
 
-enum Difficulty { EASY, NORMAL, HARD };
+#include "overlay.h"
+
+//enum Difficulty { EASY, NORMAL, HARD };
 
 class base_level {
   private:
     bool _quit;
     bool _complete;
-    static logger *_log;
 
   protected:
+    logger *_log;
     resource_manager *_rm;
+    level_configuration * _cfg;
     ALLEGRO_DISPLAY *display;
     ALLEGRO_EVENT_QUEUE *event_queue;
     ALLEGRO_TIMER *timer;
     ALLEGRO_FONT *title_font;
     ALLEGRO_FONT *textfont;
+
+    overlay *_overlay;
 
     game_controller *input;
 
@@ -38,7 +42,7 @@ class base_level {
     base_level();
     virtual ~base_level() = 0;
 
-    virtual bool play(resource_manager *) = 0;
+    virtual bool play(resource_manager *, level_configuration *) = 0;
     bool complete();
     void complete(bool);
 

@@ -13,7 +13,7 @@ class resource_manager;
 
 #include "logger.h"
 #include "fighter.h"
-//#include "resource.h"
+#include "random_generator.h"
 
 enum fonttype { NONE, TITLE, TEXT, SMALL };
 
@@ -26,9 +26,11 @@ class resource_manager {
     ALLEGRO_FONT *_textfont;
     //enum rtype { NONE, PLAYER, AUDIO, TEXTURE, FONT, DISPLAY };
 
+    random_generator *_rand_gen;
     fighter *_player;
     static resource_manager &_rm;
 
+    bool _init_display();
     bool _init_audio();
     bool _init_fonts();
 
@@ -43,9 +45,13 @@ class resource_manager {
     ALLEGRO_FONT *get_font(fonttype=NONE);
     fighter* get_player();
     ALLEGRO_SAMPLE* get_sound(const char*);
+    ALLEGRO_SAMPLE* get_sound(const char*, const char*);
     ALLEGRO_BITMAP* get_sprite(const char*);
+    ALLEGRO_BITMAP* get_sprite(const char*, const char*);
 
-    bool init();
+    random_generator* get_random_generator();
+
+    //bool init();
 
 };//end class resource_manager
 

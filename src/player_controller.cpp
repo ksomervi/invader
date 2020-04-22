@@ -40,11 +40,19 @@ bool player_controller::handle_event(ALLEGRO_EVENT &ev) {
   return true;
 }//end player_controller::handle_event()
 
-void player_controller::update(basic_object *o) {
+void player_controller::update(base_object *o) {
   if (_key_pressed[ALLEGRO_KEY_SPACE]) {
-    ((fighter*)o)->fire_weapon();
+    ((fighter*)o)->fire_weapon(fighter::primary);
   }
-}//end player_controller::update(basic_object *o)
+
+  if (_key_pressed[ALLEGRO_KEY_D]) {
+    ((fighter*)o)->fire_weapon(fighter::secondary);
+  }
+
+  if (_key_pressed[ALLEGRO_KEY_X]) {
+    ((fighter*)o)->swap_weapons();
+  }
+}//end player_controller::update(base_object *o)
 
 point_2d player_controller::direction() {
   return point_2d(left()+right(), up()+down());

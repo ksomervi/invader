@@ -4,7 +4,7 @@
  * \date 2018-09-24
  */
 
-#include <random>
+//#include <random>
 
 #include "enemy.h"
 
@@ -14,8 +14,16 @@ enemy::enemy() {
   _ctrl = new enemy_controller();
 }
 
+enemy::enemy(const enemy &e) : base_object(e) {
+  _ctrl = new enemy_controller();
+}
+
 enemy::~enemy() {
   delete _ctrl;
+}
+
+base_object *enemy::clone() {
+  return new enemy(*this);
 }
 
 void enemy::update() {

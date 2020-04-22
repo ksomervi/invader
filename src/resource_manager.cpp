@@ -1,17 +1,18 @@
 
 #include "resource_manager.h"
 
-#include<iostream>
-using std::cerr;
-using std::endl;
+#include<sstream>
+using std::stringstream;
 
 resource_manager::resource_manager() {
-  _cfg = NULL;
-  _display = NULL;
-  _title_font = NULL;
-  _textfont = NULL;
+  _cfg = nullptr;
+  _display = nullptr;
+  _title_font = nullptr;
+  _textfont = nullptr;
 
-  _player = NULL;
+  _rand_gen = new random_generator();
+
+  _player = nullptr;
 
   _log = new logger(logger::NOTE);
 
@@ -23,6 +24,7 @@ resource_manager::~resource_manager() {
     delete _player;
   }
 
+  delete _rand_gen;
   delete _log;
 }
 
@@ -31,15 +33,15 @@ logger* resource_manager::get_logger() {
 }
 
 bool resource_manager::init_resources(ALLEGRO_CONFIG *ac) {
-  _log->note("initializing resources...");
+  _log->note("Initializing resources...");
   _cfg = ac;
   if (!_cfg) {
     _log->error("no config provided to resource manager!");
     return false;
   }
-  _display = al_create_display(SCREEN_W, SCREEN_H);
-  if(!_display) {
-    _log->error("failed to create display!");
+
+  if(!_init_display()) {
+    _log->error("failed to initialize display!");
     return false;
   }
 
@@ -56,6 +58,28 @@ bool resource_manager::init_resources(ALLEGRO_CONFIG *ac) {
   return true;
 }//end resource_manager::init()
 
+bool resource_manager::_init_display() {
+  int width = atoi(option("DISPLAY", "width"));
+  int height = atoi(option("DISPLAY", "height"));
+  _display = al_create_display(width, height);
+  if(!_display) {
+    return false;
+  }
+
+  stringstream ss;
+  ss << "Created display: " << width << "x" << height;
+  _log->note(ss.str());
+
+  const char *path = option("DISPLAY", "icon");
+  if (path) {
+    ALLEGRO_BITMAP *bm = al_load_bitmap(path);
+    al_set_display_icon(_display, bm);
+  }
+
+  al_set_window_title(_display, "Invader!");
+  return true;
+}//end resource_manager::_init_display()
+
 bool resource_manager::_init_audio() {
 
   if (!al_install_audio()) {
@@ -68,7 +92,7 @@ bool resource_manager::_init_audio() {
     return false;
   }
 
-  if (!al_reserve_samples(4)) {
+  if (!al_reserve_samples(8)) {
     _log->error("failed to reserve samples!");
     return false;
   }
@@ -81,11 +105,15 @@ bool resource_manager::_init_fonts() {
   al_init_font_addon(); // initialize the font addon
   al_init_ttf_addon(); // initialize the ttf (True Type Font) addon
 
-  cerr << "fontpath: " << option("FONT", "fontpath") << endl;
+  stringstream ss;
+  ss << "fontpath: " << option("FONT", "fontpath");
+  _log->note(ss.str());
   _title_font = al_load_ttf_font(option("FONT", "fontpath"),
                                 atoi(option("FONT", "title_fontsize")), 0);
   if (!_title_font) {
-    cerr << "Failed to load title font: " << option("FONT", "fontpath") << endl;
+    ss.str("");
+    ss << "Failed to load title font: " << option("FONT", "fontpath");
+    _log->error(ss.str());
     return false;
   }
 
@@ -93,7 +121,9 @@ bool resource_manager::_init_fonts() {
   _textfont = al_load_ttf_font(option("FONT", "fontpath"),
                           atoi(option("FONT", "secondary_fontsize")), 0);
   if (!_textfont) {
-    cerr << "Failed to load secondary font: " << option("FONT", "fontpath") << endl;
+    ss.str("");
+    ss << "Failed to load secondary font: " << option("FONT", "fontpath");
+    _log->error(ss.str());
     return false;
   }
 
@@ -109,6 +139,7 @@ ALLEGRO_DISPLAY *resource_manager::get_display() {
 fighter* resource_manager::get_player() {
   if (!_player) {
     _player = new fighter();
+    _player->set_logger(_log);
   }
   return _player;
 }
@@ -127,12 +158,6 @@ ALLEGRO_FONT *resource_manager::get_font(fonttype f) {
   };
 }
 
-/*
-bool resource_manager::load_options(const char* filename) {
-  _cfg = al_load_config_file(CONFIG_FILE);
-  return (_cfg != NULL);
-}
-*/
 
 const char* resource_manager::option(const char* section, const char* key) {
   return al_get_config_value(_cfg, section, key);
@@ -140,59 +165,33 @@ const char* resource_manager::option(const char* section, const char* key) {
 
 
 ALLEGRO_SAMPLE* resource_manager::get_sound(const char* option_key) {
-  string path = option("MEDIA", option_key);
-  cerr  << "Loading sound: " << "MEDIA::" << option_key
-    << ":" << path << endl;
+  string path = option("AUDIO", option_key);
+  stringstream ss;
+  ss << "Loading sound: AUDIO::" << option_key << ":" << path;
+  _log->note(ss.str());
   ALLEGRO_SAMPLE *s = al_load_sample(path.c_str());
   return s;
 }//end resource_manager::get_sound()
 
+
 ALLEGRO_BITMAP* resource_manager::get_sprite(const char* option_key) {
-  string path = option("SPRITES", option_key);
-  cerr  << "Loading bitmap: " << "SPRITES::" << option_key
-    << ":" << path << endl;
-  ALLEGRO_BITMAP *bm = al_load_bitmap(path.c_str());
+  return get_sprite("SPRITES", option_key);
+}//end resource_manager::get_sprite()
+
+ALLEGRO_BITMAP* resource_manager::get_sprite(const char* section, const char* option_key) {
+  const char *path = option(section, option_key);
+  ALLEGRO_BITMAP *bm = nullptr;
+  if (path) {
+    stringstream ss;
+    ss << "Loading bitmap: " << section << "::" << option_key << ":" << path;
+    _log->note(ss.str());
+    bm = al_load_bitmap(path);
+  }
   return bm;
 }//end resource_manager::get_sprite()
 
-/*
-bool resource_manager::_init_fonts() {
-  al_init_font_addon(); // initialize the font addon
-  al_init_ttf_addon(); // initialize the ttf (True Type Font) addon
 
-  title_font = al_load_ttf_font(option("FONT", "fontpath"),
-                                atoi(option("FONT", "title_fontsize")), 0);
-  if (!title_font) {
-    cerr << "Failed to load title font: " << option("FONT", "fontpath") << endl;
-    return false;
-  }
-
-  //font = al_load_ttf_font(FONTNAME, SECONDARY_FONTSIZE, 0);
-  font = al_load_ttf_font(option("FONT", "fontpath"),
-                          atoi(option("FONT", "secondary_fontsize")), 0);
-  if (!font) {
-    cerr << "Failed to load secondary font: " << option("FONT", "fontpath") << endl;
-    return false;
-  }
-
-  return true;
-}//end resource_manager::_init_fonts()
-
-void resource_manager::end() {
-  if (hero) {
-    delete hero;
-  }
-
-  al_destroy_config(_cfg);
-  al_destroy_font(title_font);
-  al_destroy_font(font);
-
-  if (display) {
-    al_destroy_display(display);
-  }
-
-  return;
-}//end resource_manager::end()
-
-*/
+random_generator* resource_manager::get_random_generator() {
+  return _rand_gen;
+}
 

@@ -10,18 +10,21 @@ using std::cerr;
 using std::endl;
 
 base_level::base_level() {
-  _rm = NULL;
-  display = NULL;
-  event_queue = NULL;
-  timer = NULL;
+  _rm = nullptr;
+  _log = nullptr;
+  display = nullptr;
+  event_queue = nullptr;
+  timer = nullptr;
 
-  hero = NULL;
-  _foes = NULL;
+  _overlay = nullptr;
+
+  hero = nullptr;
+  _foes = nullptr;
 
   hits = 0;
 
-  title_font = NULL;
-  textfont = NULL;
+  title_font = nullptr;
+  textfont = nullptr;
 
   _complete = false;
   _quit = false;
@@ -32,15 +35,15 @@ base_level::~base_level() {
 };//end base_level::~base_level()
 
 void base_level::intro(int level, float delay) {
-  float textbox_h = al_get_font_line_height(title_font) +
-    4 * al_get_font_line_height(textfont);
-  float textbox_w = 0.8 * SCREEN_W;
+  int screen_w = al_get_display_width(display);
+  float textbox_h = 4 * al_get_font_line_height(title_font);
+  float textbox_w = 0.8 * screen_w;
 
   ALLEGRO_COLOR text_color = WHITE;
   ALLEGRO_BITMAP *textbox = al_create_bitmap(textbox_w, textbox_h);
   float x_base = al_get_bitmap_width(textbox)/2;
   float x_loc = x_base;
-  float y_loc = TITLE_Y;
+  float y_loc = al_get_font_line_height(title_font);
 
   int wait_delay = 3;
 
@@ -55,7 +58,7 @@ void base_level::intro(int level, float delay) {
         al_get_bitmap_height(textbox), 10, 10, text_color, 4);
 
     x_loc = x_base;
-    y_loc = TITLE_Y;
+    y_loc = al_get_font_line_height(title_font) / 2.0;
     al_draw_text(title_font, text_color, x_loc, y_loc,
         ALLEGRO_ALIGN_CENTRE, GAME_TITLE);
 
@@ -69,7 +72,7 @@ void base_level::intro(int level, float delay) {
 
     al_set_target_backbuffer(display);
     al_clear_to_color(al_map_rgb(0, 0, 0));
-    x_loc = (SCREEN_W - textbox_w) / 2;
+    x_loc = (screen_w - textbox_w) / 2;
     y_loc = 100;
     al_draw_bitmap(textbox, x_loc, y_loc, 0);
 
@@ -81,7 +84,7 @@ void base_level::intro(int level, float delay) {
   }
   cerr << endl;
   if (al_is_event_queue_empty(event_queue) == false) {
-    cerr << "pending event ... flushing" << endl;
+    _log->debug("pending event ... flushing");
     al_flush_event_queue(event_queue);
   }
 

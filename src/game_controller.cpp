@@ -41,7 +41,7 @@ bool game_controller::handle_event(ALLEGRO_EVENT &ev) {
   return false;
 }//end game_controller::handle_event()
 
-void game_controller::update(basic_object *o) { }
+void game_controller::update(base_object *o) { }
 
 point_2d game_controller::direction() {
   return _dir;
