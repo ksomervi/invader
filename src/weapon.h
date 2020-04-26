@@ -1,5 +1,7 @@
 /** \file weapon.h
- *
+ * \brief
+ * \author Kevin Somervill < kevin @ somervill dot org >
+ * \date 2020-04-25
  */
 #ifndef WEAPON_H
 #define WEAPON_H
@@ -53,8 +55,6 @@ class weapon {
 
     void redraw();
 
-    void set_logger(logger *);
-
     void sound(ALLEGRO_SAMPLE*);
     ALLEGRO_SAMPLE *sound();
 
@@ -63,4 +63,3 @@ class weapon {
 };//end class weapon
 
 #endif //!defined(WEAPON_H)
-

@@ -1,3 +1,9 @@
+/*! \file fighter.cpp
+ * \brief
+ * \author Kevin Somervill < kevin @ somervill dot org >
+ * \date 2018-07-29
+ */
+
 #ifndef FIGHTER_H
 #define FIGHTER_H
 
@@ -5,6 +11,7 @@
 #include <allegro5/allegro_primitives.h>
 
 class fighter;
+
 #include "entity.h"
 #include "entity_store.h"
 #include "logger.h"

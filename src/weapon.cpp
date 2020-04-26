@@ -4,7 +4,6 @@
  * \date 2019-02-24
  */
 
-
 #include "weapon.h"
 #include "entity.h"
 
@@ -21,13 +20,12 @@ weapon::weapon() {
   _deploy_sound = nullptr;
 }
 
-//weapon::weapon(base_object *proto, const int &max, const int &delay): _fire_delay(delay) { }
-
 weapon::~weapon() {
   if (!_cache->empty()) {
-    //TODO: delete the mine controller
-    //mine_controller * mc = _cache->front()->controller();
-    //delete mc;
+    base_controller *bc = (*_cache->begin())->controller();
+    if (bc) {
+      delete bc;
+    }
     
     for (auto &e: *_cache) {
       if (e) {
@@ -71,7 +69,7 @@ bool weapon::fire(const point_2d &p) {
         w->age(_range); //Limit how long it is active
       }
       _fire_delay = _cfg_delay;
-      cerr << "   ...  firing weapon" << endl;
+      _log->debug("   ...  firing weapon");
       return true;
     }
   }
@@ -112,7 +110,7 @@ bool weapon::init(resource_manager *rm, const char *sel) {
     return false;
   }
 
-  _log->debug("  weapon class: " + string(label));
+  _log->debug("  - weapon class: " + string(label));
 
   int max_count = 5;
   int delay = _mine_delay;
@@ -188,24 +186,19 @@ int weapon::range() {
 
 void weapon::redraw() {
   _cache->redraw();
-}
-
-void weapon::set_logger(logger *l) {
-  _log = l;
-}
+}//end weapon::redraw()
 
 void weapon::sound(ALLEGRO_SAMPLE *sample) {
   _deploy_sound = sample;
-}
+}//end weapon::sound(ALLEGRO_SAMPLE *)
 
 ALLEGRO_SAMPLE *weapon::sound() {
   return _deploy_sound;
-}
+}//end weapon::sound()
 
 void weapon::update() {
   if (_fire_delay) {
     _fire_delay--;
   }
   _cache->update();
-}
-
+}//end weapon::update()

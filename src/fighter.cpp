@@ -34,22 +34,10 @@ fighter::fighter() {
 
 fighter::~fighter() {
   if (_mines) {
-    // FIXME: Delete allocated mine_controller
-    // BODY: The controller for mines is not deleted. Add code to delete the
-    //      controller at the right location
-    //if (_mine_bm) {
-      //al_destroy_bitmap(_mine_bm);
-      //_mine_bm = nullptr;
-    //}
-    //mines have a shared controller
     delete _mines;
   }
 
   if (_blaster) {
-    //if (_blaster_bm) {
-      //al_destroy_bitmap(_blaster_bm);
-      //_blaster_bm = nullptr;
-    //}
     delete _blaster;
   }
 
