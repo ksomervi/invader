@@ -33,8 +33,6 @@ class fighter: public base_object {
 
     logger *_log;
 
-    const int _mine_delay = 30;
-    const int _blaster_delay = 10;
     base_object *clone() override {return nullptr;};
 
   public:

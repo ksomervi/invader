@@ -12,25 +12,17 @@ using std::cout;
 using std::endl;
 
 graphic_component::graphic_component() {
-  //Initial location, middle of the screen
-  _loc.x((SCREEN_W - SPRITE_SIZE) / 2.0);
-  _loc.y((SCREEN_H - SPRITE_SIZE) / 2.0);
+  _bm = nullptr;
+}//end graphic_component
 
-  _bm = NULL;
+graphic_component::graphic_component(ALLEGRO_BITMAP *bm) {
+  _bm = bm;
 }//end graphic_component
 
 graphic_component::~graphic_component() {
   if (_bm) {
     al_destroy_bitmap(_bm);
   }
-}
-
-float graphic_component::x() {
-  return _loc.x();
-}
-
-float graphic_component::y() {
-  return _loc.y();
 }
 
 float graphic_component::w() {
@@ -47,27 +39,20 @@ float graphic_component::h() {
   return 0.0;
 }
 
-void graphic_component::x(float v) {
-  _loc.x(v);
+
+void graphic_component::draw(const float &x, const float &y, const float &rot) {
+  draw(point_2d(x, y), rot);
 }
 
-void graphic_component::y(float v) {
-  _loc.y(v);
-}
 
-void graphic_component::draw(const float &rotation) {
+void graphic_component::draw(const point_2d &p, const float &rot) {
   float cx = w()/2;
   float cy = h()/2;
 
-  float dx = _loc.x() + cx;
-  float dy = _loc.y() + cy;
+  float dx = p.x() + cx;
+  float dy = p.y() + cy;
 
-  al_draw_rotated_bitmap(_bm, cx, cy, dx, dy, rotation, 0);
-}
-
-void graphic_component::draw(const point_2d &p, const float &rot) {
-  _loc = p;
-  draw(rot);
+  al_draw_rotated_bitmap(_bm, cx, cy, dx, dy, rot, 0);
 }
 
 bool graphic_component::create_bitmap(const char *filename) {
@@ -80,6 +65,11 @@ bool graphic_component::create_bitmap(float w, float h) {
   return _bm != NULL;
 }
 
+void graphic_component::destroy_bitmap() {
+  al_destroy_bitmap(_bm);
+  _bm = nullptr;
+  return;
+}
 void graphic_component::bitmap(ALLEGRO_BITMAP* bm) {
   _bm = bm;
 }
@@ -104,20 +94,4 @@ bool graphic_component::collides(graphic_component *g) {
   return ((dx<xr) and (dy<yr));
 }
 */
-
-void graphic_component::location(const point_2d& l) {
-  _loc = l;
-}
-
-point_2d graphic_component::location() {
-  return _loc;
-}
-
-void graphic_component::move(point_2d p) {
-  _loc += p;
-}//end
-
-void graphic_component::move_to(point_2d p) {
-  _loc = p;
-}//end
 

@@ -1,4 +1,4 @@
-/** \file
+/** \file weapon.h
  *
  */
 #ifndef WEAPON_H
@@ -8,8 +8,13 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_primitives.h>
 
+class weapon;
+
 #include "base_object.h"
 #include "entity_store.h"
+#include "mine_controller.h"
+//#include "logger.h"
+#include "resource_manager.h"
 
 class weapon {
 
@@ -19,25 +24,36 @@ class weapon {
     int _cfg_delay;
     int _range;
 
-    //ALLEGRO_BITMAP *_bm;
+    //Shared graphics for the entities stored
+    graphic_component * _graphic;
     ALLEGRO_SAMPLE *_deploy_sound;
+
+    const int _mine_delay = 30;
+    const int _blaster_delay = 10;
+
+    ALLEGRO_BITMAP* _default_mine();
+
+    logger *_log;
 
   public:
     weapon();
 
     ~weapon();
 
-    bool init(base_object *proto, const int &max);
+    bool init(resource_manager*, const char*);
     void clear_active();
     int count();
     void delay(const int&);
     int delay(void);
     bool fire(const point_2d&);
     _pool& get_active();
+
     void range(const int&);
     int range();
 
     void redraw();
+
+    void set_logger(logger *);
 
     void sound(ALLEGRO_SAMPLE*);
     ALLEGRO_SAMPLE *sound();

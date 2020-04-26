@@ -336,18 +336,18 @@ void level_1::end_level() {
 
   if (hero) {
     //Cleanup the bitmap we allocated
-    ALLEGRO_BITMAP *bm = hero->bitmap();
-    al_destroy_bitmap(bm);
-    hero->bitmap(NULL);
+    //ALLEGRO_BITMAP *bm = hero->graphic()->bitmap();
+    //al_destroy_bitmap(bm);
+    //hero->graphic()->bitmap(NULL);
+    hero->graphic()->destroy_bitmap();
   }
 
-  if (foe_bm) {
-    al_destroy_bitmap(foe_bm);
-    foe_bm = nullptr;
+  if (foe_gc) {
+    foe_gc->destroy_bitmap();
   }
   for (auto &f: *_foes) {
     if (f) {
-      f->bitmap(NULL);
+      f->graphic()->bitmap(NULL);
       delete f;
       f = nullptr;
     }
@@ -379,22 +379,25 @@ bool level_1::init_foes(int max) {
   _foes = new armada(); //entity_store();
   _foes->set_logger(_log);
 
-  foe_bm = _rm->get_sprite("creeper");
+  ALLEGRO_BITMAP * bm = _rm->get_sprite("creeper");
 
-  if (!foe_bm) {
-    _log->error("failed to load bitmap for foe");
-    foe_bm = al_create_bitmap(SPRITE_SIZE, SPRITE_SIZE);
-
-    al_set_target_bitmap(foe_bm);
+  if (!bm) {
+    _log->error("failed to load bitmap for foe - creating default bitmap");
+    bm = al_create_bitmap(SPRITE_SIZE, SPRITE_SIZE);
+    al_set_target_bitmap(bm);
+    //al_clear_to_color(GREEN2);
     al_clear_to_color(al_map_rgb(37, 196, 23));
     al_set_target_backbuffer(display);
   }
+
+  foe_gc = new graphic_component();
+  foe_gc->bitmap(bm);
 
   entity *f = nullptr;
   for (int i=0; i<max; i++) {
     f = new entity();
     f->controller(new enemy_controller());
-    f->bitmap(foe_bm);
+    f->graphic(foe_gc);
     f->velocity(init_vel);
     f->bound(point_2d(), _max_bounds);
     _foes->add(f);

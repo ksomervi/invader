@@ -8,15 +8,17 @@
 class base_object;
 
 #include "base_controller.h"
+#include "graphic_component.h"
 #include "point_2d.h"
 
 class base_object {
   private:
     int _id;
 
-    ALLEGRO_BITMAP *_bm;
+    //ALLEGRO_BITMAP *_bm;
 
   protected:
+    graphic_component * _gc;
     base_controller * _ctrl;
     point_2d _loc;
     point_2d _vel;
@@ -56,10 +58,13 @@ class base_object {
     bool active();
     void active(bool);
 
-    void bitmap(ALLEGRO_BITMAP*);
-    ALLEGRO_BITMAP* bitmap();
-    bool create_bitmap(float, float);
-    bool create_bitmap(const char*);
+    void graphic(graphic_component*);
+    //void graphic(ALLEGRO_BITMAP*);
+    graphic_component* graphic();
+    //void bitmap(ALLEGRO_BITMAP*);
+    //ALLEGRO_BITMAP* bitmap();
+    //bool create_bitmap(float, float);
+    //bool create_bitmap(const char*);
 
     //Perhaps this should be a friend of the class?
     bool collides(base_object*);

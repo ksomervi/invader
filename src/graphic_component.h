@@ -12,30 +12,24 @@ class graphic_component {
 
   protected:
     ALLEGRO_BITMAP *_bm;
-    point_2d _loc;
 
   public:
     graphic_component();
+    graphic_component(ALLEGRO_BITMAP*);
+    //graphic_component(const char*);
+
     virtual ~graphic_component();
-    void draw(const float& =0.0);
+
+    void draw(const float&, const float&, const float& =0.0);
     void draw(const point_2d&, const float& =0.0);
     float w();
     float h();
-    float x();
-    float y();
-    void x(float);
-    void y(float);
 
     void bitmap(ALLEGRO_BITMAP*);
     ALLEGRO_BITMAP* bitmap();
     bool create_bitmap(float, float);
     bool create_bitmap(const char*);
-
-    void location(const point_2d&);
-    point_2d location();
-
-    void move(point_2d);
-    void move_to(point_2d);
+    void destroy_bitmap();
 
 };//end class graphic_component
 

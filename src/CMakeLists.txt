@@ -71,6 +71,7 @@ add_executable(invader
   level_configuration.cpp
   entity.cpp
   entity_store.cpp
+  graphic_component.cpp
   weapon.cpp
   resource_manager.cpp
   random_generator.cpp

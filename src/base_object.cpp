@@ -8,16 +8,23 @@
 
 #include <cmath>
 
+#include <iostream>
+using std::cerr;
+using std::endl;
+
 base_object::base_object() : _loc(), _vel() {
   _id = 0;
-  _bm = nullptr;
+  //_bm = nullptr;
   _active = false;
   _ctrl = nullptr;
+
+  _gc = nullptr;
+  //_gc = new graphic_component();
 }//end base_object
 
 base_object::base_object(const base_object &other) : _loc(other._loc), _vel(other._vel) {
   _id = other._id;
-  _bm = other._bm;
+  _gc = other._gc;
   _active = other._active;
   _ctrl = other._ctrl;
   _min_bounds = other._min_bounds;
@@ -25,8 +32,16 @@ base_object::base_object(const base_object &other) : _loc(other._loc), _vel(othe
 }//end base_object
 
 base_object::~base_object() {
+  //delete _gc;
 }
 
+void base_object::graphic(graphic_component *gc) {
+  _gc = gc;
+}
+
+graphic_component* base_object::graphic() {
+  return _gc;
+}
 void base_object::controller(base_controller *c) {
   _ctrl = c;
 }
@@ -65,17 +80,23 @@ float base_object::y() {
 }
 
 float base_object::w() {
-  if (_bm) {
+  return _gc->w();
+  /*
+   * if (_bm) {
     return al_get_bitmap_width(_bm);
   }
   return 0.0;
+  */
 }
 
 float base_object::h() {
+  return _gc->h();
+  /*
   if (_bm) {
     return al_get_bitmap_height(_bm);
   }
   return 0.0;
+  */
 }
 
 void base_object::x(float v) {
@@ -95,6 +116,9 @@ float base_object::cy() {
 }
 
 void base_object::redraw(const float &rotation) {
+  _gc->draw(_loc, rotation);
+
+  /*
   float c_x = w()/2;
   float c_y = h()/2;
 
@@ -102,30 +126,36 @@ void base_object::redraw(const float &rotation) {
   float dy = _loc.y() + c_y;
 
   al_draw_rotated_bitmap(_bm, c_x, c_y, dx, dy, rotation, 0);
+  */
 }
 
 void base_object::draw(const point_2d &p) {
   _loc = p;
-  al_draw_bitmap(_bm, _loc.x(), _loc.y(), 0);
+  _gc->draw(p, 0.0);
+  //al_draw_bitmap(_bm, _loc.x(), _loc.y(), 0);
 }
 
-bool base_object::create_bitmap(const char *filename) {
-  _bm = al_load_bitmap(filename);
-  return _bm != NULL;
-}
-
-bool base_object::create_bitmap(float w, float h) {
-  _bm = al_create_bitmap(w, h);
-  return _bm != NULL;
-}
-
+/*
 void base_object::bitmap(ALLEGRO_BITMAP* bm) {
-  _bm = bm;
+  _gc->bitmap(bm);
 }
 
 ALLEGRO_BITMAP* base_object::bitmap() {
-  return _bm;
+  return _gc->bitmap();
 }
+*/
+
+//bool base_object::create_bitmap(const char *filename) {
+  //return _gc->create_bitmap(filename);
+  //_bm = al_load_bitmap(filename);
+  //return _bm != NULL;
+//}
+
+//bool base_object::create_bitmap(float w, float h) {
+  //return _gc->create_bitmap(w, h);
+  //_bm = al_create_bitmap(w, h);
+  //return _bm != NULL;
+//}
 
 bool base_object::active() {
   return _active;
