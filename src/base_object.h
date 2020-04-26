@@ -18,6 +18,7 @@ class base_object {
     //ALLEGRO_BITMAP *_bm;
 
   protected:
+    // FIXME: change graphic component to share_ptr
     graphic_component * _gc;
     base_controller * _ctrl;
     point_2d _loc;
