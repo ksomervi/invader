@@ -39,11 +39,9 @@ float graphic_component::h() {
   return 0.0;
 }
 
-
 void graphic_component::draw(const float &x, const float &y, const float &rot) {
   draw(point_2d(x, y), rot);
 }
-
 
 void graphic_component::draw(const point_2d &p, const float &rot) {
   float cx = w()/2;
@@ -55,21 +53,6 @@ void graphic_component::draw(const point_2d &p, const float &rot) {
   al_draw_rotated_bitmap(_bm, cx, cy, dx, dy, rot, 0);
 }
 
-bool graphic_component::create_bitmap(const char *filename) {
-  _bm = al_load_bitmap(filename);
-  return _bm != NULL;
-}
-
-bool graphic_component::create_bitmap(float w, float h) {
-  _bm = al_create_bitmap(w, h);
-  return _bm != NULL;
-}
-
-void graphic_component::destroy_bitmap() {
-  al_destroy_bitmap(_bm);
-  _bm = nullptr;
-  return;
-}
 void graphic_component::bitmap(ALLEGRO_BITMAP* bm) {
   _bm = bm;
 }
@@ -78,20 +61,18 @@ ALLEGRO_BITMAP* graphic_component::bitmap() {
   return _bm;
 }
 
-/*
-bool graphic_component::collides(graphic_component *g) {
-  float dx = fabs(_loc.x() - g->_loc.x());
-  float dy = fabs(_loc.y() - g->_loc.y());
-  float yr = h();
-  float xr = w();
-  if (_loc.y() > g->_loc.y()) {
-    yr = g->h();
-  }
-  if (_loc.x() > g->_loc.x()) {
-    xr = g->w();
-  }
-
-  return ((dx<xr) and (dy<yr));
+ALLEGRO_BITMAP* graphic_component::create_bitmap(float w, float h) {
+  _bm = al_create_bitmap(w, h);
+  return _bm;
 }
-*/
 
+ALLEGRO_BITMAP* graphic_component::load_bitmap(const char *filename) {
+  _bm = al_load_bitmap(filename);
+  return _bm;
+}
+
+void graphic_component::destroy_bitmap() {
+  al_destroy_bitmap(_bm);
+  _bm = nullptr;
+  return;
+}

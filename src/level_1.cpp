@@ -76,6 +76,7 @@ bool level_1::init() {
 
   hero->init(_rm);
   hero->bound(_min_bounds, _max_bounds);
+  hero->location(point_2d(screen_w/2, screen_h/2));
 
   if (!init_foes(16)) {
     _log->error("failed to create foes!");
@@ -372,7 +373,6 @@ void level_1::end_level() {
 
 bool level_1::init_foes(int max) {
   _log->debug("Initializing foes...");
-  cerr.flush();
 
   point_2d init_vel(0.0, 1.0);
 

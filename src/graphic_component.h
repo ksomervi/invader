@@ -27,8 +27,8 @@ class graphic_component {
 
     void bitmap(ALLEGRO_BITMAP*);
     ALLEGRO_BITMAP* bitmap();
-    bool create_bitmap(float, float);
-    bool create_bitmap(const char*);
+    ALLEGRO_BITMAP* create_bitmap(float, float);
+    ALLEGRO_BITMAP* load_bitmap(const char*);
     void destroy_bitmap();
 
 };//end class graphic_component

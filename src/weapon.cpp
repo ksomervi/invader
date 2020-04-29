@@ -69,7 +69,6 @@ bool weapon::fire(const point_2d &p) {
         w->age(_range); //Limit how long it is active
       }
       _fire_delay = _cfg_delay;
-      _log->debug("   ...  firing weapon");
       return true;
     }
   }

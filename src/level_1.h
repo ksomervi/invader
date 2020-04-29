@@ -10,8 +10,8 @@
 
 class level_1: public base_level {
   private:
-    //ALLEGRO_BITMAP *mine_bm = nullptr;
     graphic_component *foe_gc = NULL;
+
     ALLEGRO_SAMPLE *hit_sound = NULL;
     ALLEGRO_SAMPLE *bg_sound = NULL;
 
